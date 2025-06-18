@@ -15,101 +15,267 @@ Each prompt includes the original query, its purpose, and where it was applied i
 
 ### Prompt 1 – Understanding the Assignment
 <details>
-<summary>Ask GenAI to help interpret the test document and summarize task structure</summary>
+<summary>Ask GenAI to help interpret the test document and summarize the task structure</summary>
 
 ---
 
-**Prompt:**
-> Tôi mới nhận được thông báo vượt qua vòng duyệt CV cho vị trí DA, họ gửi kèm một bài test yêu cầu tôi làm trong 5 ngày. Tôi sẽ cung cấp bài test đó cho bạn, bạn hãy đọc và trình bày lại cho tôi nắm.
+**Prompt:**  
+> I just received an invitation to the DA technical test after passing the CV screening round. The test needs to be completed within 5 days. I will share the full test file with you — please review it and summarize the structure for me.
 
-**Purpose:**
-- Hiểu rõ yêu cầu bài test tổng thể và các nhiệm vụ trong List A và List B
+**Purpose:**  
+- Understand the overall structure of the technical test, including tasks in List A and List B.  
+- Identify the deliverables and style guidelines required.
 
-**Used for:**
-- Định hướng ban đầu để chọn task phù hợp
-
----
-</details>
-
----
-
-### Prompt 2 – Evaluate Task Options
-<details>
-<summary>Ask GenAI to help decide which task to focus on given time constraints</summary>
-
----
-
-**Prompt:**
-> Với các nhiệm vụ ở danh sách A, theo bạn trong thời gian cho phép chúng ta nên bắt đầu với dự án nào trước?
-
-**Purpose:**
-- So sánh các nhiệm vụ trong List A để chọn ra task phù hợp nhất với thời gian và kiến thức
-
-**Decision:**
-- Ban đầu chọn A01 → Sau đó chuyển sang A05 vì đơn giản hơn
+**Used for:**  
+- Initial orientation and task selection strategy.
 
 ---
 </details>
 
 ---
 
-### Prompt 3 – Confirm Markdown Style Rules
+### Prompt 2 – Evaluating Task Options
 <details>
-<summary>Ask GenAI to understand the formatting requirements from ctx_doc_style.md</summary>
+<summary>Ask GenAI to recommend the most suitable task based on timeline and complexity</summary>
 
 ---
 
-**Prompt:**
-> Trước khi chọn nhiệm vụ, tôi sẽ cung cấp file `.md` về quy tắc viết markdown cho bạn, bạn hãy ghi nhớ chuẩn này để viết báo cáo cho đúng.
+**Prompt:**  
+> Given the tasks in List A, which one should I start with if I want to ensure quality within the given time frame?
 
-**Purpose:**
-- Đảm bảo toàn bộ nội dung sau này tuân thủ định dạng chuẩn của công ty
+**Purpose:**  
+- Compare tasks A01–A05 and recommend the one that fits best with the time, complexity, and expected deliverables.
 
-**Used in:**
-- Tất cả các section trong `report_A05.md` sau này
+**Decision:**  
+- Initially considered A01 → Later switched to A05 due to better clarity and scope for a solo analysis.
 
 ---
 </details>
 
 ---
 
-### Prompt 4 – Review and Improve Prompt Documentation
+### Prompt 3 – Clarifying Markdown Style Rules
 <details>
-<summary>Ask GenAI to review and reformat the prompt log for Task A05</summary>
+<summary>Ask GenAI to help understand and apply the formatting rules in ctx_doc_style.md</summary>
 
 ---
 
-**Prompt:**
-> Đây là file prompt tôi viết:  
+**Prompt:**  
+> Before selecting the task, I’ll provide you with a markdown file describing the style guide required by the company. Please review and follow that format throughout the project documentation.
+
+**Purpose:**  
+- Ensure all reports (`report_A05.md`, prompt logs, supplementary files) fully comply with the internal style guide.  
+- Avoid structural errors such as misplaced `---`, incorrect bullet usage, or unwrapped `<details>` sections.
+
+**Used in:**  
+- Every section of `report_A05.md` and other deliverables throughout the project.
+
+---
+</details>
+
+---
+
+### Prompt 4 – Review and Improve Prompt Documentation Format
+<details>
+<summary>Ask GenAI to review and reformat the prompt log file for better structure</summary>
+
+---
+
+**Prompt:**  
+> Here's the initial version of my prompt log file:  
 > ```
 > ---
-> title: _prompt 
+> title: _prompt
 > ---
-> 
-> # Prompts used for Task A05 – Customer Onboarding Journey Analytics (KYC/AML)
+> # Prompts used for Task A05 – Customer Onboarding Journey Analytics
 > ...
 > ```
-> chuyển về chuẩn giúp tôi
+> Can you restructure it to be more professional and aligned with the expected format?
 
-**Purpose:**
-- Nhờ GenAI đánh giá và chỉnh sửa file prompt để đúng chuẩn định dạng và yêu cầu trong bài test
-- Cải thiện tính rõ ràng, mạch lạc, và tuân thủ style `ctx_doc_style.md`
+**Purpose:**  
+- Reformat the prompt file for better readability, consistency, and compliance with documentation expectations.
 
-**Result:**
-- File `report_A05_prompt.md` được tái cấu trúc lại theo format chính thức, bao gồm:
-  - Tên file theo chuẩn YAML
-  - Các prompt chia thành khối `<details>`
-  - Có mục đích và vị trí sử dụng rõ ràng
+**Result:**  
+- The prompt log (`report_A05_prompt.md`) was rewritten to include:
+  - A proper YAML title
+  - Structured `<details>` blocks for each prompt
+  - Descriptions of prompt purpose and where they were used in the project
 
-**Used in:**
-- Toàn bộ phần cấu trúc ngày đầu tiên trong file prompt chính thức
+**Used in:**  
+- Entire Day 1 section of `report_A05_prompt.md`
 
 ---
+</details>
+
+---
+
+## Day 2 – Data Sources and Schema Planning
+
+---
+
+### Prompt 1 – Clarifying the Scope of Task A05
+<details>
+<summary>I selected task A05, but I’m not entirely sure what the company wants me to do.</summary>
+
+---
+
+**Purpose:**  
+- Clarify the scope, goals, and expected deliverables of Task A05.  
+- Identify the core analytical pillars: customer onboarding, KYC/AML, funnel design.
+
+**GenAI Summary:**  
+- The company does not require actual system implementation or real data.  
+- The goal is to assess analytical thinking, data framework design, and technical documentation.  
+- The analysis should focus on: funnel performance, friction points, and compliance efficiency.
+
+---
+</details>
+
+---
+
+### Prompt 2 – Explain the problem and plan from a non-technical stakeholder perspective
+<details>
+<summary>As a data analyst, imagine I'm a non-tech stakeholder. Can you explain the problem and your plan from start to finish?</summary>
+
+---
+
+**Purpose:**  
+- Create a high-level, business-friendly explanation of the problem context and planned approach.  
+- Used as the basis for Sections 1 and 2 of the report.
+
+**Used in:**  
+- `## 1. Problem Statement`  
+- `## 2. Project Objectives`
+
+---
+</details>
+
+---
+
+### Prompt 3 – Generate content for Section 1
+<details>
+<summary>Now let’s move on and write Section 1 based on the earlier planning.</summary>
+
+---
+
+**Purpose:**  
+- Generate bullet point content for the problem statement.  
+- Describe current onboarding challenges such as abandonment, friction, cost, and risk.
+
+---
+</details>
+
+---
+
+### Prompt 4 – Generate content for Section 2
+<details>
+<summary>Write Section 2 based on the same pipeline.</summary>
+
+---
+
+**Purpose:**  
+- Define the project’s primary objectives and key business questions.  
+- Emphasize customer experience, risk control, and analytical KPIs.
+
+---
+</details>
+
+---
+
+### Prompt 5 – Generate the project plan in Section 3
+<details>
+<summary>I’ve written the pipeline, now let’s complete Section 3.</summary>
+
+---
+
+**Purpose:**  
+- Define the four-phase project plan: data collection → analytics framework → deep-dive analysis → recommendations.  
+- Ensure the format adheres to `ctx_doc_style.md`, using bullet points, `---`, and structured `<details>` blocks.
+
+---
+</details>
+
+---
+
+### Prompt 6 – Clarify whether real data collection is required
+<details>
+<summary>Do I need to collect or work with real data to complete this task?</summary>
+
+---
+
+**Purpose:**  
+- Confirm whether real-world data pipelines or code are required.
+
+**GenAI Summary:**  
+- No real data or implementation is needed.  
+- Focus is on designing logic, data flow, and documentation.  
+- The deliverable is an analytical framework, not executable code.
+
+---
+</details>
+
+---
+
+### Prompt 7 – Clarify the line count and file expectations
+<details>
+<summary>I noticed there's a line count requirement (1000–1500 lines) and 2–10 files per task. Is that correct?</summary>
+
+---
+
+**Purpose:**  
+- Understand documentation expectations in terms of depth and granularity.
+
+**GenAI Summary:**  
+- Correct. Reports should be detailed, modular, and structured.  
+- Long sections should be split across files (e.g., schema, KPIs, dashboards).  
+- Multiple markdown files may be required to fully present the solution.
+
+---
+</details>
+
+---
+
+### Prompt 8 – Write Section 4.1: Raw Data Sources
+<details>
+<summary>Let’s implement Section 4.1 and describe the necessary raw data sources in detail.</summary>
+
+---
+
+**Prompt:**  
+> Please help me write Section 4.1 – Raw Data Sources. Use `ctx_doc_style.md` format. Group the data into categories (registration, identity verification, biometrics, risk, communications...) and provide example fields and rationale for each.
+
+**Used in:**  
+- `## 4. Data Sources and Schema Design` → Section 4.1
+
+---
+</details>
+
+---
+
+### Prompt 9 – Update prompt log and README after completing Day 2
+<details>
+<summary>Ask GenAI to help finalize Day 2 by writing prompt logs and updating the project README</summary>
+
+---
+
+**Prompt:**  
+> I’ve finished Day 2. Please help me update `report_A05_prompt.md` to include all prompts used today, and revise the progress tracker in `README.md` accordingly.
+
+**Purpose:**  
+- Document all GenAI interactions for Day 2 in a professional format.  
+- Ensure the `README.md` reflects accurate progress and work completed.
+
+**Used in:**  
+- End of `report_A05_prompt.md` (Day 2)  
+- Timeline section and checklist in `README.md`
+
+---
+
 </details>
 
 ---
 
 ## Notes
 
-- GenAI tool used: ChatGPT (GPT-4o)
-- Các tài liệu sinh ra sẽ được format lại để phù hợp với `ctx_doc_style.md`
+- GenAI tool used: ChatGPT (GPT-4o), Gemini (Flash 2.5)
+- The generated documents will be reformatted to suit `ctx_doc_style.md`
