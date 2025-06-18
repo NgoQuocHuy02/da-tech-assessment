@@ -28,6 +28,15 @@ title: report_a05_customer_onboarding_analytics
 | **Tỷ lệ từ chối (Rejection Rate)** | Tỷ lệ hồ sơ bị từ chối qua các bước KYC. |
 | **Tỷ lệ rớt bước (Drop-off Rate)** | Phần trăm người dùng không hoàn thành một bước nào đó trong phễu onboarding. |
 | **Chờ xử lý thủ công**      | Những hồ sơ cần nhân viên can thiệp, không thể xử lý tự động. |
+| **user\_id**                   | Mã định danh duy nhất của người dùng                                 |
+| **registration\_channel**      | Kênh mà người dùng bắt đầu đăng ký (Web, Mobile, Referral...)        |
+| **ocr\_confidence**            | Mức độ tin cậy của kết quả nhận dạng ký tự từ giấy tờ                |
+| **face\_match\_score**         | Điểm đo mức độ khớp giữa ảnh selfie và giấy tờ tùy thân              |
+| **liveness\_check**            | Quy trình kiểm tra người dùng là người thật, không phải ảnh hoặc bot |
+| **pep\_flag / sanction\_flag** | Cờ đánh dấu người dùng nằm trong danh sách chính trị hoặc bị cấm vận |
+| **internal\_risk\_score**      | Điểm rủi ro nội bộ do hệ thống đánh giá dựa trên các chỉ báo         |
+| **abandonment\_flag**          | Biến đánh dấu người dùng đã từ bỏ quy trình tại một bước nào đó      |
+| **retry\_count**               | Số lần người dùng gửi lại giấy tờ xác minh                           |
 
 ---
 </details>
