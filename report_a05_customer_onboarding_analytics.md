@@ -31,3 +31,222 @@ title: report_a05_customer_onboarding_analytics
 
 ---
 </details>
+
+## Tóm Tắt Tổng Quan
+---
+<details>
+<summary>Tổng Quan Cao Cấp về Khung Phân Tích và Tác Động Kinh Doanh Chính</summary>
+
+---
+
+- Phần này cung cấp một bản tóm tắt ngắn gọn về vấn đề, giải pháp đề xuất và lợi ích mong đợi.
+- Nó nêu bật các thành phần cốt lõi của khung phân tích cho quy trình `onboarding` khách hàng và `KYC/AML`.
+- Tập trung vào giá trị chiến lược của dự án đối với các bên liên quan trong kinh doanh.
+
+---
+
+</details>
+
+---
+
+## 1. Phát Biểu Vấn Đề
+---
+<details>
+<summary>Mô Tả Chi Tiết Thách Thức Kinh Doanh trong Quy Trình Onboarding Khách Hàng và KYC/AML</summary>
+
+---
+
+- **Tình Hình Hiện Tại:**
+  - Nhiều khách hàng tiềm năng bắt đầu quy trình đăng ký nhưng bỏ dở giữa chừng.
+  - Tồn tại các `điểm ma sát` đáng kể, đặc biệt trong các bước xác minh `KYC/AML` phức tạp.
+- **Hậu Quả:**
+  - `Mất Khách Hàng Tiềm Năng`: Ảnh hưởng trực tiếp đến việc thu hút người dùng và tăng trưởng kinh doanh.
+  - `Tăng Chi Phí Vận Hành`: Do hỗ trợ thủ công, xác minh thất bại và xử lý lại.
+  - `Trải Nghiệm Khách Hàng Chưa Tối Ưu`: Dẫn đến sự khó chịu của người dùng và ấn tượng ban đầu tiêu cực.
+  - `Rủi Ro Tuân Thủ`: Quy trình `KYC/AML` kém hiệu quả tiềm ẩn rủi ro pháp lý và tuân thủ.
+- **Thách Thức Chung:** Chúng ta thiếu hiểu biết rõ ràng, dựa trên dữ liệu về hành trình `onboarding` của khách hàng để xác định chính xác các `điểm đau` và tối ưu hóa quy trình một cách hiệu quả, đồng thời duy trì tuân thủ.
+
+---
+
+</details>
+
+---
+
+## 2. Mục Tiêu Dự Án
+---
+<details>
+<summary>Các Mục Tiêu Rõ Ràng và Kết Quả Mong Đợi của Sáng Kiến Phân Tích</summary>
+
+---
+
+- **Mục Tiêu Chính:**
+  - Xây dựng một hệ thống phân tích mạnh mẽ để có cái nhìn sâu sắc về hành trình `onboarding` của khách hàng.
+  - Hệ thống này sẽ cho phép tối ưu hóa quy trình, giảm tỷ lệ bỏ cuộc và nâng cao trải nghiệm người dùng.
+  - Đồng thời, đảm bảo tuân thủ đầy đủ các quy định `KYC/AML`.
+- **Các Câu Hỏi Chính Cần Trả Lời:**
+  - `Bước nào` trong quy trình `onboarding` có tỷ lệ bỏ cuộc cao nhất?
+  - `Tại sao` người dùng lại bỏ dở quy trình tại những điểm cụ thể đó?
+  - `Mất bao lâu` để một khách hàng hoàn tất toàn bộ luồng `onboarding` và xác minh?
+  - `Những cải tiến khả thi nào` có thể được thực hiện để tinh gọn và đơn giản hóa quy trình mà không ảnh hưởng đến bảo mật và tuân thủ?
+
+---
+
+</details>
+
+---
+
+## 3. Kế Hoạch và Các Giai Đoạn Dự Án
+---
+<details>
+<summary>Chiến Lược Toàn Diện Từ Đầu Đến Cuối để Giải Quyết Vấn Đề Phân Tích Onboarding</summary>
+
+---
+
+- Kế hoạch này phác thảo phương pháp tiếp cận 4 giai đoạn, tập trung vào việc biến dữ liệu thô thành thông tin chi tiết có thể hành động:
+
+  ---
+
+  #### Giai Đoạn 1: Thu Thập & Chuẩn Bị Dữ Liệu (Xây Dựng Nền Tảng)
+  ---
+  - **Những Gì Chúng Ta Sẽ Làm:**
+    - Hợp tác với các nhóm kỹ thuật để xác định và thu thập tất cả dữ liệu liên quan đến đăng ký và xác minh khách hàng.
+    - Ví dụ về dữ liệu:
+      - `Thời điểm đăng ký của người dùng` (`timestamp`) (bắt đầu, hoàn thành từng bước).
+      - `Các bước cụ thể đã hoàn thành` hoặc đã cố gắng thực hiện.
+      - `Lỗi gặp phải` trong quá trình.
+      - `Thời gian chờ đợi` cho mỗi bước xác minh.
+      - `Kết quả xác minh` (thành công/thất bại, lý do thất bại).
+      - `Nhật ký liên lạc` với người dùng (ví dụ: thông báo email/SMS).
+    - Thiết kế một `sơ đồ dữ liệu` (`blueprint`) hoặc `schema` rõ ràng để dễ hiểu và sử dụng.
+  - **Mục Tiêu:**
+    - Đảm bảo có sẵn dữ liệu sạch, chính xác và có thể sử dụng được để phân tích.
+
+  ---
+
+  #### Giai Đoạn 2: Xây Dựng Khung Phân Tích (Vẽ Bức Tranh Toàn Cảnh)
+  ---
+  - **Những Gì Chúng Ta Sẽ Làm:**
+    - Xây dựng các `phễu` (`funnels`) để trực quan hóa toàn bộ hành trình của khách hàng từ khi bắt đầu đăng ký đến khi kích hoạt tài khoản.
+    - Định nghĩa các `chỉ số hiệu suất chính` (`KPIs`) như:
+      - `Tỷ lệ chuyển đổi theo từng bước`.
+      - `Thời gian trung bình để hoàn tất xác minh`.
+      - `Tỷ lệ thất bại KYC` theo lý do.
+      - `Chi phí trên mỗi lần onboarding thành công`.
+    - Đề xuất các phương pháp `kiểm thử A/B` (`A/B testing`) cho các luồng `onboarding` khác nhau hoặc so sánh hiệu suất với các `benchmark`.
+  - **Mục Tiêu:**
+    - Xác định chính xác các bước gây tắc nghẽn và hiểu rõ tác động của chúng.
+
+  ---
+
+  #### Giai Đoạn 3: Phân Tích Chuyên Sâu & Xác Định Vấn Đề (Tìm Ra Gốc Rễ)
+  ---
+  - **Những Gì Chúng Ta Sẽ Làm:**
+    - Thực hiện phân tích chuyên sâu để hiểu `tại sao` khách hàng bỏ cuộc.
+    - Điều tra các yếu tố như:
+      - Độ phức tạp của quy trình tải tài liệu.
+      - Thời gian chờ đợi phản hồi.
+      - Sự rõ ràng của hướng dẫn.
+    - Phân tích các trường hợp `KYC/AML bị từ chối` để xác định các lý do phổ biến và đề xuất cải thiện quy trình tuân thủ.
+  - **Mục Tiêu:**
+    - Chỉ ra nguyên nhân gốc rễ của các vấn đề và các cơ hội cải thiện cụ thể.
+
+  ---
+
+  #### Giai Đoạn 4: Báo Cáo & Đề Xuất Giải Pháp (Biến Dữ Liệu Thành Hành Động)
+  ---
+  - **Những Gì Chúng Ta Sẽ Làm:**
+    - Tổng hợp các phát hiện vào một báo cáo rõ ràng, dễ hiểu, tập trung vào các khuyến nghị có thể hành động.
+    - Ví dụ về các khuyến nghị:
+      - `Đơn giản hóa bước X` trong luồng.
+      - `Tự động hóa kiểm tra Y`.
+      - `Cải thiện thông báo cho người dùng` ở bước Z.
+    - Phác thảo `Dashboard` (bảng điều khiển) để các nhóm liên quan có thể dễ dàng theo dõi hiệu suất theo thời gian thực.
+  - **Mục Tiêu:**
+    - Cung cấp thông tin chi tiết và giải pháp để các nhóm Sản phẩm, Marketing, Vận hành và Tuân thủ có thể cùng nhau hợp tác, nâng cao trải nghiệm khách hàng và hiệu quả kinh doanh.
+
+  ---
+
+- **Sử Dụng Công Cụ GenAI:**
+  - Trong suốt tất cả các giai đoạn, các công cụ `GenAI` sẽ được tận dụng để tăng tốc độ phân tích, tạo báo cáo và đảm bảo độ chính xác, tối đa hóa hiệu quả và chất lượng đầu ra.
+
+---
+
+</details>
+
+---
+
+## 4. Nguồn Dữ Liệu và Thiết Kế Schema (Giai đoạn tiếp theo)
+---
+<details>
+<summary>Mô Tả Chi Tiết về Các Nguồn Dữ Liệu Thô và Mô Hình Dữ Liệu Đề Xuất</summary>
+
+---
+
+- Phần này sẽ được điền vào tiếp theo, trình bày chi tiết:
+  - `Nguồn Dữ Liệu Thô` (`Raw Data Sources`): Các hệ thống hoặc nhật ký cụ thể nơi dữ liệu `onboarding` cư trú.
+  - `Schema Dữ Liệu Đề Xuất` (`Proposed Data Schema`): Cấu trúc bảng, định nghĩa trường và mối quan hệ (ví dụ: `user_journey`, `kyc_verification`, `risk_assessment`, `communication_logs`).
+  - `Sơ Đồ Luồng Dữ Liệu` (`Data Flow Diagram`) (Tùy chọn, thông qua `Mermaid`): Biểu diễn trực quan cách dữ liệu di chuyển từ nguồn đến phân tích.
+
+---
+
+</details>
+
+---
+
+## 5. Logic Chuyển Đổi Dữ Liệu
+---
+<details>
+<summary>Mô Tả Các Quy Trình Làm Sạch, Chuẩn Hóa và Tổng Hợp Dữ Liệu</summary>
+
+---
+
+- Phần này sẽ phác thảo các bước để chuyển đổi dữ liệu thô thành định dạng có thể sử dụng được để phân tích.
+
+---
+
+</details>
+
+---
+
+## 6. Khung Phân Tích và Các KPIs
+---
+<details>
+<summary>Định Nghĩa Các Chỉ Số Hiệu Suất Chính và Các Phương Pháp Phân Tích</summary>
+
+---
+
+- Phần này sẽ trình bày chi tiết phương pháp phân tích `phễu` (`funnel analysis`), định nghĩa tỷ lệ `chuyển đổi` (`conversion rates`) và các chỉ số liên quan khác.
+
+---
+
+</details>
+
+---
+
+## 7. Chiến Lược Báo Cáo và Dashboard
+---
+<details>
+<summary>Các Hình Ảnh Trực Quan và Cấu Trúc Báo Cáo Đề Xuất cho Các Bên Liên Quan</summary>
+
+---
+
+- Phần này sẽ đề cập đến cách các thông tin chi tiết sẽ được trình bày và các `dashboard` sẽ được thiết kế.
+
+---
+
+</details>
+
+---
+
+## 8. Tác Động Kinh Doanh và Khuyến Nghị
+---
+<details>
+<summary>Các Khuyến Nghị Cụ Thể và Kết Quả Mong Đợi để Cải Thiện Kinh Doanh</summary>
+
+---
+
+- Phần này sẽ tóm tắt các lời khuyên có thể hành động và những tác động tích cực dự kiến đến kinh doanh.
+
+---
+
+</details>
