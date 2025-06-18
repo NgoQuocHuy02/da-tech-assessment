@@ -174,18 +174,85 @@ title: report_a05_customer_onboarding_analytics
 </details>
 
 ---
-
-## 4. Nguồn Dữ Liệu và Thiết Kế Schema (Giai đoạn tiếp theo)
----
-<details>
-<summary>Mô Tả Chi Tiết về Các Nguồn Dữ Liệu Thô và Mô Hình Dữ Liệu Đề Xuất</summary>
-
+## 4. Nguồn Dữ Liệu và Thiết Kế Schema
 ---
 
-- Phần này sẽ được điền vào tiếp theo, trình bày chi tiết:
-  - `Nguồn Dữ Liệu Thô` (`Raw Data Sources`): Các hệ thống hoặc nhật ký cụ thể nơi dữ liệu `onboarding` cư trú.
-  - `Schema Dữ Liệu Đề Xuất` (`Proposed Data Schema`): Cấu trúc bảng, định nghĩa trường và mối quan hệ (ví dụ: `user_journey`, `kyc_verification`, `risk_assessment`, `communication_logs`).
-  - `Sơ Đồ Luồng Dữ Liệu` (`Data Flow Diagram`) (Tùy chọn, thông qua `Mermaid`): Biểu diễn trực quan cách dữ liệu di chuyển từ nguồn đến phân tích.
+### <details>
+<summary>4.1 – Nguồn Dữ Liệu Thô (Raw Data Sources)</summary>
+
+---
+
+- Để xây dựng khung phân tích hành trình `onboarding`, chúng ta cần thu thập dữ liệu từ nhiều hệ thống khác nhau trong quy trình đăng ký và xác minh.
+- Dưới đây là các nhóm dữ liệu thô chính:
+
+---
+
+#### 🧾 Nhóm 1: Dữ Liệu Đăng Ký Người Dùng (User Registration Logs)
+
+- Bao gồm tất cả thông tin liên quan đến thời điểm người dùng bắt đầu quá trình đăng ký.
+- Trường dữ liệu quan trọng:
+  - `user_id`: Mã định danh duy nhất
+  - `registration_start_time`: Thời điểm bắt đầu đăng ký
+  - `registration_channel`: Web / mobile / referral
+  - `device_type`, `os_version`, `browser`: Dùng để phân tích hành vi thiết bị
+  - `language`, `region`: Phục vụ phân tích theo địa lý
+
+---
+
+#### 🪪 Nhóm 2: Dữ Liệu Xác Minh Danh Tính (Identity Verification Logs)
+
+- Bao gồm thông tin giấy tờ người dùng cung cấp và quá trình xử lý OCR.
+- Trường dữ liệu chính:
+  - `doc_type`: CMND / CCCD / Passport
+  - `ocr_status`, `ocr_confidence`: Kết quả nhận dạng ký tự
+  - `upload_time`, `verification_result`, `rejection_reason`
+  - `retry_count`: Số lần thử lại (nếu có)
+
+---
+
+#### 🧠 Nhóm 3: Dữ Liệu Sinh Trắc (Biometric Verification)
+
+- Xác minh người thật (liveness) và đối chiếu khuôn mặt.
+- Trường dữ liệu:
+  - `face_match_score`: Mức độ khớp khuôn mặt
+  - `liveness_check_result`: true/false
+  - `device_camera_quality`: chất lượng camera
+  - `frame_blur_score`: đánh giá độ rõ ảnh
+  - `action_prompt_passed`: có làm đúng yêu cầu (nhìn trái/phải...)
+
+---
+
+#### 🚦 Nhóm 4: Đánh Giá Rủi Ro & Tuân Thủ (Risk & Compliance)
+
+- Dữ liệu từ hệ thống chống rửa tiền (AML) và kiểm tra PEP/sanction.
+- Trường dữ liệu:
+  - `pep_flag`, `sanction_flag`: Có nằm trong danh sách hay không
+  - `internal_risk_score`: Điểm đánh giá nội bộ
+  - `risk_decision`: approve / manual_review / reject
+  - `manual_review_reason` (nếu có)
+
+---
+
+#### 💬 Nhóm 5: Nhật Ký Tương Tác & Giao Tiếp (User Communication Logs)
+
+- Ghi lại các lần gửi email, thông báo, chăm sóc người dùng.
+- Trường dữ liệu:
+  - `email_sent`, `sms_sent`, `push_notification_sent`
+  - `time_sent`, `user_response_time`
+  - `support_ticket_opened`, `ticket_status`, `assigned_agent_id`
+
+---
+
+#### 📱 Nhóm 6: Hành Vi Ứng Dụng (App Event Logs)
+
+- Dữ liệu hành vi như mở app, thao tác ở từng bước onboarding.
+- Trường dữ liệu:
+  - `screen_viewed`, `step_started`, `step_completed`
+  - `timestamp`, `session_duration`, `abandonment_flag`
+
+---
+
+- Những nhóm dữ liệu này là nền tảng để thiết kế schema, xác định funnel và tính KPI trong các phần tiếp theo.
 
 ---
 
