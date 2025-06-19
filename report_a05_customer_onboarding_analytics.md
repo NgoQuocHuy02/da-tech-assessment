@@ -474,6 +474,73 @@ title: report_a05_customer_onboarding_analytics
 
 - Luồng dữ liệu này được thiết kế để đảm bảo tính toàn vẹn, khả năng mở rộng và hiệu quả, cung cấp nền tảng vững chắc cho mọi hoạt động phân tích về hành trình `onboarding` khách hàng.
 
+#### 5.2 – Chi Tiết Các Bước Chuyển Đổi (Detailed Transformation Steps)
+
+---
+#### 5.2.1 – Thu Thập Dữ Liệu Thô (Raw Data Ingestion)
+---
+
+<details>
+<summary>Mô tả cách dữ liệu thô được thu thập từ nhiều hệ thống nguồn</summary>
+
+---
+
+...
+- Giai đoạn đầu tiên trong pipeline ELT là **thu thập dữ liệu thô từ các hệ thống nguồn**, đảm bảo dữ liệu đầy đủ và chính xác cho các bước xử lý tiếp theo.
+- Dữ liệu đến từ **nhiều hệ thống phân tán**, mỗi hệ thống có định dạng và tốc độ cập nhật khác nhau.
+
+- **Hệ thống nguồn chính:**
+    - Dữ liệu được thu thập từ các nhóm hệ thống sau:
+        - **Hệ thống Đăng ký người dùng**: thông tin hồ sơ và thời điểm bắt đầu hành trình onboarding.
+        - **Hệ thống KYC & Biometric**: bao gồm ảnh giấy tờ, trạng thái OCR, kết quả kiểm tra khuôn mặt và liveness.
+        - **Hệ thống Risk & Compliance**: dữ liệu PEP/sanction, điểm rủi ro nội bộ, kết quả đánh giá.
+        - **Hệ thống Giao tiếp & CSKH**: email, SMS, push notification, nhật ký ticket hỗ trợ.
+        - **Ứng dụng & Mobile App**: dữ liệu sự kiện hành vi như chuyển bước, thoát giữa chừng, thời lượng thao tác.
+
+- **Phương thức thu thập đề xuất:**
+
+| Loại nguồn | Phương thức tích hợp | Công nghệ phù hợp |
+|------------|----------------------|--------------------|
+| API endpoints | Tự động gọi API định kỳ hoặc theo sự kiện | `Airflow`, `Cloud Functions` |
+| Database logs | Realtime streaming hoặc CDC (Change Data Capture) | `Debezium`, `Kafka`, `BigQuery Data Transfer` |
+| File-based logs | Tải theo lô (batch) từ storage (CSV, JSON, Parquet) | `Cloud Storage + dbt`, `Fivetran` |
+| Event tracking | Gửi từ client/app theo sự kiện | `Segment`, `Snowplow`, `GA4`, `Firebase` |
+| Manual review logs | Nhập tay hoặc đồng bộ từ hệ thống CRM nội bộ | `CSV`, `Google Sheets`, `App Script` |
+
+- **Các điểm cần lưu ý:**
+    - Đảm bảo **định danh người dùng thống nhất** (`user_id`) giữa các hệ thống (dùng UUID hoặc hashed ID).
+    - Tất cả thời gian phải được **chuyển đổi sang UTC** để đồng bộ khi phân tích.
+    - Dữ liệu thô nên được lưu vào **Landing Zone** theo format nguyên gốc, không biến đổi, để đảm bảo khả năng xử lý lại (`replayable`) và kiểm tra sai lệch.
+...
+
+---
+
+- Giai đoạn thu thập dữ liệu là nền tảng quan trọng, ảnh hưởng trực tiếp đến độ tin cậy của hệ thống phân tích. Việc thiết kế ingestion pipeline phải đảm bảo:
+  - Tự động hóa cao
+  - Kiểm soát lỗi tốt
+  - Dễ mở rộng khi hệ thống tăng trưởng
+
+---
+</details>
+
+
+##### 5.2.2 – Làm Sạch & Chuẩn Hóa Dữ Liệu (Data Cleaning & Standardization)
+*(Sẽ hoàn thiện ở bước tiếp theo)*
+
+##### 5.2.3 – Làm Giàu Dữ Liệu (Data Enrichment)
+*(Placeholder cho bước sau)*
+
+##### 5.2.4 – Xây Dựng Các Bảng Fact (Fact Table Construction)
+*(Placeholder cho bước sau)*
+
+##### 5.2.5 – Xây Dựng Các Bảng Dim (Dimension Table Construction)
+*(Placeholder cho bước sau)*
+
+#### 5.3 – Đảm Bảo Chất Lượng Dữ Liệu (Data Quality Assurance)
+*(Placeholder cho bước sau)*
+
+#### 5.4 – Công Cụ và Công Nghệ Đề Xuất (Recommended Tools & Technologies)
+*(Placeholder cho bước sau)*
 
 ---
 
