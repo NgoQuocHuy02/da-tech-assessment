@@ -399,7 +399,7 @@ title: report_a05_customer_onboarding_analytics
 
   ---
 
- ##### 📊 Sơ đồ quan hệ giữa các bảng (ERD)
+  ##### 📊 Sơ đồ quan hệ giữa các bảng (ERD)
   ---
 
   ```mermaid
@@ -411,7 +411,7 @@ title: report_a05_customer_onboarding_analytics
       dim_users ||--o{ fact_manual_review_logs : has
       fact_kyc_verification_details ||--o{ fact_manual_review_logs : triggers
   ```
-
+---
 - Việc thiết kế `schema` này đảm bảo tính toàn vẹn dữ liệu, hiệu quả truy vấn và khả năng mở rộng, là nền tảng vững chắc cho việc phân tích chuyên sâu ở các giai đoạn tiếp theo.
 
 ---
