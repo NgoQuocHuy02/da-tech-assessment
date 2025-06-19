@@ -598,8 +598,67 @@ title: report_a05_customer_onboarding_analytics
 </details>
 
 
+---
 ##### 5.2.3 – Làm Giàu Dữ Liệu (Data Enrichment)
-*(Placeholder cho bước sau)*
+---
+
+<details>
+<summary>Bổ sung thông tin bổ trợ vào dữ liệu để nâng cao giá trị phân tích</summary>
+
+---
+
+- Sau khi dữ liệu được làm sạch và chuẩn hóa, bước tiếp theo là **làm giàu dữ liệu** (enrichment).
+- Mục tiêu của giai đoạn này là bổ sung thêm các trường thông tin có giá trị phân tích cao, phục vụ trực tiếp cho việc tính toán `KPIs`, theo dõi hành vi người dùng, và phân khúc hiệu quả.
+
+---
+
+##### 🔍 Các chiến lược enrichment phổ biến trong bài toán onboarding
+
+| Nhóm dữ liệu | Kỹ thuật làm giàu áp dụng |
+|-------------|---------------------------|
+| **User registration** | Tính `registration_duration` = `completion_time - start_time` |
+| **Device & region** | Tra cứu `geo-IP` để thêm `continent`, `city`, hoặc phân vùng rủi ro |
+| **App events** | Gắn `event_stage` (top/mid/bottom of funnel), tính `step_duration` trung bình |
+| **KYC/AML** | Thêm trường `is_high_risk_user` nếu `risk_score > ngưỡng` |
+| **Communication** | Xác định `response_delay_bucket` (ví dụ: phản hồi trong 1h, 1-12h, >24h) |
+| **Session** | Tính toán số phiên (`session_count`), thời lượng tương tác trung bình |
+
+---
+
+##### 🧠 Enrichment theo logic kinh doanh
+
+- **Phân khúc người dùng:** dựa trên nguồn đăng ký, độ tuổi, quốc gia
+- **Nhóm hành vi:** người dùng vượt qua KYC ngay lần đầu → tag `first_pass`
+- **Gắn cohort:** cohort theo tuần đăng ký (`W24_2025`), phục vụ phân tích retention
+- **Dự đoán churn sớm:** nếu `session_count = 1` và `KYC = fail` → đánh cờ `likely_churn = true`
+
+---
+
+##### 📌 Ví dụ enrichment cụ thể
+
+| Trường mới | Cách tính | Mục đích |
+|------------|-----------|----------|
+| `kyc_total_attempts` | COUNT số bản ghi `KYC` theo `user_id` | Đánh giá độ khó quy trình |
+| `avg_step_duration` | AVG(`duration_in_step_seconds`) theo `user_id` | Phân tích UX từng bước |
+| `interaction_score` | Tổ hợp các chỉ số từ tương tác + phản hồi | Dự đoán người dùng tích cực |
+| `risk_segment` | CASE WHEN `risk_score` > 80 THEN 'High'... | Phân loại để kiểm soát chặt hơn |
+
+---
+
+##### 🛠 Công cụ hỗ trợ enrichment
+
+- SQL: sử dụng `JOIN`, `CASE`, `DATE_DIFF`, `GROUP BY`
+- dbt: mô hình hóa bảng trung gian (`intermediate models`)
+- Python (pandas): nếu cần pipeline enrichment trước khi load
+- BigQuery hoặc Snowflake: dùng views hoặc materialized tables
+
+---
+
+- Việc enrichment giúp **"biến dữ liệu hành vi thành thông tin phân tích"**, là cầu nối quan trọng giữa dữ liệu thô và insight có giá trị cho business.
+
+---
+</details>
+
 
 ##### 5.2.4 – Xây Dựng Các Bảng Fact (Fact Table Construction)
 *(Placeholder cho bước sau)*
