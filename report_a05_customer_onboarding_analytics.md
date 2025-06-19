@@ -412,7 +412,8 @@ title: report_a05_customer_onboarding_analytics
       fact_kyc_verification_details ||--o{ fact_manual_review_logs : triggers
   ```
 ---
-- Việc thiết kế `schema` này đảm bảo tính toàn vẹn dữ liệu, hiệu quả truy vấn và khả năng mở rộng, là nền tảng vững chắc cho việc phân tích chuyên sâu ở các giai đoạn tiếp theo.
+- Với thiết kế schema như trên, chúng ta có thể dễ dàng xây dựng các truy vấn phục vụ phân tích funnel (`drop-off rate`, `completion rate`), phân tích thời gian (`time-to-verify`), cũng như đánh giá hiệu quả quy trình `KYC/AML` và `manual review`.
+- Đây là nền tảng vững chắc cho các bước xử lý tiếp theo: logic biến đổi dữ liệu, tính KPI và xây dựng dashboard.
 
 ---
 
@@ -426,8 +427,53 @@ title: report_a05_customer_onboarding_analytics
 <summary>Mô Tả Các Quy Trình Làm Sạch, Chuẩn Hóa và Tổng Hợp Dữ Liệu</summary>
 
 ---
+#### 5.1 – Tổng Quan Về Luồng Dữ Liệu (Data Flow Overview)
+---
 
-- Phần này sẽ phác thảo các bước để chuyển đổi dữ liệu thô thành định dạng có thể sử dụng được để phân tích.
+- Mục tiêu của phần này là cung cấp một cái nhìn toàn cảnh về quá trình dữ liệu được thu thập, xử lý và chuyển đổi để phục vụ phân tích hành trình `onboarding` khách hàng và `KYC/AML`.
+- Luồng dữ liệu được thiết kế theo mô hình `ELT (Extract, Load, Transform)` hiện đại, cho phép linh hoạt trong việc xử lý dữ liệu quy mô lớn trên nền tảng `cloud data warehouse`.
+- Các giai đoạn chính của luồng dữ liệu bao gồm:
+
+  - **1. Thu Thập Dữ Liệu Thô (Raw Data Ingestion):**
+    - Dữ liệu được thu thập liên tục hoặc theo đợt từ các hệ thống nguồn khác nhau như: hệ thống đăng ký, hệ thống `KYC/Biometric`, hệ thống `Risk/Compliance`, hệ thống giao tiếp, và nhật ký sự kiện ứng dụng.
+    - Phương thức thu thập đa dạng bao gồm `API integration`, `database replication`, và `log forwarding`.
+
+  - **2. Khu Vực Lưu Trữ Dữ Liệu Thô (Raw Data Landing Zone / Data Lake):**
+    - Dữ liệu thô được lưu trữ nguyên trạng tại đây, thường là trên các dịch vụ `Cloud Storage` (ví dụ: `GCS`, `S3`), đảm bảo tính toàn vẹn và khả năng `re-processing` khi cần.
+
+  - **3. Tải Dữ Liệu Vào Kho Dữ Liệu (Data Loading to Data Warehouse):**
+    - Dữ liệu từ `Landing Zone` được tải vào một `Data Warehouse` mạnh mẽ (`Google BigQuery`, Snowflake, Redshift), tạo nền tảng cho các bước chuyển đổi hiệu suất cao.
+
+  - **4. Chuyển Đổi Dữ Liệu (Data Transformation):**
+    - Giai đoạn này thực hiện các phép làm sạch, chuẩn hóa, làm giàu và tổng hợp dữ liệu ngay trong `Data Warehouse` để xây dựng các bảng `dim` và `fact` theo `schema` đã thiết kế.
+
+  - **5. Lớp Dữ Liệu Phân Tích (Analytical Data Layer):**
+    - Các bảng `dim` và `fact` đã được xử lý và tối ưu hóa nằm trong `Data Warehouse`, sẵn sàng cho các mục đích phân tích và báo cáo.
+
+  - **6. Lớp Tiêu Thụ Dữ Liệu (Data Consumption / Reporting):**
+    - Dữ liệu từ lớp phân tích được sử dụng bởi các công cụ `Business Intelligence` (BI) để tạo ra các `dashboard`, báo cáo và tính toán các `KPI`.
+
+- Luồng dữ liệu tổng quát có thể được hình dung qua sơ đồ sau:
+
+    ```mermaid
+    flowchart TD
+        subgraph Source Systems
+            A[Hệ thống đăng ký] --> RawData
+            B[Hệ thống KYC/Biometric] --> RawData
+            C[Hệ thống Risk/Compliance] --> RawData
+            D[Hệ thống Giao tiếp] --> RawData
+            E[App Event Logs] --> RawData
+            F[Hệ thống Duyệt thủ công] --> RawData
+        end
+
+        RawData[Khu vực lưu trữ dữ liệu thô<br>(GCS/S3)] --> Load[Tải vào Data Warehouse<br>(BigQuery)]
+        Load --> Transform[Chuyển đổi dữ liệu<br>(dbt/SQL)]
+        Transform --> AnalyticalLayer[Lớp dữ liệu phân tích<br>(Dim & Fact Tables)]
+        AnalyticalLayer --> Consumption[Báo cáo & Dashboard<br>(Looker Studio/Power BI)]
+    ```
+
+- Luồng dữ liệu này được thiết kế để đảm bảo tính toàn vẹn, khả năng mở rộng và hiệu quả, cung cấp nền tảng vững chắc cho mọi hoạt động phân tích về hành trình `onboarding` khách hàng.
+
 
 ---
 
