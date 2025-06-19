@@ -696,8 +696,126 @@ title: report_a05_customer_onboarding_analytics
 </details>
 
 
-##### 5.2.4 – Xây Dựng Các Bảng Fact (Fact Table Construction)
-*(Placeholder cho bước sau)*
+---
+#### 5.2.4 – Xây Dựng Các Bảng Fact (Fact Table Construction)
+---
+
+<details>
+<summary>Mô tả logic và các bước để tạo ra các bảng fact từ dữ liệu đã được làm sạch và làm giàu</summary>
+
+---
+
+- Các bảng **fact** lưu trữ dữ liệu định lượng hoặc sự kiện theo dòng thời gian, là nền tảng cho hầu hết các phân tích như: `funnel`, `conversion rate`, `drop-off analysis`, `retention`, `failure reason`, `risk decision`, v.v.
+- Chúng có **khóa ngoại `user_id`** liên kết đến `dim_users` và thường gắn với thời gian (`timestamp`) để phân tích theo phiên/chu kỳ.
+
+---
+
+### ✅ Các bảng fact chính cần xây dựng
+
+---
+
+##### 📊 `fact_onboarding_events` – Các sự kiện trong hành trình Onboarding
+
+- **Nguồn dữ liệu:** Nhật ký sự kiện từ app/web (`app_event_logs`)
+- **Mỗi bản ghi:** Một hành động cụ thể của người dùng trong hành trình onboarding
+
+| Trường | Diễn giải logic |
+|--------|------------------|
+| `event_name` | Được ánh xạ từ mã sự kiện gốc, chuẩn hóa thành nhóm `KYC_STARTED`, `ID_UPLOAD`, `LIVENESS_PASS`, `ACCOUNT_ACTIVATED`, v.v. |
+| `onboarding_step` | Gán số thứ tự cho từng bước trong phễu onboarding (ví dụ: `1` = đăng ký, `2` = upload giấy tờ) |
+| `duration_in_step_seconds` | Tính toán bằng `event_end_time - event_start_time` hoặc thời gian giữa hai sự kiện |
+| `event_status` | Gắn nhãn `SUCCESS`, `FAILURE`, `PENDING`, `RETRY` |
+| `error_code`, `error_message` | Lấy từ hệ thống khi bước thất bại |
+| `session_id`, `device_type` | Từ app logs hoặc cookie headers |
+
+- **Phép tổng hợp:** Có thể `COUNT(DISTINCT step)` để tính tỷ lệ hoàn tất.
+
+---
+
+##### 📋 `fact_kyc_verification_details` – Chi tiết quá trình KYC
+
+- **Nguồn dữ liệu:** Hệ thống xác minh giấy tờ, OCR, liveness
+- **Mỗi bản ghi:** Một lần gửi thông tin xác minh
+
+| Trường | Diễn giải logic |
+|--------|------------------|
+| `kyc_submission_id` | Mã hóa từ hệ thống nội bộ hoặc UUID |
+| `document_type`, `ocr_status`, `face_match_score` | Trích xuất từ kết quả trả về của provider |
+| `kyc_result` | Mapping lại trạng thái thô thành `Approved`, `Rejected`, `Retry`, `Under Review` |
+| `rejection_reason` | Có thể là `ARRAY<STRING>` nếu lý do phức tạp |
+| `number_of_retries` | Tính bằng `COUNT(*)` theo `user_id` |
+| `processing_time_seconds` | `submission_end_time - start_time`, hoặc thời gian hệ thống xử lý log |
+
+- **Gắn cờ enrichment:** `is_first_pass_success = TRUE` nếu chỉ có 1 bản ghi và `kyc_result = Approved`
+
+---
+
+##### 🚨 `fact_risk_assessments` – Đánh giá rủi ro AML/PEP
+
+- **Nguồn dữ liệu:** Hệ thống risk scoring nội bộ, hoặc tích hợp bên ngoài (API sanction check)
+- **Mỗi bản ghi:** Một lượt đánh giá rủi ro trên user
+
+| Trường | Diễn giải |
+|--------|-----------|
+| `risk_score` | 0–100, từ hệ thống scoring |
+| `pep_flag`, `sanction_flag` | Boolean |
+| `final_risk_decision` | Mapping `Clear`, `Review`, `Reject` |
+| `decision_reason` | `ARRAY<STRING>` nếu có nhiều lý do |
+
+---
+
+##### 💬 `fact_user_communications` – Tương tác với người dùng
+
+- **Nguồn dữ liệu:** CRM, hệ thống gửi Email/SMS, ticket support
+- **Mỗi bản ghi:** Một lượt gửi thông báo hoặc phản hồi hỗ trợ
+
+| Trường | Diễn giải |
+|--------|-----------|
+| `communication_type` | `Email`, `Push`, `In-app`, `SMS` |
+| `delivery_status` | `Delivered`, `Failed`, `Opened` |
+| `user_interaction_status` | Gắn enrichment `Clicked`, `Ignored`, `Responded` |
+| `support_ticket_id` | Liên kết đến bảng `ticket`, nếu có |
+
+---
+
+##### 📎 `fact_manual_review_logs` – Lượt xử lý thủ công
+
+- **Nguồn:** Hệ thống nội bộ ghi lại các hành động của đội kiểm duyệt người thật
+- **Mỗi bản ghi:** Một lượt truy cập hồ sơ để xem xét bằng tay
+
+| Trường | Diễn giải |
+|--------|-----------|
+| `reviewer_id` | Mã hóa ID nhân sự xử lý |
+| `action_type` | `Approve`, `Escalate`, `Reject` |
+| `notes`, `review_duration` | Dữ liệu vận hành dùng để đánh giá năng suất & consistency |
+
+---
+
+### 🔗 Mối quan hệ với Dimension Tables
+
+- Mỗi bảng fact sẽ có các khóa ngoại:  
+  - `user_id` → `dim_users`  
+  - `session_id` → (nếu cần, tách bảng `dim_sessions`)  
+  - `document_type`, `communication_type`, v.v. có thể là `dim_code` (tùy dự án)
+
+---
+
+### 🛠 Công cụ / Kỹ thuật thực hiện
+
+| Bước | Công cụ gợi ý |
+|------|----------------|
+| Join, transform | SQL (BigQuery), dbt |
+| Xử lý enrich phức tạp | Python (pandas), Spark |
+| Tự động hóa ETL | dbt model, Airflow DAG |
+| Kiểm tra | Great Expectations, dbt tests |
+
+---
+
+- Việc xây dựng tốt các bảng fact giúp **rút ngắn thời gian phân tích**, **giảm lỗi logic**, và **mở rộng được hệ thống phân tích trong tương lai**.
+
+---
+</details>
+
 
 ##### 5.2.5 – Xây Dựng Các Bảng Dim (Dimension Table Construction)
 *(Placeholder cho bước sau)*
