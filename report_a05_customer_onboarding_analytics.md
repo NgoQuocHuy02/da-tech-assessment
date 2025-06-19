@@ -937,8 +937,96 @@ title: report_a05_customer_onboarding_analytics
 </details>
 
 
+---
 #### 5.3 – Đảm Bảo Chất Lượng Dữ Liệu (Data Quality Assurance)
-*(Placeholder cho bước sau)*
+---
+
+<details>
+<summary>Mô tả các biện pháp và công cụ để duy trì chất lượng dữ liệu xuyên suốt Data Pipeline</summary>
+
+---
+
+##### 🎯 Mục Tiêu & Tầm Quan Trọng
+
+- **Data Quality Assurance (DQA)** là yếu tố then chốt để xây dựng niềm tin vào hệ thống phân tích.
+- Đặc biệt trong môi trường tuân thủ nghiêm ngặt như `KYC/AML`, dữ liệu sai lệch có thể dẫn đến:
+  - Đánh giá rủi ro sai
+  - Phân tích hành vi sai lệch
+  - Báo cáo không đạt chuẩn kiểm toán
+
+---
+
+##### 🔍 5 Yếu Tố Cốt Lõi của Chất Lượng Dữ Liệu
+
+- **Accuracy**: Dữ liệu phản ánh đúng thực tế nghiệp vụ (ví dụ: `user_id`, `event_time` phải chính xác).
+- **Completeness**: Dữ liệu không thiếu trường bắt buộc (`kyc_result`, `registration_channel`...).
+- **Consistency**: Không mâu thuẫn giữa các hệ thống, các bản ghi (ví dụ: KYC status không thay đổi bất hợp lý).
+- **Timeliness**: Dữ liệu có mặt đúng lúc để phân tích (ví dụ: dashboard cập nhật hàng ngày).
+- **Validity**: Tuân thủ định dạng, kiểu dữ liệu, quy tắc nghiệp vụ (`email`, `risk_score`, `status`...).
+
+---
+
+##### 🧱 Kiểm Tra DQA Theo Tầng (Layered QA Strategy)
+
+##### ✅ 1. Source Layer – Tại Nguồn
+
+- **Mục tiêu**: Phát hiện sớm dữ liệu bẩn trước khi vào pipeline.
+- **Ví dụ**:
+  - Kiểm tra số cột trong file CSV.
+  - Đảm bảo schema của file JSON đúng định dạng.
+
+##### ✅ 2. Transformation Layer – Khi Làm Sạch & Làm Giàu
+
+- **Mục tiêu**: Đảm bảo tính toàn vẹn, chính xác sau mỗi bước xử lý.
+- **Ví dụ**:
+  - `user_id` là duy nhất trong `dim_users`.
+  - `kyc_result` chỉ chứa giá trị hợp lệ.
+  - `foreign keys` của `fact_*` đều tồn tại trong `dim_*`.
+
+##### ✅ 3. Consumption Layer – Trước Khi Phân Tích
+
+- **Mục tiêu**: Đảm bảo dữ liệu sẵn sàng cho BI/dashboard.
+- **Ví dụ**:
+  - So sánh `conversion rate` giữa dashboard và query SQL gốc.
+  - Tổng số user mới trong ngày không đột ngột = 0.
+
+---
+
+##### 🛠️ Các Kiểm Tra Cụ Thể và Công Cụ Gợi Ý
+
+| Loại Kiểm Tra            | Mô Tả & Mục Tiêu                                                                 | Công Cụ / Kỹ Thuật                                      |
+|--------------------------|-----------------------------------------------------------------------------------|----------------------------------------------------------|
+| **Uniqueness**           | Đảm bảo khóa chính (user_id, event_id) là duy nhất                              | `dbt tests: unique`, `SQL COUNT(DISTINCT)`              |
+| **Completeness**         | Các trường bắt buộc không NULL                                                   | `dbt not_null`, `SQL WHERE col IS NULL`                 |
+| **Validity**             | Giá trị hợp lệ, đúng định dạng                                                   | `dbt accepted_values`, `SQL REGEXP`, `CASE WHEN`        |
+| **Referential Integrity**| `FK` trong fact tồn tại trong dim                                                | `dbt relationships`, `LEFT JOIN NULL CHECK`             |
+| **Volume/Growth**        | Phát hiện sụt giảm/tăng bất thường về số lượng bản ghi                           | `BigQuery Monitoring`, `Looker Health`, `dbt metrics`   |
+| **Timeliness**           | Dữ liệu có được cập nhật đúng lịch không                                         | `Airflow DAG SLA`, `last_updated_at`, `alert rules`     |
+| **Consistency**          | So sánh KPI giữa hệ thống nguồn và kết quả phân tích                             | `dbt snapshots`, `SQL JOIN + ASSERT`, `data diff`       |
+
+---
+
+##### 🔄 Quy Trình Xử Lý Lỗi DQA
+
+1. **Phát hiện lỗi**: Tự động qua dbt test hoặc cảnh báo từ hệ giám sát.
+2. **Cảnh báo**: Gửi thông báo qua Email/Slack đến nhóm liên quan.
+3. **Root Cause Analysis**: Tìm nguyên nhân: lỗi source, parsing, logic transformation?
+4. **Khắc phục & Backfill**: Sửa lỗi và chạy lại phần dữ liệu bị ảnh hưởng.
+5. **Theo dõi sau khắc phục**: Đảm bảo không tái diễn.
+
+---
+
+##### ✅ Tổng Kết
+
+- DQA không phải là “chốt kiểm tra” cuối cùng, mà là **điểm giám sát xuyên suốt pipeline**.
+- Việc xây dựng hệ thống kiểm tra toàn diện ở mọi tầng giúp:
+  - Ngăn lỗi từ sớm → tiết kiệm chi phí.
+  - Tăng uy tín của đội Data đối với Compliance, Product.
+  - Bảo vệ doanh nghiệp khỏi rủi ro pháp lý, đặc biệt với KYC/AML.
+
+---
+</details>
+
 
 #### 5.4 – Công Cụ và Công Nghệ Đề Xuất (Recommended Tools & Technologies)
 *(Placeholder cho bước sau)*
