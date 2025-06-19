@@ -612,49 +612,85 @@ title: report_a05_customer_onboarding_analytics
 
 ---
 
-##### 🔍 Các chiến lược enrichment phổ biến trong bài toán onboarding
+##### 🔍 Các chiến lược enrichment phổ biến
 
 | Nhóm dữ liệu | Kỹ thuật làm giàu áp dụng |
 |-------------|---------------------------|
 | **User registration** | Tính `registration_duration` = `completion_time - start_time` |
-| **Device & region** | Tra cứu `geo-IP` để thêm `continent`, `city`, hoặc phân vùng rủi ro |
-| **App events** | Gắn `event_stage` (top/mid/bottom of funnel), tính `step_duration` trung bình |
-| **KYC/AML** | Thêm trường `is_high_risk_user` nếu `risk_score > ngưỡng` |
-| **Communication** | Xác định `response_delay_bucket` (ví dụ: phản hồi trong 1h, 1-12h, >24h) |
-| **Session** | Tính toán số phiên (`session_count`), thời lượng tương tác trung bình |
+| **Device & region** | Tra cứu `geo-IP`, phân tích thiết bị từ `User-Agent` |
+| **App events** | Gắn `event_stage`, tính `step_duration` trung bình |
+| **KYC/AML** | Tính `is_high_risk_user`, phân loại `risk_level` |
+| **Communication** | Xác định `response_delay_bucket`, hành vi phản hồi |
+| **Session** | Tính toán `session_count`, `avg_session_duration` |
 
 ---
 
 ##### 🧠 Enrichment theo logic kinh doanh
 
-- **Phân khúc người dùng:** dựa trên nguồn đăng ký, độ tuổi, quốc gia
-- **Nhóm hành vi:** người dùng vượt qua KYC ngay lần đầu → tag `first_pass`
-- **Gắn cohort:** cohort theo tuần đăng ký (`W24_2025`), phục vụ phân tích retention
-- **Dự đoán churn sớm:** nếu `session_count = 1` và `KYC = fail` → đánh cờ `likely_churn = true`
+- Phân khúc người dùng: theo quốc gia, thiết bị, nguồn kênh đăng ký
+- Cohort tuần đăng ký: `W25_2025`
+- Cờ hành vi đặc biệt: `first_pass_KYC`, `likely_churn = true`
 
 ---
 
-##### 📌 Ví dụ enrichment cụ thể
+##### 🛠 Công cụ hỗ trợ
 
-| Trường mới | Cách tính | Mục đích |
-|------------|-----------|----------|
-| `kyc_total_attempts` | COUNT số bản ghi `KYC` theo `user_id` | Đánh giá độ khó quy trình |
-| `avg_step_duration` | AVG(`duration_in_step_seconds`) theo `user_id` | Phân tích UX từng bước |
-| `interaction_score` | Tổ hợp các chỉ số từ tương tác + phản hồi | Dự đoán người dùng tích cực |
-| `risk_segment` | CASE WHEN `risk_score` > 80 THEN 'High'... | Phân loại để kiểm soát chặt hơn |
-
----
-
-##### 🛠 Công cụ hỗ trợ enrichment
-
-- SQL: sử dụng `JOIN`, `CASE`, `DATE_DIFF`, `GROUP BY`
-- dbt: mô hình hóa bảng trung gian (`intermediate models`)
-- Python (pandas): nếu cần pipeline enrichment trước khi load
-- BigQuery hoặc Snowflake: dùng views hoặc materialized tables
+| Mục đích | Công cụ gợi ý |
+|---------|---------------|
+| Enrich dạng text | SQL `LOWER()`, `REGEXP`, Python `re` |
+| Ghép bảng | SQL `JOIN`, `LEFT JOIN` |
+| Phân loại logic | SQL `CASE`, Python `if-else` |
+| Kết nối API ngoài | Python `requests`, Spark `UDF` |
 
 ---
 
-- Việc enrichment giúp **"biến dữ liệu hành vi thành thông tin phân tích"**, là cầu nối quan trọng giữa dữ liệu thô và insight có giá trị cho business.
+📌 **Xem thêm các chiến lược nâng cao bên dưới**:
+
+</details>
+
+<details>
+<summary>📌 Chi tiết mở rộng: Các chiến lược enrichment nâng cao</summary>
+
+---
+
+### ✅ Enrichment từ nguồn ngoài
+
+#### 🌍 Vị trí địa lý từ IP
+- **Cách làm**: IP → country, city, timezone
+- **Nguồn**: MaxMind GeoIP2, IP2Location API
+- **Lý do**: phân tích drop-off theo vùng, compliance địa phương
+
+#### 💻 Thiết bị & hệ điều hành
+- Trích từ User-Agent string
+- Ví dụ enrich thêm: `device_category`, `os_version`, `browser_family`
+- Hữu ích để kiểm tra liệu tỷ lệ thất bại KYC có liên quan đến thiết bị?
+
+#### 📣 Thông tin chiến dịch Marketing
+- Source/medium/campaign từ Firebase, Adjust
+- Gắn thêm trường: `marketing_channel`, `is_paid_user`
+
+---
+
+### ✅ Enrichment tính toán nội bộ
+
+| Trường mới | Mô tả | Mục tiêu |
+|------------|--------|----------|
+| `duration_in_step_seconds` | Thời gian mỗi bước | UX tracking |
+| `kyc_attempt_number` | Tổng lần gửi lại | Đánh giá friction |
+| `risk_level_category` | Nhóm hóa risk_score | Báo cáo dễ hiểu hơn |
+| `day_of_week`, `hour_of_day` | Trích từ timestamp | Phân tích theo hành vi giờ/ngày |
+| `kyc_verification_status_granular` | Chi tiết hóa trạng thái KYC | Nhìn rõ điểm nghẽn |
+
+---
+
+### ✅ Kỹ thuật chuyên sâu
+
+- **User-defined enrichment logic**: gắn `user_type` = `trusted`, `new`, `risky`
+- **Predictive enrichment** (gợi ý nếu đi xa hơn): Xác suất `conversion_likelihood`, `likely_to_drop`
+
+---
+
+- Các enrichment này giúp tạo thêm bối cảnh cho phân tích, góp phần làm **phễu onboarding chính xác hơn**, **phân tích cohort sâu hơn**, và hỗ trợ **ra quyết định kinh doanh hiệu quả**.
 
 ---
 </details>
