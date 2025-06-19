@@ -1188,11 +1188,43 @@ flowchart TD
 <details>
 <summary>Định Nghĩa Các Chỉ Số Hiệu Suất Chính và Các Phương Pháp Phân Tích</summary>
 
+#### 6.1 – Phân Tích Phễu Onboarding (Onboarding Funnel Analysis)
+---
+<details>
+<summary>Thiết kế phễu hành trình khách hàng và các điểm rơi quan trọng</summary>
+
 ---
 
-- Phần này sẽ trình bày chi tiết phương pháp phân tích `phễu` (`funnel analysis`), định nghĩa tỷ lệ `chuyển đổi` (`conversion rates`) và các chỉ số liên quan khác.
+- **Mục tiêu:** Hiểu hành vi người dùng trong từng bước của quá trình onboarding và phát hiện các điểm gây gián đoạn để tối ưu hóa trải nghiệm.
+
+- **Định nghĩa các bước chính trong hành trình onboarding:**
+
+  | Bước | Mô tả Hành Vi                       | Điều kiện trong Dữ Liệu                          | Nguồn Dữ Liệu                |
+  |------|--------------------------------------|--------------------------------------------------|------------------------------|
+  | B1   | Bắt đầu đăng ký                     | `event_name = 'REGISTRATION_STARTED'`            | `fact_onboarding_events`     |
+  | B2   | Tải giấy tờ xác minh                | `event_name = 'ID_DOCUMENT_UPLOADED'`            | `fact_onboarding_events`     |
+  | B3   | Hoàn tất xác minh khuôn mặt         | `event_name = 'LIVENESS_CHECK_COMPLETED'`        | `fact_onboarding_events`     |
+  | B4   | KYC được phê duyệt                 | `kyc_result = 'Approved'`                        | `fact_kyc_verification_details` |
+  | B5   | Kích hoạt tài khoản thành công      | `event_name = 'ACCOUNT_ACTIVATED'`               | `fact_onboarding_events`     |
+
+- **Các chỉ số phân tích chính trong phễu:**
+
+  | Tên Chỉ Số                         | Công Thức / Logic                                                      |
+  |------------------------------------|------------------------------------------------------------------------|
+  | `step_completion_rate`            | Tỷ lệ hoàn thành mỗi bước: `count(Bn) / count(B1)`                    |
+  | `drop_off_rate_Bn`                | Tỷ lệ rớt tại bước Bn: `1 - step_completion_rate(Bn)`                 |
+  | `avg_time_between_steps`          | Thời gian trung bình giữa hai bước: `AVG(Timestamp(Bn+1) - Timestamp(Bn))` |
+  | `kyc_retry_ratio`                 | `COUNT(retry > 0) / COUNT(all)` trong bảng `fact_kyc_verification_details` |
+  | `conversion_rate`                 | `count(B5) / count(B1)` – tỷ lệ hoàn tất onboarding thành công         |
+
+- **Lợi ích của phân tích phễu:**
+  - Xác định các điểm "thắt cổ chai" gây gián đoạn onboarding.
+  - Đưa ra cải tiến giao diện người dùng, UX hoặc quy trình xác minh.
+  - Theo dõi hiệu suất onboarding theo thời gian, thiết bị, kênh đăng ký...
 
 ---
+
+</details>
 
 </details>
 
