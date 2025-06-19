@@ -275,6 +275,130 @@ Each prompt includes the original query, its purpose, and where it was applied i
 
 ---
 
+---
+## Day 3 – Schema Completion and Transformation Logic
+---
+
+### Prompt 1 – Validate and Extend Proposed Data Schema
+<details>
+<summary>Request GenAI to review and enhance the proposed schema (Section 4.2)</summary>
+
+---
+
+**Prompt:**
+> Here is the schema I developed together with Gemini in Section 4.2. Could you review it and suggest improvements or extensions based on best practices?
+
+**Purpose:**
+- Validate the proposed `fact` and `dimension` tables
+- Identify potential schema issues or missing fields
+- Align schema with analytical needs (KYC/AML funnel, user drop-off, conversion)
+
+---
+
+</details>
+
+---
+
+### Prompt 2 – Clarify the Purpose of Mermaid ER Diagram
+<details>
+<summary>Ask why Mermaid syntax ER diagram didn’t render and whether it’s supported in GitHub</summary>
+
+---
+
+**Prompt:**
+> I tried using this Mermaid ER diagram to visualize table relationships, but it didn’t render properly in my editor. Can GitHub display this? And what’s the actual use of this block?
+
+**Purpose:**
+- Understand syntax compatibility and rendering issues
+- Ensure technical correctness of the visualization
+- Justify the diagram’s inclusion in report
+
+---
+
+</details>
+
+---
+
+### Prompt 3 – Transition to Transformation Logic (Section 5)
+<details>
+<summary>Announce and plan the transition to the next major section of the report</summary>
+
+---
+
+**Prompt:**
+> We’ve completed Sections 1 to 4.2. Let’s move into Section 5 – Data Transformation Logic. This is a crucial part of the pipeline, so we need to go slowly and carefully from here.
+
+**Purpose:**
+- Mark milestone progress
+- Shift focus toward the transformation pipeline (ELT)
+- Emphasize analytical reasoning for logic design
+
+---
+
+</details>
+
+---
+
+### Prompt 4 – Confirm Structure for Section 5
+<details>
+<summary>Ask GenAI to help define the complete outline for Section 5</summary>
+
+---
+
+**Prompt:**
+> Before we begin writing, can you help confirm the subsection breakdown for Section 5 based on best practices? I want to prepare the `.md` headers so I can paste content smoothly as we complete each part.
+
+**Purpose:**
+- Create a reusable Markdown structure
+- Ensure consistency across transformation subsections (5.1–5.5)
+- Save time during documentation
+
+---
+
+</details>
+
+---
+
+### Prompt 5 – Review My Draft for Section 5.2.2
+<details>
+<summary>Ask GenAI to combine and enhance personal draft with professional standards</summary>
+
+---
+
+**Prompt:**
+> I drafted content for 5.2.2 – Data Cleaning & Standardization. Can you combine my ideas with your professional suggestions to make the section stronger?
+
+**Purpose:**
+- Collaborate with GenAI on logic structuring
+- Elevate writing quality, cover common cleaning scenarios
+- Align with transformation best practices
+
+---
+
+</details>
+
+---
+
+### Prompt 6 – Review Terminology After Section 6.1
+<details>
+<summary>Check whether newly introduced metrics or fields should be added to the glossary</summary>
+
+---
+
+**Prompt:**
+> After today’s work, we’ve reached Section 6.1. Based on all the new fields and metrics we introduced (e.g., duration_in_step, funnel conversion rate), are there any glossary terms we should add?
+
+**Purpose:**
+- Keep glossary updated with domain-specific concepts
+- Ensure clarity for non-technical stakeholders
+- Maintain consistency across documentation
+
+---
+
+</details>
+
+---
+
 ## Notes
 
 - GenAI tool used: ChatGPT (GPT-4o), Gemini (Flash 2.5)

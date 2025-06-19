@@ -27,7 +27,7 @@ The project is based on Task **A05 – Customer Onboarding Journey Analytics (KY
 |-----|-----------|
 | **Day 1** | ✅ Reviewed assignment, selected Task A05, created prompt log, Start README.md & prompt.md |
 | **Day 2** | ✅ Complete Sections 1–3 and 4.1 in main report; finalize analytical plan structure; update README.md and prompt log. |
-| Day 3 | ⏳ To be completed |
+| **Day 3** | ✅ Complete Sections 4-5 and 6.1 in main report; update README.md and prompt log. |
 | Day 4 | ⏳ To be completed |
 | Day 5 | ⏳ Final review, polishing, submission |
 
