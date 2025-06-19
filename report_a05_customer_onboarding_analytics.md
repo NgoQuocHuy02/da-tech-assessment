@@ -1117,6 +1117,7 @@ flowchart TD
 
 ---
 
+
 ##### 6. Công Cụ Đảm Bảo Chất Lượng Dữ Liệu (DQA)
 
 - **Công cụ:** dbt tests, Great Expectations, Soda Core
@@ -1149,13 +1150,39 @@ flowchart TD
 | Data Quality Assurance (DQA)  | dbt tests, Great Expectations              | Giám sát chất lượng dữ liệu toàn pipeline           |
 | Visualization / BI            | Looker Studio, Power BI, Tableau           | Tạo báo cáo và dashboard cho các bên liên quan      |
 
-
 ---
 
 </details>
 
 ---
 
+#### 5.5 – Tổng Kết Giai Đoạn Chuyển Đổi Dữ Liệu (Summary of Transformation Logic)
+---
+<details>
+<summary>Tóm lược toàn bộ giai đoạn ETL/ELT trước khi chuyển sang phân tích</summary>
+
+---
+
+- Giai đoạn chuyển đổi dữ liệu (Section 5) đã mô tả chi tiết luồng xử lý từ thô đến phân tích, bao gồm:
+  - ✅ Thu thập và làm sạch dữ liệu từ nhiều nguồn không đồng nhất.
+  - ✅ Làm giàu dữ liệu bằng thông tin bên ngoài và biến phái sinh.
+  - ✅ Xây dựng các bảng `fact` (sự kiện, hành vi) và `dim` (ngữ cảnh mô tả).
+  - ✅ Áp dụng kiểm soát chất lượng dữ liệu toàn diện.
+  - ✅ Lựa chọn công cụ hiện đại, cloud-native, chi phí tối ưu và dễ mở rộng (BigQuery, dbt, Airflow, Looker).
+
+- Luồng dữ liệu này đảm bảo rằng toàn bộ nền tảng phân tích cho hành trình `onboarding` và `KYC/AML` là:
+  - 🔍 **Chính xác** về nghiệp vụ
+  - 💡 **Sẵn sàng phân tích sâu** để khám phá insight
+  - 🧱 **Mở rộng được** khi nhu cầu tăng trưởng
+
+- Đây là tiền đề vững chắc để bước sang **Chương 6 – Khung phân tích và KPI**, nơi dữ liệu sẽ thực sự phát huy sức mạnh hỗ trợ ra quyết định kinh doanh.
+
+---
+</details>
+
+</details>
+
+---
 ## 6. Khung Phân Tích và Các KPIs
 ---
 <details>
