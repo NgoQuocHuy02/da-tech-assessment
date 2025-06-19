@@ -457,27 +457,30 @@ title: report_a05_customer_onboarding_analytics
 
     ```mermaid
     flowchart TD
-        subgraph Source Systems
-            A[Hệ thống đăng ký] --> RawData
-            B[Hệ thống KYC/Biometric] --> RawData
-            C[Hệ thống Risk/Compliance] --> RawData
-            D[Hệ thống Giao tiếp] --> RawData
-            E[App Event Logs] --> RawData
-            F[Hệ thống Duyệt thủ công] --> RawData
-        end
+    subgraph Source Systems
+        A[Hệ thống đăng ký] --> RawData
+        B[Hệ thống KYC/Biometric] --> RawData
+        C[Hệ thống Risk/Compliance] --> RawData
+        D[Hệ thống Giao tiếp] --> RawData
+        E[App Event Logs] --> RawData
+        F[Hệ thống Duyệt thủ công] --> RawData
+    end
 
-        RawData[Khu vực lưu trữ dữ liệu thô<br>(GCS/S3)] --> Load[Tải vào Data Warehouse<br>(BigQuery)]
-        Load --> Transform[Chuyển đổi dữ liệu<br>(dbt/SQL)]
-        Transform --> AnalyticalLayer[Lớp dữ liệu phân tích<br>(Dim & Fact Tables)]
-        AnalyticalLayer --> Consumption[Báo cáo & Dashboard<br>(Looker Studio/Power BI)]
+    RawData[Khu vực lưu trữ dữ liệu thô\n(GCS/S3)] --> Load[Tải vào Data Warehouse\n(BigQuery)]
+    Load --> Transform[Chuyển đổi dữ liệu\n(dbt/SQL)]
+    Transform --> AnalyticalLayer[Lớp dữ liệu phân tích\n(Dim & Fact Tables)]
+    AnalyticalLayer --> Consumption[Báo cáo & Dashboard\n(Looker Studio/Power BI)]
+
     ```
 
 - Luồng dữ liệu này được thiết kế để đảm bảo tính toàn vẹn, khả năng mở rộng và hiệu quả, cung cấp nền tảng vững chắc cho mọi hoạt động phân tích về hành trình `onboarding` khách hàng.
 
+---
+
 #### 5.2 – Chi Tiết Các Bước Chuyển Đổi (Detailed Transformation Steps)
 
 ---
-#### 5.2.1 – Thu Thập Dữ Liệu Thô (Raw Data Ingestion)
+##### 5.2.1 – Thu Thập Dữ Liệu Thô (Raw Data Ingestion)
 ---
 
 <details>
@@ -485,7 +488,6 @@ title: report_a05_customer_onboarding_analytics
 
 ---
 
-...
 - Giai đoạn đầu tiên trong pipeline ELT là **thu thập dữ liệu thô từ các hệ thống nguồn**, đảm bảo dữ liệu đầy đủ và chính xác cho các bước xử lý tiếp theo.
 - Dữ liệu đến từ **nhiều hệ thống phân tán**, mỗi hệ thống có định dạng và tốc độ cập nhật khác nhau.
 
