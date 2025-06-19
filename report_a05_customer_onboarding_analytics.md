@@ -1029,7 +1029,126 @@ title: report_a05_customer_onboarding_analytics
 
 
 #### 5.4 – Công Cụ và Công Nghệ Đề Xuất (Recommended Tools & Technologies)
-*(Placeholder cho bước sau)*
+---
+<details>
+<summary>Liệt kê và giải thích các công cụ, công nghệ được lựa chọn cho việc xây dựng Data Pipeline</summary>
+
+---
+
+##### 🎯 Mục Tiêu
+
+- Xây dựng một hệ thống xử lý dữ liệu onboarding/KYC hiện đại, mạnh mẽ, dễ mở rộng và duy trì.
+- Ưu tiên các công cụ cloud-native (Google Cloud Platform) kết hợp với các công cụ mã nguồn mở nổi bật (dbt, Airflow).
+- Đảm bảo pipeline hỗ trợ các nhu cầu phân tích đa dạng, theo thời gian thực và theo lô.
+
+---
+
+##### 🏗️ Kiến Trúc Tổng Thể và Luồng Dữ Liệu
+
+```mermaid
+flowchart TD
+    subgraph GCP [Google Cloud Platform]
+        A[Source Systems] --> B[GCS - Landing Zone]
+        B --> C[BigQuery - Data Warehouse]
+        C --> D[dbt: Transformation]
+        D --> E[Looker Studio / BI Tools]
+    end
+    D --> F[dbt Tests - Data Quality Checks]
+    F --> G[Monitoring - Alerting]
+```
+
+---
+
+##### 📌 Công Cụ Theo Chức Năng
+
+---
+
+##### 1. Nền Tảng Lưu Trữ Dữ Liệu Thô (Raw Data Landing Zone / Data Lake)
+
+- **Công cụ:** Google Cloud Storage (GCS)
+- **Lý do lựa chọn:**
+  - Khả năng mở rộng không giới hạn
+  - Tích hợp sâu với BigQuery, Airflow, Cloud Functions
+  - Chi phí thấp và bền vững
+
+---
+
+##### 2. Kho Dữ Liệu (Data Warehouse)
+
+- **Công cụ:** Google BigQuery
+- **Lý do lựa chọn:**
+  - Serverless, xử lý dữ liệu quy mô lớn nhanh chóng
+  - Chuẩn SQL và hỗ trợ BigQuery ML
+  - Kết nối trực tiếp với Looker Studio, Power BI
+
+---
+
+##### 3. Công Cụ Tích Hợp / Thu Thập Dữ Liệu (Ingestion Tools)
+
+- **Công cụ:**
+  - BigQuery Data Transfer Service
+  - Cloud Functions, Cloud Run
+  - Kafka, Google Cloud Pub/Sub
+  - Fivetran, Airbyte
+
+- **Lý do lựa chọn:** Hỗ trợ ingestion từ SaaS, API, và streaming event logs hiệu quả
+
+---
+
+##### 4. Công Cụ Chuyển Đổi Dữ Liệu (Transformation)
+
+- **Công cụ:** dbt + BigQuery SQL
+- **Tùy chọn:** Python / PySpark (Cloud Dataflow)
+
+- **Lý do lựa chọn:**
+  - Modular modeling, version control
+  - Auto-documentation và testing
+  - In-warehouse processing tối ưu hiệu suất
+
+---
+
+##### 5. Công Cụ Điều Phối (Orchestration)
+
+- **Công cụ:** Apache Airflow (Cloud Composer)
+- **Lý do lựa chọn:**
+  - Quản lý DAGs rõ ràng
+  - Tích hợp cảnh báo khi pipeline lỗi
+  - Cộng đồng lớn, dễ mở rộng
+
+---
+
+##### 6. Công Cụ Đảm Bảo Chất Lượng Dữ Liệu (DQA)
+
+- **Công cụ:** dbt tests, Great Expectations, Soda Core
+- **Lý do lựa chọn:**
+  - Kiểm tra `not_null`, `unique`, `relationships`
+  - Định nghĩa các expectation rõ ràng, tạo báo cáo tình trạng dữ liệu
+  - Tích hợp vào CI/CD
+
+---
+
+##### 7. Công Cụ BI / Trực Quan Hóa (Visualization)
+
+- **Công cụ:** Looker Studio (hoặc Power BI, Tableau)
+- **Lý do lựa chọn:**
+  - Miễn phí, dễ dùng, phù hợp stakeholder không kỹ thuật
+  - Kết nối gốc BigQuery, tương tác real-time
+  - Tạo dashboard động, chia sẻ dễ dàng
+
+---
+
+##### ✅ Tổng Kết Công Cụ Đề Xuất
+
+| Thành phần                      | Công cụ chính                              | Ghi chú                                              |
+|--------------------------------|--------------------------------------------|------------------------------------------------------|
+| Data Lake                      | Google Cloud Storage (GCS)                 | Lưu trữ dữ liệu thô, mở rộng tốt                    |
+| Data Warehouse                 | BigQuery                                   | Phân tích dữ liệu lớn, hiệu suất cao                |
+| Ingestion                      | Pub/Sub, Fivetran, Cloud Functions         | Hỗ trợ cả batch và streaming ingestion              |
+| Transformation                 | dbt + SQL, Python                          | Modular hóa logic xử lý, dễ kiểm thử và maintain    |
+| Orchestration                  | Airflow / Cloud Composer                   | Điều phối pipeline linh hoạt và có kiểm soát lỗi    |
+| Data Quality Assurance (DQA)  | dbt tests, Great Expectations              | Giám sát chất lượng dữ liệu toàn pipeline           |
+| Visualization / BI            | Looker Studio, Power BI, Tableau           | Tạo báo cáo và dashboard cho các bên liên quan      |
+
 
 ---
 
