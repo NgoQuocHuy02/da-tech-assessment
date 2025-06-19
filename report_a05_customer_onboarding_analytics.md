@@ -653,25 +653,25 @@ title: report_a05_customer_onboarding_analytics
 
 ---
 
-### ✅ Enrichment từ nguồn ngoài
+##### ✅ Enrichment từ nguồn ngoài
 
-#### 🌍 Vị trí địa lý từ IP
+##### 🌍 Vị trí địa lý từ IP
 - **Cách làm**: IP → country, city, timezone
 - **Nguồn**: MaxMind GeoIP2, IP2Location API
 - **Lý do**: phân tích drop-off theo vùng, compliance địa phương
 
-#### 💻 Thiết bị & hệ điều hành
+##### 💻 Thiết bị & hệ điều hành
 - Trích từ User-Agent string
 - Ví dụ enrich thêm: `device_category`, `os_version`, `browser_family`
 - Hữu ích để kiểm tra liệu tỷ lệ thất bại KYC có liên quan đến thiết bị?
 
-#### 📣 Thông tin chiến dịch Marketing
+##### 📣 Thông tin chiến dịch Marketing
 - Source/medium/campaign từ Firebase, Adjust
 - Gắn thêm trường: `marketing_channel`, `is_paid_user`
 
 ---
 
-### ✅ Enrichment tính toán nội bộ
+##### ✅ Enrichment tính toán nội bộ
 
 | Trường mới | Mô tả | Mục tiêu |
 |------------|--------|----------|
@@ -683,7 +683,7 @@ title: report_a05_customer_onboarding_analytics
 
 ---
 
-### ✅ Kỹ thuật chuyên sâu
+##### ✅ Kỹ thuật chuyên sâu
 
 - **User-defined enrichment logic**: gắn `user_type` = `trusted`, `new`, `risky`
 - **Predictive enrichment** (gợi ý nếu đi xa hơn): Xác suất `conversion_likelihood`, `likely_to_drop`
@@ -697,7 +697,7 @@ title: report_a05_customer_onboarding_analytics
 
 
 ---
-#### 5.2.4 – Xây Dựng Các Bảng Fact (Fact Table Construction)
+##### 5.2.4 – Xây Dựng Các Bảng Fact (Fact Table Construction)
 ---
 
 <details>
@@ -710,7 +710,7 @@ title: report_a05_customer_onboarding_analytics
 
 ---
 
-### ✅ Các bảng fact chính cần xây dựng
+##### ✅ Các bảng fact chính cần xây dựng
 
 ---
 
@@ -791,7 +791,7 @@ title: report_a05_customer_onboarding_analytics
 
 ---
 
-### 🔗 Mối quan hệ với Dimension Tables
+##### 🔗 Mối quan hệ với Dimension Tables
 
 - Mỗi bảng fact sẽ có các khóa ngoại:  
   - `user_id` → `dim_users`  
@@ -800,7 +800,7 @@ title: report_a05_customer_onboarding_analytics
 
 ---
 
-### 🛠 Công cụ / Kỹ thuật thực hiện
+##### 🛠 Công cụ / Kỹ thuật thực hiện
 
 | Bước | Công cụ gợi ý |
 |------|----------------|
@@ -817,8 +817,126 @@ title: report_a05_customer_onboarding_analytics
 </details>
 
 
-##### 5.2.5 – Xây Dựng Các Bảng Dim (Dimension Table Construction)
-*(Placeholder cho bước sau)*
+---
+##### 5.2.5 – Xây Dựng Các Bảng Dimension (Dimension Table Construction)
+---
+
+<details>
+<summary>Mô tả logic và các bước để tạo ra các bảng dimension từ dữ liệu đã được làm sạch và làm giàu</summary>
+
+---
+
+- Các bảng dimension (**dim tables**) cung cấp ngữ cảnh mô tả chi tiết cho các sự kiện và phép đo lường trong các bảng fact.
+- Chúng chứa các thuộc tính (attributes) được dùng để lọc, nhóm và phân tích dữ liệu – ví dụ: người dùng nào, thời gian nào, qua kênh nào, sử dụng thiết bị gì.
+- Mỗi bảng dim có một **khóa chính (Primary Key)** duy nhất, và các bảng fact sẽ tham chiếu tới thông qua **khóa ngoại (Foreign Key)**.
+
+---
+
+##### 📘 `dim_users` – Thông Tin Người Dùng
+
+- **Mục đích:** Lưu trữ thông tin mô tả và trạng thái của người dùng trong hành trình onboarding.
+- **Nguồn dữ liệu:**  
+  - Hệ thống đăng ký (registration system)  
+  - Dữ liệu xác minh KYC/Biometric  
+  - Dữ liệu Risk & Compliance  
+
+- **Logic xây dựng:**
+  - Đảm bảo mỗi `user_id` duy nhất.
+  - **SCD Type 1:** Dùng cho các thuộc tính cập nhật liên tục như `email`, `phone_number`.
+  - **SCD Type 2:** Cho các thuộc tính cần theo dõi lịch sử như `risk_category`, `user_segment`.
+
+- **Các trường đặc trưng:**
+  - `user_id`, `registration_time`, `first_kyc_success_time`
+  - `latest_kyc_status`, `risk_category`, `is_active_user`
+  - `user_segment`, `geo_country`, `language_preference`
+
+---
+
+##### 📅 `dim_time` – Thông Tin Thời Gian
+
+- **Mục đích:** Phân tích thời gian theo ngày/tuần/tháng/quý/năm.
+- **Nguồn dữ liệu:** Sinh tự động bằng SQL/Python.
+
+- **Trường dữ liệu:**
+  - `date_key` (YYYYMMDD), `date`, `day_of_week`, `week_num`, `month`, `quarter`, `year`
+  - `is_weekend`, `holiday_name`
+
+- **Ứng dụng:** Hỗ trợ slice/dice dữ liệu theo thời gian trong dashboard.
+
+---
+
+##### 📶 `dim_channel` – Kênh Đăng Ký / Marketing
+
+- **Mục đích:** Cung cấp ngữ cảnh về nguồn người dùng đến từ đâu.
+- **Nguồn dữ liệu:** Từ marketing attribution (`GA`, `Firebase`, `AppsFlyer`...)
+
+- **Logic xây dựng:**
+  - Chuẩn hóa các giá trị `channel`, `source`, `medium`
+  - Gom nhóm thành `channel_group` như: `Paid`, `Organic`, `Referral`
+
+- **Trường dữ liệu:**
+  - `channel_id`, `channel_name`, `channel_group`, `source`, `campaign_id`
+
+---
+
+##### 📱 `dim_device` – Thiết Bị Người Dùng
+
+- **Mục đích:** Phân tích trải nghiệm onboarding theo từng thiết bị.
+- **Nguồn dữ liệu:** Trích từ `User-Agent` hoặc event logs.
+
+- **Logic enrichment:**
+  - Trích xuất từ chuỗi `user_agent` → `device_type`, `os`, `browser`, `device_model`
+
+- **Trường dữ liệu:**
+  - `device_id`, `device_type`, `os_version`, `browser_type`, `device_model`
+
+---
+
+##### 💬 `dim_communication_type` – Loại Giao Tiếp
+
+- **Mục đích:** Chuẩn hóa loại tin nhắn trong `fact_user_communications`
+- **Giá trị ví dụ:** `Email`, `SMS`, `Push`, `In-App Message`
+
+---
+
+##### 📄 `dim_document_type` – Loại Giấy Tờ
+
+- **Mục đích:** Chuẩn hóa và phân loại các loại giấy tờ người dùng cung cấp.
+- **Giá trị ví dụ:** `Passport`, `National ID`, `Driver's License`
+
+---
+
+##### 🔗 Mối Quan Hệ Giữa Fact và Dimension Tables
+
+| Fact Table | Dimension Table Tham Chiếu |
+|------------|-----------------------------|
+| `fact_onboarding_events` | `dim_users`, `dim_time`, `dim_channel`, `dim_device` |
+| `fact_kyc_verification_details` | `dim_users`, `dim_document_type`, `dim_time` |
+| `fact_risk_assessments` | `dim_users`, `dim_time` |
+| `fact_user_communications` | `dim_users`, `dim_communication_type`, `dim_time` |
+
+---
+
+##### 🛠 Công Cụ / Kỹ Thuật Đề Xuất
+
+| Tác vụ | Công cụ gợi ý |
+|-------|----------------|
+| Xây dựng `dim_users` | SQL (BigQuery), `dbt` (cho SCD Type 2), Python |
+| Sinh `dim_time` | SQL (`GENERATE_DATE_ARRAY` – BigQuery), Python |
+| Chuẩn hóa `dim_channel`, `dim_device` | SQL `CASE`, `UDF`, thư viện `user_agents` |
+| Quản lý pipeline | dbt models, Airflow DAGs |
+
+---
+
+##### ✅ Tổng Kết
+
+- Việc xây dựng các bảng dimension chuẩn xác là yếu tố then chốt để phân tích sâu, slice/dice hiệu quả, và xây dựng dashboard thân thiện cho stakeholder.
+- Mỗi bảng dimension cần đảm bảo: dữ liệu sạch, không trùng, chuẩn hóa và dễ `JOIN` với các bảng fact.
+- Dimension Tables là lớp “ngữ cảnh” bổ sung giá trị phân tích mà dữ liệu sự kiện (event) đơn lẻ không thể mang lại.
+
+---
+</details>
+
 
 #### 5.3 – Đảm Bảo Chất Lượng Dữ Liệu (Data Quality Assurance)
 *(Placeholder cho bước sau)*
