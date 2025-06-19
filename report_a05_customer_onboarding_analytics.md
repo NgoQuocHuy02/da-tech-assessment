@@ -455,23 +455,7 @@ title: report_a05_customer_onboarding_analytics
 
 - Luồng dữ liệu tổng quát có thể được hình dung qua sơ đồ sau:
 
-    ```mermaid
-    flowchart TD
-    subgraph Source Systems
-        A[Hệ thống đăng ký] --> RawData
-        B[Hệ thống KYC/Biometric] --> RawData
-        C[Hệ thống Risk/Compliance] --> RawData
-        D[Hệ thống Giao tiếp] --> RawData
-        E[App Event Logs] --> RawData
-        F[Hệ thống Duyệt thủ công] --> RawData
-    end
-
-    RawData[Khu vực lưu trữ dữ liệu thô\n(GCS/S3)] --> Load[Tải vào Data Warehouse\n(BigQuery)]
-    Load --> Transform[Chuyển đổi dữ liệu\n(dbt/SQL)]
-    Transform --> AnalyticalLayer[Lớp dữ liệu phân tích\n(Dim & Fact Tables)]
-    AnalyticalLayer --> Consumption[Báo cáo & Dashboard\n(Looker Studio/Power BI)]
-
-    ```
+    <pre lang="markdown"> ```mermaid flowchart TD subgraph Source Systems A[Hệ thống đăng ký] --> RawData B[Hệ thống KYC/Biometric] --> RawData C[Hệ thống Risk/Compliance] --> RawData D[Hệ thống Giao tiếp] --> RawData E[App Event Logs] --> RawData F[Hệ thống Duyệt thủ công] --> RawData end RawData[Khu vực lưu trữ dữ liệu thô\n(GCS/S3)] --> Load[Tải vào Data Warehouse\n(BigQuery)] Load --> Transform[Chuyển đổi dữ liệu\n(dbt/SQL)] Transform --> AnalyticalLayer[Lớp dữ liệu phân tích\n(Dim & Fact Tables)] AnalyticalLayer --> Consumption[Báo cáo & Dashboard\n(Looker Studio/Power BI)] ``` </pre>
 
 - Luồng dữ liệu này được thiết kế để đảm bảo tính toàn vẹn, khả năng mở rộng và hiệu quả, cung cấp nền tảng vững chắc cho mọi hoạt động phân tích về hành trình `onboarding` khách hàng.
 
