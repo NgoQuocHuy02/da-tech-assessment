@@ -457,19 +457,19 @@ title: report_a05_customer_onboarding_analytics
 
     ```mermaid
     flowchart TD
-      subgraph Source_Systems [Hệ thống nguồn]
-        A[Hệ thống đăng ký] --> RawData
-        B[Hệ thống KYC/Biometric] --> RawData
-        C[Hệ thống Risk/Compliance] --> RawData
-        D[Hệ thống Giao tiếp] --> RawData
-        E[App Event Logs] --> RawData
-        F[Hệ thống Duyệt thủ công] --> RawData
-      end
+  subgraph Source_Systems [Hệ thống nguồn]
+    A[Hệ thống đăng ký] --> RawData
+    B[Hệ thống KYC/Biometric] --> RawData
+    C[Hệ thống Risk/Compliance] --> RawData
+    D[Hệ thống Giao tiếp] --> RawData
+    E[App Event Logs] --> RawData
+    F[Hệ thống Duyệt thủ công] --> RawData
+  end
 
-      RawData[Khu vực lưu trữ dữ liệu thô<br/>(GCS/S3)] --> Load[Tải vào Data Warehouse<br/>(BigQuery)]
-      Load --> Transform[Chuyển đổi dữ liệu<br/>(dbt/SQL)]
-      Transform --> AnalyticalLayer[Lớp dữ liệu phân tích<br/>(Dim & Fact Tables)]
-      AnalyticalLayer --> Consumption[Báo cáo & Dashboard<br/>(Looker Studio/Power BI)]
+  RawData["Khu vực lưu trữ dữ liệu thô (GCS/S3)"] --> Load["Tải vào Data Warehouse (BigQuery)"]
+  Load --> Transform["Chuyển đổi dữ liệu (dbt/SQL)"]
+  Transform --> AnalyticalLayer["Lớp dữ liệu phân tích (Dim & Fact Tables)"]
+  AnalyticalLayer --> Consumption["Báo cáo & Dashboard (Looker Studio/Power BI)"]
     ```
 
 - Luồng dữ liệu này được thiết kế để đảm bảo tính toàn vẹn, khả năng mở rộng và hiệu quả, cung cấp nền tảng vững chắc cho mọi hoạt động phân tích về hành trình `onboarding` khách hàng.
@@ -525,8 +525,78 @@ title: report_a05_customer_onboarding_analytics
 </details>
 
 
+---
 ##### 5.2.2 – Làm Sạch & Chuẩn Hóa Dữ Liệu (Data Cleaning & Standardization)
-*(Sẽ hoàn thiện ở bước tiếp theo)*
+---
+
+<details>
+<summary>Mô tả các quy trình làm sạch, chuẩn hóa và xử lý dữ liệu thô để đảm bảo chất lượng và tính nhất quán</summary>
+
+---
+
+- Mục tiêu của giai đoạn này là biến dữ liệu thô, có thể lộn xộn và không nhất quán, thành một định dạng sạch sẽ, chuẩn hóa và sẵn sàng cho phân tích.
+- Đây là bước cực kỳ quan trọng vì nếu đầu vào là dữ liệu "rác" (Garbage In), thì đầu ra của phân tích cũng sẽ sai lệch nghiêm trọng (Garbage Out).
+
+---
+
+##### 🎯 Lý do cần làm sạch và chuẩn hóa
+
+| Vấn đề phổ biến | Hậu quả nếu không xử lý |
+|------------------|--------------------------|
+| Dữ liệu thiếu / NULL | Gây sai lệch thống kê, lỗi khi join bảng |
+| Định dạng không chuẩn | Không thể chuyển đổi hoặc so sánh |
+| Trùng lặp bản ghi | Gây trùng đếm, sai kết quả phân tích |
+| Giá trị ngoại lệ | Kéo lệch trung bình, gây hiểu nhầm |
+| Không thống nhất | Gây khó khăn khi lọc, phân nhóm |
+
+---
+
+##### 🧹 Các bước làm sạch dữ liệu
+
+| Vấn đề | Phương pháp xử lý |
+|--------|--------------------|
+| **NULL/thiếu dữ liệu** | Gán mặc định (`unknown`), loại bỏ nếu critical, đánh cờ `is_incomplete` |
+| **Trùng lặp bản ghi** | Xác định dựa trên `user_id + event_name + timestamp`, giữ bản mới nhất |
+| **Giá trị bất hợp lệ** | Dùng kiểm tra biên (boundary check), loại bỏ hoặc đánh cờ `invalid` |
+| **Timestamp sai** | Chuẩn hóa về `UTC`, bỏ bản ghi có timestamp tương lai quá xa |
+| **Dữ liệu phân tán** | Gộp trường tương đương, chuẩn hóa biến thể tên |
+
+---
+
+##### 🛠 Chuẩn hóa định dạng và chuỗi
+
+| Đối tượng | Quy tắc chuẩn hóa |
+|----------|--------------------|
+| **Text fields** | lowercase hóa, trim space, viết hoa chuẩn (`Ho Chi Minh`) |
+| **Country / Region** | Ánh xạ về ISO-3166 (`VN`, `Viet Nam`, `Vietnam` → `Vietnam`) |
+| **Device / OS / Browser** | Dùng bảng mapping chuẩn (`chrome`, `iOS 17`, `Android`) |
+| **Thời gian** | Chuyển về `ISO 8601` UTC (`2025-06-17T08:00:00Z`) |
+| **Mã định danh** | Format chuẩn: UUID hoặc hashed, không rỗng, không trùng |
+
+---
+
+##### 🔧 Công cụ và kỹ thuật được đề xuất
+
+| Công đoạn | Công cụ đề xuất |
+|-----------|------------------|
+| Làm sạch cơ bản | SQL (BigQuery Standard SQL) |
+| Chuẩn hóa chuỗi | Python (`pandas`, `str.lower()`, `regex`, `fuzzywuzzy`) |
+| Phát hiện trùng | `ROW_NUMBER() OVER`, `DISTINCT`, `pandas.duplicated()` |
+| Kiểm tra thời gian | `TIMESTAMP_DIFF`, kiểm tra `> NOW()` |
+| Mapping chuẩn | Python dict / SQL CASE / JOIN bảng tham chiếu |
+
+---
+
+- Ngoài ra, cần thêm cột **đánh cờ chất lượng** vào bảng dữ liệu để phân tích sau này, ví dụ:
+  - `is_valid` (TRUE/FALSE)
+  - `data_quality_flag`
+  - `cleaning_note`
+
+- Việc làm sạch và chuẩn hóa không chỉ giúp tạo ra dữ liệu tin cậy, mà còn làm nền tảng cho việc xây dựng bảng `fact`/`dim` chất lượng cao và KPI chính xác.
+
+---
+</details>
+
 
 ##### 5.2.3 – Làm Giàu Dữ Liệu (Data Enrichment)
 *(Placeholder cho bước sau)*
