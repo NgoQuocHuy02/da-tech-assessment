@@ -475,10 +475,9 @@ title: report_a05_customer_onboarding_analytics
 - Luồng dữ liệu này được thiết kế để đảm bảo tính toàn vẹn, khả năng mở rộng và hiệu quả, cung cấp nền tảng vững chắc cho mọi hoạt động phân tích về hành trình `onboarding` khách hàng.
 
 ---
-
 #### 5.2 – Chi Tiết Các Bước Chuyển Đổi (Detailed Transformation Steps)
-
 ---
+
 ##### 5.2.1 – Thu Thập Dữ Liệu Thô (Raw Data Ingestion)
 ---
 
