@@ -2,502 +2,486 @@
 title: report_a05_customer_onboarding_analytics
 ---
 
-# Phân Tích Hành Trình Onboarding Khách Hàng (KYC/AML)
+# Customer Onboarding Journey Analysis (KYC/AML)
 
 ---
-## Thuật Ngữ
+## Terminology
 ---
-
 <details>
-<summary>Giải Nghĩa Các Thuật Ngữ Quan Trọng Trong Onboarding và KYC/AML</summary>
+<summary>Key Terms and Definitions in Onboarding and KYC/AML</summary>
 
 ---
 
-
-| **Thuật Ngữ**                          | **Định Nghĩa**                                                                 |
-|---------------------------------------|--------------------------------------------------------------------------------|
-| **A/B Testing**                       | Phương pháp thử nghiệm hai phiên bản để đo lường tác động của thay đổi.       |
-| **abandonment_flag**                  | Biến đánh dấu người dùng đã từ bỏ quy trình tại một bước nào đó.              |
-| **AML**                               | Anti-Money Laundering – Chống rửa tiền, đảm bảo khách hàng không liên quan đến hoạt động tài chính phi pháp. |
-| **approval rate (Tỷ lệ chấp thuận)**  | Tỷ lệ hồ sơ người dùng được duyệt qua các bước xác minh.                      |
-| **audit log / audit trail**           | Nhật ký ghi lại toàn bộ hành động để phục vụ kiểm toán và tuân thủ.           |
-| **auto-approve rule**                 | Quy tắc cho phép tự động phê duyệt hồ sơ nếu thỏa điều kiện nhất định.        |
-| **baseline metrics**                  | Chỉ số cơ sở trước khi áp dụng thay đổi, dùng để so sánh sau cải tiến.        |
-| **business impact**                   | Tác động đến hoạt động hoặc mục tiêu kinh doanh.                              |
-| **channel_id**                        | ID của kênh đăng ký, dùng trong phân tích attribution.                        |
-| **churn**                             | Tỷ lệ người dùng rời bỏ hệ thống hoặc ngừng sử dụng dịch vụ.                  |
-| **cohort**                            | Nhóm người dùng có chung đặc điểm hoặc thời điểm bắt đầu hành trình.          |
-| **conversion (Chuyển đổi)**           | Tỷ lệ người dùng hoàn tất một bước hoặc toàn bộ quá trình onboarding.         |
-| **CPA (Cost per Acquisition)**        | Chi phí để có được một người dùng mới (nếu tích hợp dữ liệu chi phí).         |
-| **CSAT (Customer Satisfaction Score)**| Thước đo mức độ hài lòng của người dùng, thường thu thập qua khảo sát.        |
-| **device_model**                      | Mẫu thiết bị người dùng sử dụng.                                               |
-| **device_type**                       | Loại thiết bị người dùng sử dụng (Mobile, Desktop, Tablet...).                |
-| **dim table**                         | Bảng dimension – chứa thông tin mô tả như người dùng, thiết bị, thời gian...  |
-| **document rejection reason**         | Lý do cụ thể khiến giấy tờ bị từ chối trong quá trình KYC.                    |
-| **drop-off**                          | Hiện tượng người dùng rời bỏ quy trình onboarding tại một bước cụ thể.        |
-| **drop-off rate**                     | Phần trăm người dùng không hoàn thành một bước nào đó trong phễu onboarding.  |
-| **duration_in_step_seconds**          | Thời gian người dùng ở lại tại một bước cụ thể trong quy trình onboarding.    |
-| **event_name**                        | Tên của sự kiện trong log ứng dụng (VD: KYC_STARTED).                         |
-| **face_match_score**                 | Điểm đo mức độ khớp giữa ảnh selfie và giấy tờ tùy thân.                      |
-| **false negative**                    | Trường hợp hệ thống không phát hiện rủi ro mặc dù có.                         |
-| **false positive**                    | Trường hợp hệ thống đánh dấu sai một hồ sơ là rủi ro.                         |
-| **funnel conversion rate**            | Tỷ lệ chuyển đổi giữa các bước trong hành trình onboarding.                  |
-| **geo_country / geo_city**            | Quốc gia / thành phố mà người dùng đang sinh sống hoặc đăng ký.               |
-| **insight**                           | Thông tin có giá trị được rút ra từ dữ liệu để hỗ trợ ra quyết định.         |
-| **internal_risk_score**               | Điểm rủi ro nội bộ do hệ thống đánh giá dựa trên các chỉ báo.                |
-| **KYC**                               | Know Your Customer – Quy trình xác minh danh tính khách hàng theo quy định.  |
-| **kyc_result**                        | Kết quả xác minh danh tính: Approved, Rejected, Pending...                    |
-| **liveness_check**                    | Quy trình kiểm tra người dùng là người thật, không phải ảnh hoặc bot.         |
-| **manual_review**                     | Quy trình đánh giá hồ sơ thủ công bởi con người.                              |
-| **manual_review_queue_volume**        | Số lượng hồ sơ đang chờ xử lý thủ công tại một thời điểm.                     |
-| **monitoring dashboard**              | Bảng điều khiển trực quan giúp theo dõi và giám sát hiệu suất theo thời gian. |
-| **OCR**                               | Optical Character Recognition – Công nghệ đọc ký tự từ ảnh giấy tờ.           |
-| **ocr_confidence**                    | Mức độ tin cậy của kết quả nhận dạng ký tự từ giấy tờ.                        |
-| **ocr_status**                        | Trạng thái OCR: Success, Failure, Partial.                                    |
-| **onboarding**                        | Quá trình đưa người dùng mới từ đăng ký đến khi có thể sử dụng đầy đủ dịch vụ.|
-| **onboarding journey**                | Hành trình người dùng trải qua từ lúc đăng ký đến khi được kích hoạt hoàn toàn.|
-| **onboarding_step**                  | Thứ tự các bước trong phễu onboarding.                                        |
-| **operational efficiency**            | Hiệu quả vận hành, thể hiện qua năng suất và tối ưu hóa quy trình.            |
-| **PEP**                               | Politically Exposed Person – Cá nhân có ảnh hưởng chính trị, cần giám sát chặt chẽ hơn. |
-| **pep_flag / sanction_flag**          | Cờ đánh dấu người dùng nằm trong danh sách chính trị hoặc bị cấm vận.         |
-| **phễu onboarding (Funnel)**          | Chuỗi các bước người dùng cần thực hiện trong quá trình onboarding.           |
-| **registration_channel**              | Kênh mà người dùng bắt đầu đăng ký (Web, Mobile, Referral...).                |
-| **registration_completion_rate**      | Tỷ lệ người dùng hoàn tất toàn bộ quy trình đăng ký.                          |
-| **retry_count**                       | Số lần người dùng gửi lại giấy tờ xác minh.                                   |
-| **risk_score**                        | Điểm đánh giá rủi ro tổng hợp của người dùng.                                 |
-| **risk traceability**                 | Khả năng truy xuất các quyết định liên quan đến rủi ro từ dữ liệu gốc.        |
-| **ROI (Return on Investment)**        | Lợi tức đầu tư – giá trị thu được so với chi phí bỏ ra cho cải tiến hoặc dự án.|
-| **sanction match rate**               | Tỷ lệ người dùng khớp với danh sách trừng phạt.                               |
-| **session_id**                        | Mã định danh của một phiên truy cập người dùng.                               |
-| **stakeholder**                       | Bên liên quan – các cá nhân hoặc nhóm chịu ảnh hưởng bởi kết quả phân tích.   |
-| **time_to_kyc_completion**            | Thời gian từ khi đăng ký đến khi hoàn tất xác minh danh tính.                |
-| **time_to_kyc_success**               | Thời gian từ khi người dùng bắt đầu đến khi hoàn tất xác minh KYC.           |
-| **user_id**                           | Mã định danh duy nhất của người dùng.                                         |
-
+  | **Term**                          | **Definition**                                                                 |
+  |------------------------------------|-------------------------------------------------------------------------------|
+  | **A/B Testing**                    | A method of testing two versions to measure the impact of a change.           |
+  | **abandonment_flag**               | A variable indicating a user abandoned the process at a certain step.         |
+  | **AML**                            | Anti-Money Laundering – Ensures customers are not involved in illegal finance.|
+  | **approval rate**                  | The rate of user profiles approved through verification steps.                |
+  | **audit log / audit trail**        | A log recording all actions for audit and compliance purposes.                |
+  | **auto-approve rule**              | A rule allowing automatic approval if certain conditions are met.             |
+  | **baseline metrics**               | Baseline metrics before changes, used for post-improvement comparison.        |
+  | **business impact**                | Impact on business operations or objectives.                                  |
+  | **channel_id**                     | Registration channel ID, used in attribution analysis.                        |
+  | **churn**                          | The rate of users leaving or stopping service usage.                          |
+  | **cohort**                         | A group of users sharing common characteristics or start time.                |
+  | **conversion**                     | The rate of users completing a step or the entire onboarding process.         |
+  | **CPA (Cost per Acquisition)**     | Cost to acquire a new user (if cost data is integrated).                      |
+  | **CSAT (Customer Satisfaction Score)**| A measure of user satisfaction, usually via surveys.                      |
+  | **device_model**                   | The model of device used by the user.                                         |
+  | **device_type**                    | The type of device used (Mobile, Desktop, Tablet, etc.).                      |
+  | **dim table**                      | Dimension table – contains descriptive info like user, device, time, etc.     |
+  | **document rejection reason**      | Specific reason a document was rejected during KYC.                           |
+  | **drop-off**                       | Users leaving the onboarding process at a specific step.                      |
+  | **drop-off rate**                  | Percentage of users not completing a step in the onboarding funnel.           |
+  | **duration_in_step_seconds**       | Time a user spends at a specific step in onboarding.                          |
+  | **event_name**                     | Name of the event in the app log (e.g., KYC_STARTED).                        |
+  | **face_match_score**               | Score measuring the match between selfie and ID photo.                        |
+  | **false negative**                 | System fails to detect risk when it exists.                                   |
+  | **false positive**                 | System incorrectly flags a profile as risky.                                  |
+  | **funnel conversion rate**         | Conversion rate between steps in the onboarding journey.                      |
+  | **geo_country / geo_city**         | Country/city where the user lives or registers.                               |
+  | **insight**                        | Valuable information derived from data to support decision-making.            |
+  | **internal_risk_score**            | Internal risk score assessed by the system based on indicators.               |
+  | **KYC**                            | Know Your Customer – Customer identity verification process as required.      |
+  | **kyc_result**                     | KYC result: Approved, Rejected, Pending, etc.                                 |
+  | **liveness_check**                 | Process to check if the user is real, not a photo or bot.                     |
+  | **manual_review**                  | Manual profile review process by humans.                                      |
+  | **manual_review_queue_volume**     | Number of profiles waiting for manual review at a given time.                 |
+  | **monitoring dashboard**           | Visual dashboard for real-time performance monitoring.                        |
+  | **OCR**                            | Optical Character Recognition – Technology to read text from document images. |
+  | **ocr_confidence**                 | Confidence level of OCR results.                                              |
+  | **ocr_status**                     | OCR status: Success, Failure, Partial.                                        |
+  | **onboarding**                     | The process of moving a new user from registration to full service access.    |
+  | **onboarding journey**             | The user's journey from registration to full activation.                      |
+  | **onboarding_step**                | The order of steps in the onboarding funnel.                                  |
+  | **operational efficiency**         | Operational efficiency, reflected in productivity and process optimization.   |
+  | **PEP**                            | Politically Exposed Person – Requires stricter monitoring.                    |
+  | **pep_flag / sanction_flag**       | Flags indicating user is on political or sanction lists.                      |
+  | **onboarding funnel**              | Sequence of steps users must complete during onboarding.                      |
+  | **registration_channel**           | Channel where user started registration (Web, Mobile, Referral, etc.).        |
+  | **registration_completion_rate**   | Percentage of users completing the entire registration process.               |
+  | **retry_count**                    | Number of times user resubmitted verification documents.                      |
+  | **risk_score**                     | Aggregate risk score of the user.                                             |
+  | **risk traceability**              | Ability to trace risk decisions back to source data.                          |
+  | **ROI (Return on Investment)**     | Value gained versus cost for improvements or projects.                        |
+  | **sanction match rate**            | Rate of users matching sanction lists.                                        |
+  | **session_id**                     | Unique identifier for a user session.                                         |
+  | **stakeholder**                    | Stakeholder – individuals or groups affected by analysis results.             |
+  | **time_to_kyc_completion**         | Time from registration to KYC completion.                                     |
+  | **time_to_kyc_success**            | Time from user start to KYC completion.                                       |
+  | **user_id**                        | Unique identifier for the user.                                               |
 
 ---
 </details>
 
 ---
-## Mục Lục
+## Table of Contents
 ---
 <details>
-<summary>Xem tổng quan các chương và phần chính của tài liệu</summary>
+<summary>Overview of Main Chapters and Sections</summary>
 
 ---
 
-- [Tóm Tắt Tổng Quan](#tóm-tắt-tổng-quan)
-- [1. Phát Biểu Vấn Đề](#1-phát-biểu-vấn-đề)
-- [2. Mục Tiêu Dự Án](#2-mục-tiêu-dự-án)
-- [3. Kế Hoạch và Các Giai Đoạn Dự Án](#3-kế-hoạch-và-các-giai-đoạn-dự-án)
-- [4. Nguồn Dữ Liệu và Thiết Kế Schema](#4-nguồn-dữ-liệu-và-thiết-kế-schema)
-    - [4.1 – Nguồn Dữ Liệu Thô (Raw Data Sources)](#41--nguồn-dữ-liệu-thô-raw-data-sources)
-    - [4.2 – Thiết Kế Schema Dữ Liệu Đề Xuất (Proposed Data Schema)](#42--thiết-kế-schema-dữ-liệu-đề-xuất-proposed-data-schema)
-- [5. Logic Chuyển Đổi Dữ Liệu](#5-logic-chuyển-đổi-dữ-liệu)
-    - [5.1 – Tổng Quan Về Luồng Dữ Liệu (Data Flow Overview)](#51--tổng-quan-về-luồng-dữ-liệu-data-flow-overview)
-    - [5.2 – Chi Tiết Các Bước Chuyển Đổi (Detailed Transformation Steps)](#52--chi-tiết-các-bước-chuyển-đổi-detailed-transformation-steps)
-        - [5.2.1 – Thu Thập Dữ Liệu Thô (Raw Data Ingestion)](#521--thu-thập-dữ-liệu-thô-raw-data-ingestion)
-        - [5.2.2 – Làm Sạch & Chuẩn Hóa Dữ Liệu (Data Cleaning & Standardization)](#522--làm-sạch--chuẩn-hóa-dữ-liệu-data-cleaning--standardization)
-        - [5.2.3 – Làm Giàu Dữ Liệu (Data Enrichment)](#523--làm-giàu-dữ-liệu-data-enrichment)
-        - [5.2.4 – Xây Dựng Các Bảng Fact (Fact Table Construction)](#524--xây-dựng-các-bảng-fact-fact-table-construction)
-        - [5.2.5 – Xây Dựng Các Bảng Dimension (Dimension Table Construction)](#525--xây-dựng-các-bảng-dimension-dimension-table-construction)
-    - [5.3 – Đảm Bảo Chất Lượng Dữ Liệu (Data Quality Assurance)](#53--đảm-bảo-chất-lượng-dữ-liệu-data-quality-assurance)
-    - [5.4 – Công Cụ và Công Nghệ Đề Xuất (Recommended Tools & Technologies)](#54--công-cụ-và-công-nghệ-đề-xuất-recommended-tools--technologies)
-    - [5.5 – Tổng Kết Giai Đoạn Chuyển Đổi Dữ Liệu (Summary of Transformation Logic)](#55--tổng-kết-giai-đoạn-chuyển-đổi-dữ-liệu-summary-of-transformation-logic)
-- [6. Khung Phân Tích và Các KPIs](#6-khung-phân-tích-và-các-kpis)
-    - [6.1 – Thiết Kế Cấu Trúc Phễu Onboarding (Funnel Modeling)](#61--thiết-kế-cấu-trúc-phễu-onboarding-funnel-modeling)
-    - [6.2 – Phân Tích Thực Tế Dữ Liệu Funnel (Funnel Metrics Analysis)](#62--phân-tích-thực-tế-dữ-liệu-funnel-funnel-metrics-analysis)
-    - [6.3 – Chỉ Số KPI Cốt Lõi (Key Performance Indicators)](#63--chỉ-số-kpi-cốt-lõi-key-performance-indicators)
-    - [6.4 – Phân Tích Hành Vi Người Dùng (User Behavior Analytics)](#64--phân-tích-hành-vi-người-dùng-user-behavior-analytics)
-    - [6.5 – Phân Tích Tuân Thủ & Rủi Ro (Compliance & Risk Insights)](#65--phân-tích-tuân-thủ--rủi-ro-compliance--risk-insights)
-- [7. Chiến Lược Báo Cáo và Dashboard](#7-chiến-lược-báo-cáo-và-dashboard)
-    - [7.1 – Cấu Trúc Dashboard Đề Xuất Theo Chủ Đề (Theme-Oriented Dashboard Structure)](#71--cấu-trúc-dashboard-đề-xuất-theo-chủ-đề-theme-oriented-dashboard-structure)
-    - [7.2 – Phân Loại Dashboard Theo Đối Tượng Người Dùng (Stakeholder-Oriented Dashboards)](#72--phân-loại-dashboard-theo-đối-tượng-người-dùng-stakeholder-oriented-dashboards)
-    - [7.3 – Quy Ước Trực Quan Hóa Dữ Liệu (Visualization Guidelines)](#73--quy-ước-trực-quan-hóa-dữ-liệu-visualization-guidelines)
-- [8. Tác Động Kinh Doanh và Khuyến Nghị](#8-tác-động-kinh-doanh-và-khuyến-nghị)
-    - [8.1 – Khuyến Nghị Dựa Trên Phân Tích (Analysis-Driven Recommendations)](#81--khuyến-nghị-dựa-trên-phân-tích-analysis-driven-recommendations)
-    - [8.2 – Tác Động Kinh Doanh Mong Đợi (Expected Business Impact)](#82--tác-động-kinh-doanh-mong-đợi-expected-business-impact)
-    - [8.3 – Kế Hoạch Đo Lường và Theo Dõi (Measurement & Monitoring Plan)](#83--kế-hoạch-đo-lường-và-theo-dõi-measurement-monitoring-plan)
+  - [Executive Summary](#executive-summary)
+  - [1. Problem Statement](#1-problem-statement)
+  - [2. Project Objectives](#2-project-objectives)
+  - [3. Project Plan and Phases](#3-project-plan-and-phases)
+  - [4. Data Sources and Schema Design](#4-data-sources-and-schema-design)
+    - [4.1 – Raw Data Sources](#41--raw-data-sources)
+    - [4.2 – Proposed Data Schema](#42--proposed-data-schema)
+  - [5. Data Transformation Logic](#5-data-transformation-logic)
+    - [5.1 – Data Flow Overview](#51--data-flow-overview)
+    - [5.2 – Detailed Transformation Steps](#52--detailed-transformation-steps)
+      - [5.2.1 – Raw Data Ingestion](#521--raw-data-ingestion)
+      - [5.2.2 – Data Cleaning & Standardization](#522--data-cleaning--standardization)
+      - [5.2.3 – Data Enrichment](#523--data-enrichment)
+      - [5.2.4 – Fact Table Construction](#524--fact-table-construction)
+      - [5.2.5 – Dimension Table Construction](#525--dimension-table-construction)
+    - [5.3 – Data Quality Assurance](#53--data-quality-assurance)
+    - [5.4 – Recommended Tools & Technologies](#54--recommended-tools--technologies)
+    - [5.5 – Summary of Transformation Logic](#55--summary-of-transformation-logic)
+  - [6. Analytics Framework and KPIs](#6-analytics-framework-and-kpis)
+    - [6.1 – Funnel Modeling](#61--funnel-modeling)
+    - [6.2 – Funnel Metrics Analysis](#62--funnel-metrics-analysis)
+    - [6.3 – Key Performance Indicators](#63--key-performance-indicators)
+    - [6.4 – User Behavior Analytics](#64--user-behavior-analytics)
+    - [6.5 – Compliance & Risk Insights](#65--compliance--risk-insights)
+  - [7. Reporting and Dashboard Strategy](#7-reporting-and-dashboard-strategy)
+    - [7.1 – Theme-Oriented Dashboard Structure](#71--theme-oriented-dashboard-structure)
+    - [7.2 – Stakeholder-Oriented Dashboards](#72--stakeholder-oriented-dashboards)
+    - [7.3 – Visualization Guidelines](#73--visualization-guidelines)
+  - [8. Business Impact and Recommendations](#8-business-impact-and-recommendations)
+    - [8.1 – Analysis-Driven Recommendations](#81--analysis-driven-recommendations)
+    - [8.2 – Expected Business Impact](#82--expected-business-impact)
+    - [8.3 – Measurement & Monitoring Plan](#83--measurement--monitoring-plan)
 
 ---
-
 </details>
 
 ---
-## Tóm Tắt Tổng Quan
+## Executive Summary
 ---
 <details>
-<summary>Tổng Quan Cao Cấp về Khung Phân Tích và Tác Động Kinh Doanh Chính</summary>
+<summary>High-Level Overview of Analytics Framework and Key Business Impacts</summary>
 
 ---
 
-- Báo cáo này tập trung vào phân tích hành trình `onboarding` và quy trình `KYC/AML` trong lĩnh vực tài chính, nhằm tối ưu chuyển đổi người dùng, tăng cường tuân thủ, và giảm thiểu rủi ro vận hành.
-
-- Dựa trên bài toán giả định từ doanh nghiệp, nhóm phân tích đã thiết kế một hệ thống phân tích toàn diện, bao gồm:
-  - **Lược đồ dữ liệu (schema)** chuẩn hóa theo mô hình Kim Tự Tháp (Star Schema).
-  - **Pipeline xử lý dữ liệu** từ thu thập, làm sạch, đến xây dựng bảng `fact/dim`, kiểm soát chất lượng (DQA).
-  - **Khung phân tích (Analytics Framework)** với các chỉ số KPI cốt lõi, phân tích hành vi, phân tích rủi ro.
-  - **Dashboard theo chủ đề và người dùng**, hỗ trợ ra quyết định cho các bộ phận Điều hành, Vận hành, Risk, Marketing và Product.
-
-- Từ các phân tích định lượng và định tính, báo cáo đưa ra **các khuyến nghị có thể hành động**, như cải tiến UI, tối ưu thuật toán OCR, tự động hóa duyệt hồ sơ rủi ro thấp.
-
-- Các tác động kinh doanh mong đợi bao gồm:
-  - **Tăng tỷ lệ chuyển đổi** người dùng đăng ký thành công.
-  - **Giảm chi phí vận hành**, đặc biệt là chi phí xử lý thủ công.
-  - **Cải thiện trải nghiệm người dùng** và mức độ hài lòng.
-  - **Tăng cường hiệu quả quản lý rủi ro và tuân thủ** quy định pháp lý.
-
-- Báo cáo này không chỉ cung cấp góc nhìn chiến lược, mà còn triển khai chi tiết về mặt kỹ thuật, quy trình và đo lường, sẵn sàng được ứng dụng vào thực tế hoặc mở rộng cho các dự án phân tích lớn hơn.
+  - This report focuses on analyzing the customer onboarding journey and KYC/AML process in the financial sector, aiming to optimize user conversion, enhance compliance, and reduce operational risk.
+  - Based on a hypothetical business case, the analytics team designed a comprehensive analytics system, including:
+    - A standardized data schema following the Star Schema model.
+    - A data processing pipeline from collection, cleaning, to fact/dim table construction and data quality control (DQA).
+    - An analytics framework with core KPIs, behavioral analysis, and risk analysis.
+    - Thematic and user-oriented dashboards to support decision-making for Operations, Risk, Marketing, and Product teams.
+  - From both quantitative and qualitative analyses, the report provides actionable recommendations, such as UI improvements, OCR algorithm optimization, and automation for low-risk profile approvals.
+  - Expected business impacts include:
+    - Increased conversion rate of successful user registrations.
+    - Reduced operational costs, especially manual processing costs.
+    - Improved user experience and satisfaction.
+    - Enhanced risk management and regulatory compliance.
+  - This report not only offers a strategic perspective but also details technical, process, and measurement aspects, ready for real-world application or scaling to larger analytics projects.
 
 ---
-
-</details>
-
-
----
-
-## 1. Phát Biểu Vấn Đề
----
-<details>
-<summary>Mô Tả Chi Tiết Thách Thức Kinh Doanh trong Quy Trình Onboarding Khách Hàng và KYC/AML</summary>
-
----
-
-- **Tình Hình Hiện Tại:**
-  - Nhiều khách hàng tiềm năng bắt đầu quy trình đăng ký nhưng bỏ dở giữa chừng.
-  - Tồn tại các `điểm ma sát` đáng kể, đặc biệt trong các bước xác minh `KYC/AML` phức tạp.
-- **Hậu Quả:**
-  - `Mất Khách Hàng Tiềm Năng`: Ảnh hưởng trực tiếp đến việc thu hút người dùng và tăng trưởng kinh doanh.
-  - `Tăng Chi Phí Vận Hành`: Do hỗ trợ thủ công, xác minh thất bại và xử lý lại.
-  - `Trải Nghiệm Khách Hàng Chưa Tối Ưu`: Dẫn đến sự khó chịu của người dùng và ấn tượng ban đầu tiêu cực.
-  - `Rủi Ro Tuân Thủ`: Quy trình `KYC/AML` kém hiệu quả tiềm ẩn rủi ro pháp lý và tuân thủ.
-- **Thách Thức Chung:** Chúng ta thiếu hiểu biết rõ ràng, dựa trên dữ liệu về hành trình `onboarding` của khách hàng để xác định chính xác các `điểm đau` và tối ưu hóa quy trình một cách hiệu quả, đồng thời duy trì tuân thủ.
-
----
-
 </details>
 
 ---
-
-## 2. Mục Tiêu Dự Án
+## 1. Problem Statement
 ---
 <details>
-<summary>Các Mục Tiêu Rõ Ràng và Kết Quả Mong Đợi của Sáng Kiến Phân Tích</summary>
+<summary>Detailed Description of Business Challenges in Onboarding and KYC/AML Process</summary>
 
 ---
 
-- **Mục Tiêu Chính:**
-  - Xây dựng một hệ thống phân tích mạnh mẽ để có cái nhìn sâu sắc về hành trình `onboarding` của khách hàng.
-  - Hệ thống này sẽ cho phép tối ưu hóa quy trình, giảm tỷ lệ bỏ cuộc và nâng cao trải nghiệm người dùng.
-  - Đồng thời, đảm bảo tuân thủ đầy đủ các quy định `KYC/AML`.
-- **Các Câu Hỏi Chính Cần Trả Lời:**
-  - `Bước nào` trong quy trình `onboarding` có tỷ lệ bỏ cuộc cao nhất?
-  - `Tại sao` người dùng lại bỏ dở quy trình tại những điểm cụ thể đó?
-  - `Mất bao lâu` để một khách hàng hoàn tất toàn bộ luồng `onboarding` và xác minh?
-  - `Những cải tiến khả thi nào` có thể được thực hiện để tinh gọn và đơn giản hóa quy trình mà không ảnh hưởng đến bảo mật và tuân thủ?
+- **Current Situation:**
+  - Many potential customers start the onboarding process but drop out midway.
+  - There are significant friction points, especially in KYC/AML verification steps.
+- **Consequences:**
+  - `Loss of Potential Customers`: Direct impact on attracting users and growing business.
+  - `Increased Operational Costs`: Due to manual support, failed verifications, and retries.
+  - `Poor User Experience`: Leads to user discomfort and negative initial impression.
+  - `Regulatory Compliance Issues`: KYC/AML process inefficiencies pose potential legal risks.
+- **Common Challenges:** We lack clear understanding, based on data about the onboarding journey of customers, to accurately identify pain points and optimize the process while maintaining compliance.
 
 ---
-
 </details>
 
 ---
-
-## 3. Kế Hoạch và Các Giai Đoạn Dự Án
+## 2. Project Objectives
 ---
 <details>
-<summary>Chiến Lược Toàn Diện Từ Đầu Đến Cuối để Giải Quyết Vấn Đề Phân Tích Onboarding</summary>
+<summary>Clear and Measurable Goals and Outcomes of the Analytical Initiative</summary>
 
 ---
 
-- Kế hoạch này phác thảo phương pháp tiếp cận 4 giai đoạn, tập trung vào việc biến dữ liệu thô thành thông tin chi tiết có thể hành động:
-
-  ---
-
-  #### Giai Đoạn 1: Thu Thập & Chuẩn Bị Dữ Liệu (Xây Dựng Nền Tảng)
-  ---
-  - **Những Gì Chúng Ta Sẽ Làm:**
-    - Hợp tác với các nhóm kỹ thuật để xác định và thu thập tất cả dữ liệu liên quan đến đăng ký và xác minh khách hàng.
-    - Ví dụ về dữ liệu:
-      - `Thời điểm đăng ký của người dùng` (`timestamp`) (bắt đầu, hoàn thành từng bước).
-      - `Các bước cụ thể đã hoàn thành` hoặc đã cố gắng thực hiện.
-      - `Lỗi gặp phải` trong quá trình.
-      - `Thời gian chờ đợi` cho mỗi bước xác minh.
-      - `Kết quả xác minh` (thành công/thất bại, lý do thất bại).
-      - `Nhật ký liên lạc` với người dùng (ví dụ: thông báo email/SMS).
-    - Thiết kế một `sơ đồ dữ liệu` (`blueprint`) hoặc `schema` rõ ràng để dễ hiểu và sử dụng.
-  - **Mục Tiêu:**
-    - Đảm bảo có sẵn dữ liệu sạch, chính xác và có thể sử dụng được để phân tích.
-
-  ---
-
-  #### Giai Đoạn 2: Xây Dựng Khung Phân Tích (Vẽ Bức Tranh Toàn Cảnh)
-  ---
-  - **Những Gì Chúng Ta Sẽ Làm:**
-    - Xây dựng các `phễu` (`funnels`) để trực quan hóa toàn bộ hành trình của khách hàng từ khi bắt đầu đăng ký đến khi kích hoạt tài khoản.
-    - Định nghĩa các `chỉ số hiệu suất chính` (`KPIs`) như:
-      - `Tỷ lệ chuyển đổi theo từng bước`.
-      - `Thời gian trung bình để hoàn tất xác minh`.
-      - `Tỷ lệ thất bại KYC` theo lý do.
-      - `Chi phí trên mỗi lần onboarding thành công`.
-    - Đề xuất các phương pháp `kiểm thử A/B` (`A/B testing`) cho các luồng `onboarding` khác nhau hoặc so sánh hiệu suất với các `benchmark`.
-  - **Mục Tiêu:**
-    - Xác định chính xác các bước gây tắc nghẽn và hiểu rõ tác động của chúng.
-
-  ---
-
-  #### Giai Đoạn 3: Phân Tích Chuyên Sâu & Xác Định Vấn Đề (Tìm Ra Gốc Rễ)
-  ---
-  - **Những Gì Chúng Ta Sẽ Làm:**
-    - Thực hiện phân tích chuyên sâu để hiểu `tại sao` khách hàng bỏ cuộc.
-    - Điều tra các yếu tố như:
-      - Độ phức tạp của quy trình tải tài liệu.
-      - Thời gian chờ đợi phản hồi.
-      - Sự rõ ràng của hướng dẫn.
-    - Phân tích các trường hợp `KYC/AML bị từ chối` để xác định các lý do phổ biến và đề xuất cải thiện quy trình tuân thủ.
-  - **Mục Tiêu:**
-    - Chỉ ra nguyên nhân gốc rễ của các vấn đề và các cơ hội cải thiện cụ thể.
-
-  ---
-
-  #### Giai Đoạn 4: Báo Cáo & Đề Xuất Giải Pháp (Biến Dữ Liệu Thành Hành Động)
-  ---
-  - **Những Gì Chúng Ta Sẽ Làm:**
-    - Tổng hợp các phát hiện vào một báo cáo rõ ràng, dễ hiểu, tập trung vào các khuyến nghị có thể hành động.
-    - Ví dụ về các khuyến nghị:
-      - `Đơn giản hóa bước X` trong luồng.
-      - `Tự động hóa kiểm tra Y`.
-      - `Cải thiện thông báo cho người dùng` ở bước Z.
-    - Phác thảo `Dashboard` (bảng điều khiển) để các nhóm liên quan có thể dễ dàng theo dõi hiệu suất theo thời gian thực.
-  - **Mục Tiêu:**
-    - Cung cấp thông tin chi tiết và giải pháp để các nhóm Sản phẩm, Marketing, Vận hành và Tuân thủ có thể cùng nhau hợp tác, nâng cao trải nghiệm khách hàng và hiệu quả kinh doanh.
-
-  ---
-
-- **Sử Dụng Công Cụ GenAI:**
-  - Trong suốt tất cả các giai đoạn, các công cụ `GenAI` sẽ được tận dụng để tăng tốc độ phân tích, tạo báo cáo và đảm bảo độ chính xác, tối đa hóa hiệu quả và chất lượng đầu ra.
+- **Main Objective:**
+  - Build a robust analytics system to gain deep insights into the customer onboarding journey.
+  - This system will allow us to optimize the process, reduce drop-off rates, and improve user experience.
+  - Simultaneously, we will ensure full compliance with KYC/AML regulations.
+- **Key Questions:**
+  - Which `step` in the onboarding process has the highest drop-off rate?
+  - Why do users drop out at specific points?
+  - How long does it take for a customer to complete the entire onboarding and KYC/AML process?
+  - What incremental improvements can be made to streamline the process without compromising security and compliance?
 
 ---
-
 </details>
 
 ---
-## 4. Nguồn Dữ Liệu và Thiết Kế Schema
+## 3. Project Plan and Phases
 ---
 <details>
-<summary>Mô Tả Chi Tiết về Các Nguồn Dữ Liệu Thô và Mô Hình Dữ Liệu Đề Xuất</summary>
+<summary>Comprehensive Strategy from Start to Finish to Address Analytical Challenges</summary>
 
 ---
 
-#### 4.1 – Nguồn Dữ Liệu Thô (Raw Data Sources)
+- This plan outlines a four-stage approach, focusing on transforming raw data into actionable insights:
+
+  ---
+
+  #### Phase 1: Data Collection and Setup (Building a Foundation)
+  ---
+  - **What We'll Do:**
+    - Collaborate with technical teams to identify and collect all data related to user registration and KYC/AML verification.
+    - Example data:
+      - `User registration timestamp` (`timestamp`) (start, completion of each step)
+      - `Steps completed` or attempted
+      - `Errors encountered` during the process
+      - `Waiting times` for each verification step
+      - `Verification results` (success/failure, failure reasons)
+      - `Communication logs` with users (e.g., email/SMS notifications)
+    - Design a clear `data schema` (`blueprint`) or `schema` for easy understanding and use.
+  - **Objective:**
+    - Ensure clean, accurate data is available for analysis.
+
+  ---
+
+  #### Phase 2: Building the Analytics Framework (Painting a Comprehensive Picture)
+  ---
+  - **What We'll Do:**
+    - Create funnels (`funnels`) to visualize the entire customer journey from registration to activation.
+    - Define key performance indicators (`KPIs`) such as:
+      - `Conversion rate by step`
+      - `Average time to complete verification`
+      - `KYC failure rate by reason`
+      - `Cost per successful onboarding`
+    - Propose A/B testing methods for different onboarding flows or benchmarks.
+  - **Objective:**
+    - Identify bottlenecks and understand the impact of each step.
+
+  ---
+
+  #### Phase 3: Deep Analysis and Problem Identification (Identifying Root Causes)
+  ---
+  - **What We'll Do:**
+    - Conduct deep analysis to understand why customers drop out.
+    - Investigate factors such as:
+      - The complexity of KYC/AML document submission
+      - Waiting time for response
+      - Clarity of instructions
+    - Analyze cases of `KYC/AML rejection` to identify common reasons and suggest improvements to compliance processes.
+  - **Objective:**
+    - Identify root causes of issues and opportunities for improvement.
+
+  ---
+
+  #### Phase 4: Reporting and Proposing Solutions (Turning Data into Actionable Actions)
+  ---
+  - **What We'll Do:**
+    - Summarize findings into a clear, actionable report.
+    - Examples of proposed actions:
+      - Simplifying step X
+      - Automating check Y
+      - Improving notification for user at step Z
+    - Draft a `dashboard` (control panel) for easy real-time tracking of performance.
+  - **Objective:**
+    - Provide detailed information and solutions for cross-functional collaboration to improve user experience and business effectiveness.
+
+  ---
+
+- **Using GenAI:**
+  - Throughout all phases, GenAI tools will be leveraged to speed up analysis, generate reports, and ensure data accuracy, maximizing efficiency and output quality.
+
 ---
-- Để xây dựng khung phân tích hành trình `onboarding`, chúng ta cần thu thập dữ liệu từ nhiều hệ thống khác nhau trong quy trình đăng ký và xác minh.
-- Dưới đây là các nhóm dữ liệu thô chính:
+</details>
+
+---
+## 4. Data Sources and Schema Design
+---
+<details>
+<summary>Detailed Description of Raw Data Sources and Proposed Data Schema</summary>
+
+---
+
+#### 4.1 – Raw Data Sources
+---
+- To build the analytics framework for the onboarding journey and KYC/AML, we need to collect data from various systems involved in the registration and verification process.
+- Below are the main data sources:
 
   ---
 
-  ##### 🧾 Nhóm 1: Dữ Liệu Đăng Ký Người Dùng (User Registration Logs)
+  ##### 📄 Group 1: User Registration Logs
   ---
-  - Bao gồm tất cả thông tin liên quan đến thời điểm người dùng bắt đầu quá trình đăng ký.
-  - Trường dữ liệu quan trọng:
-    - `user_id`: Mã định danh duy nhất
-    - `registration_start_time`: Thời điểm bắt đầu đăng ký
+  - Includes all information related to user registration time.
+  - Important fields:
+    - `user_id`: Unique identifier
+    - `registration_start_time`: Registration start time
     - `registration_channel`: Web / mobile / referral
-    - `device_type`, `os_version`, `browser`: Dùng để phân tích hành vi thiết bị
-    - `language`, `region`: Phục vụ phân tích theo địa lý
+    - `device_type`, `os_version`, `browser`: Used for analyzing device usage
+    - `language`, `region`: Used for regional analysis
 
   ---
 
-  ##### 🪪 Nhóm 2: Dữ Liệu Xác Minh Danh Tính (Identity Verification Logs)
+  ##### 🪪 Group 2: Identity Verification Logs
   ---
-  - Bao gồm thông tin giấy tờ người dùng cung cấp và quá trình xử lý `OCR`.
-  - Trường dữ liệu chính:
+  - Includes information about user-provided documents and OCR processing.
+  - Main fields:
     - `doc_type`: CMND / CCCD / Passport
-    - `ocr_status`, `ocr_confidence`: Kết quả nhận dạng ký tự
-    - `upload_time`, `verification_result`, `rejection_reason`
-    - `retry_count`: Số lần thử lại (nếu có)
+    - `ocr_status`, `ocr_confidence`: OCR result
+    - `upload_time`, `verification_result`, `rejection_reason"
+    - `retry_count`: Number of retries (if any)
 
   ---
 
-  ##### 🧠 Nhóm 3: Dữ Liệu Sinh Trắc (Biometric Verification)
+  ##### 🧠 Group 3: Biometric Verification Data
   ---
-  - Xác minh người thật (`liveness`) và đối chiếu khuôn mặt.
-  - Trường dữ liệu:
-    - `face_match_score`: Mức độ khớp khuôn mặt
+  - Verifies real user (`liveness`) and face match.
+  - Fields:
+    - `face_match_score`: Face match score
     - `liveness_check_result`: true/false
-    - `device_camera_quality`: chất lượng camera
-    - `frame_blur_score`: đánh giá độ rõ ảnh
-    - `action_prompt_passed`: có làm đúng yêu cầu (nhìn trái/phải...)
+    - `device_camera_quality`: Camera quality
+    - `frame_blur_score`: Image clarity assessment
+    - `action_prompt_passed`: Whether the action was performed correctly (looking left/right...)
 
   ---
 
-  ##### 🚦 Nhóm 4: Đánh Giá Rủi Ro & Tuân Thủ (Risk & Compliance)
+  ##### 🚦 Group 4: Risk & Compliance Data
   ---
-  - Dữ liệu từ hệ thống chống rửa tiền (`AML`) và kiểm tra `PEP/sanction`.
-  - Trường dữ liệu:
-    - `pep_flag`, `sanction_flag`: Có nằm trong danh sách hay không
-    - `internal_risk_score`: Điểm đánh giá nội bộ
+  - Data from anti-money laundering (`AML`) and PEP/sanction check systems.
+  - Fields:
+    - `pep_flag`, `sanction_flag`: Whether user is on political or sanction lists
+    - `internal_risk_score`: Internal risk score
     - `risk_decision`: approve / manual_review / reject
-    - `manual_review_reason` (nếu có)
+    - `manual_review_reason` (if applicable)
 
   ---
 
-  ##### 💬 Nhóm 5: Nhật Ký Tương Tác & Giao Tiếp (User Communication Logs)
+  ##### 💬 Group 5: User Communication Logs
   ---
-  - Ghi lại các lần gửi `email`, thông báo, chăm sóc người dùng.
-  - Trường dữ liệu:
-    - `email_sent`, `sms_sent`, `push_notification_sent`
-    - `time_sent`, `user_response_time`
-    - `support_ticket_opened`, `ticket_status`, `assigned_agent_id`
+  - Records emails, notifications, and customer support interactions.
+  - Fields:
+    - `email_sent`, `sms_sent`, `push_notification_sent"
+    - `time_sent`, `user_response_time"
+    - `support_ticket_opened`, `ticket_status`, `assigned_agent_id"
 
   ---
 
-  ##### 📱 Nhóm 6: Hành Vi Ứng Dụng (App Event Logs)
+  ##### 📱 Group 6: App Event Logs
   ---
-  - Dữ liệu hành vi như mở `app`, thao tác ở từng bước `onboarding`.
-  - Trường dữ liệu:
-    - `screen_viewed`, `step_started`, `step_completed`
-    - `timestamp`, `session_duration`, `abandonment_flag`
+  - Logs user behavior such as app usage, actions at each onboarding step.
+  - Fields:
+    - `screen_viewed`, `step_started`, `step_completed"
+    - `timestamp`, `session_duration`, `abandonment_flag"
 
   ---
 
-- Những nhóm dữ liệu này là nền tảng để thiết kế `schema`, xác định `funnel` và tính `KPI` trong các phần tiếp theo.
+- These data sources form the foundation for designing `schema`, defining `funnels`, and calculating `KPIs` in the following sections.
 
 ---
-#### 4.2 – Thiết Kế Schema Dữ Liệu Đề Xuất (Proposed Data Schema)
+#### 4.2 – Proposed Data Schema
 ---
-- Để hỗ trợ phân tích hành trình `onboarding` khách hàng và `KYC/AML`, chúng ta đề xuất một mô hình dữ liệu tập trung, bao gồm các bảng được thiết kế để thu thập và tổ chức thông tin từ các nguồn dữ liệu thô khác nhau.
-- Mục tiêu là tạo ra một `schema` rõ ràng, dễ truy vấn, giúp tính toán các chỉ số `KPI` và xây dựng `phễu` (`funnel`) một cách hiệu quả.
-- Các bảng chính trong `schema` đề xuất của chúng ta bao gồm:
+- To support the analysis of the onboarding journey and KYC/AML, we propose a centralized data model, including tables designed to collect and organize information from various raw data sources.
+- The goal is to create a clear, queryable schema that calculates KPIs and builds `funnels` efficiently.
+- Our proposed schema includes the following main tables:
 
   ---
 
-  ##### 📊 Bảng: `dim_users` (Thông tin Người Dùng)
+  ##### 📊 Table: `dim_users` (User Information)
   ---
-  - **Mục đích:** Chứa các thông tin cơ bản và thuộc tính tĩnh của người dùng.
-  - **Mối quan hệ:** Liên kết với tất cả các bảng khác thông qua `user_id`.
-  - **Cấu trúc bảng:**
+  - **Purpose:** Contains basic and static user attributes.
+  - **Relationship:** Linked to all other tables through `user_id`.
+  - **Structure:**
 
-    | Tên Trường (Field Name) | Kiểu Dữ Liệu (Data Type) | Mô Tả (Description) |
-    | :---------------------- | :----------------------- | :------------------ |
-    | `user_id`               | `STRING`                 | `Khóa chính` (`Primary Key`), mã định danh duy nhất của người dùng. |
-    | `registration_start_time` | `TIMESTAMP`              | Thời điểm khách hàng bắt đầu quá trình đăng ký tài khoản. |
-    | `registration_channel`  | `STRING`                 | Kênh đăng ký ban đầu (ví dụ: `Web`, `Mobile App`, `Referral`, `Partnership`). |
-    | `device_type`           | `STRING`                 | Loại thiết bị được sử dụng để đăng ký (`Mobile`, `Tablet`, `Desktop`). |
-    | `os_version`            | `STRING`                 | Phiên bản hệ điều hành (`iOS 17`, `Android 13`, `Windows 10`). |
-    | `browser_type`          | `STRING`                 | Loại trình duyệt (`Chrome`, `Safari`, `Firefox`). |
-    | `language_preference`   | `STRING`                 | Ngôn ngữ mà người dùng đã chọn hoặc hệ thống phát hiện. |
-    | `geo_country`           | `STRING`                 | Quốc gia của người dùng dựa trên IP hoặc thông tin đăng ký ban đầu. |
-    | `email`                 | `STRING`                 | Địa chỉ email được sử dụng khi đăng ký (có thể được mã hóa/băm để bảo mật). |
-    | `phone_number`          | `STRING`                 | Số điện thoại được sử dụng (có thể được mã hóa/băm). |
-    | `account_status`        | `STRING`                 | Trạng thái tài khoản hiện tại (`Pending`, `Verified`, `Rejected`, `Suspended`). |
-    | `registration_completion_time` | `TIMESTAMP`         | Thời điểm người dùng hoàn tất quá trình đăng ký cơ bản. |
-
-  ---
-
-  ##### 📈 Bảng: `fact_onboarding_events` (Các Sự Kiện Hành Trình Onboarding)
-  ---
-  - **Mục đích:** Ghi lại từng sự kiện hoặc bước mà người dùng thực hiện trong quá trình `onboarding`. Đây là bảng chính để xây dựng `phễu` (`funnel`).
-  - **Mối quan hệ:** Liên kết với `dim_users` qua `user_id`.
-  - **Cấu trúc bảng:**
-
-    | Tên Trường (Field Name) | Kiểu Dữ Liệu (Data Type) | Mô Tả (Description) |
-    | :---------------------- | :----------------------- | :------------------ |
-    | `event_id`              | `STRING`                 | `Khóa chính`, mã định danh duy nhất cho mỗi sự kiện. |
-    | `user_id`               | `STRING`                 | `Khóa ngoại` (`Foreign Key`), liên kết đến `dim_users`. |
-    | `event_timestamp`       | `TIMESTAMP`              | Thời điểm chính xác xảy ra sự kiện. |
-    | `event_name`            | `STRING`                 | Tên của sự kiện (`KYC_STARTED`, `ID_DOCUMENT_UPLOADED`, `LIVENESS_CHECK_FAILED`, `ACCOUNT_ACTIVATED`). |
-    | `onboarding_step`       | `INT`                    | Số thứ tự của bước trong hành trình `onboarding` (ví dụ: `1` cho đăng ký, `2` cho tải giấy tờ). |
-    | `step_description`      | `STRING`                 | Mô tả chi tiết về bước `onboarding`. |
-    | `event_status`          | `STRING`                 | Trạng thái của sự kiện (`SUCCESS`, `FAILURE`, `PENDING`, `RETRY`). |
-    | `error_code`            | `STRING`                 | Mã lỗi (nếu có) khi sự kiện thất bại. |
-    | `error_message`         | `STRING`                 | Mô tả lỗi dễ hiểu (nếu có). |
-    | `session_id`            | `STRING`                 | `ID` của phiên làm việc mà sự kiện xảy ra. |
-    | `duration_in_step_seconds` | `INT`                 | Thời gian người dùng ở lại trong bước này trước khi chuyển tiếp hoặc thoát. |
+    | Field Name (Field Name) | Data Type (Data Type) | Description (Description) |
+    | :---------------------- | :-------------------- | :---------------------- |
+    | `user_id`               | `STRING`              | `Primary Key`, unique identifier for the user. |
+    | `registration_start_time` | `TIMESTAMP`           | Time user started registering for an account. |
+    | `registration_channel`  | `STRING`              | Initial registration channel (e.g., `Web`, `Mobile App`, `Referral`, `Partnership`). |
+    | `device_type`           | `STRING`              | Device type used for registration (`Mobile`, `Tablet`, `Desktop`). |
+    | `os_version`            | `STRING`              | Operating system version (`iOS 17`, `Android 13`, `Windows 10`). |
+    | `browser_type`          | `STRING`              | Browser type (`Chrome`, `Safari`, `Firefox`). |
+    | `language_preference`   | `STRING`              | Language user has selected or system detected. |
+    | `geo_country`           | `STRING`              | User's country based on IP or initial registration information. |
+    | `email`                 | `STRING`              | Email used for registration (can be encrypted/hashed for security). |
+    | `phone_number`          | `STRING`              | Phone number used (can be encrypted/hashed). |
+    | `account_status`        | `STRING`              | Current account status (`Pending`, `Verified`, `Rejected`, `Suspended`). |
+    | `registration_completion_time` | `TIMESTAMP`         | Time user completed basic registration process. |
 
   ---
 
-  ##### 📋 Bảng: `fact_kyc_verification_details` (Chi Tiết Xác Minh KYC)
+  ##### 📈 Table: `fact_onboarding_events` (Onboarding Events)
   ---
-  - **Mục đích:** Lưu trữ thông tin chi tiết về từng lần nộp/xác minh giấy tờ và sinh trắc học.
-  - **Mối quan hệ:** Liên kết với `dim_users` qua `user_id`.
-  - **Cấu trúc bảng:**
+  - **Purpose:** Records each event or step a user completes during onboarding. This is the main table for building funnels.
+  - **Relationship:** Linked to `dim_users` through `user_id`.
+  - **Structure:**
 
-    | Tên Trường (Field Name) | Kiểu Dữ Liệu (Data Type) | Mô Tả (Description) |
-    | :---------------------- | :----------------------- | :------------------ |
-    | `kyc_submission_id`     | `STRING`                 | `Khóa chính`, mã định danh duy nhất cho mỗi lần nộp `KYC`. |
-    | `user_id`               | `STRING`                 | `Khóa ngoại`, liên kết đến `dim_users`. |
-    | `submission_timestamp`  | `TIMESTAMP`              | Thời điểm người dùng gửi thông tin `KYC`. |
-    | `document_type`         | `STRING`                 | Loại giấy tờ được nộp (`Passport`, `National ID`, `Driver's License`). |
-    | `ocr_status`            | `STRING`                 | Trạng thái nhận dạng `OCR` (`Success`, `Failure`, `Partial`). |
-    | `ocr_confidence_score`  | `FLOAT`                  | Điểm tin cậy của kết quả `OCR` (0.0 - 1.0). |
-    | `face_match_score`      | `FLOAT`                  | Điểm khớp khuôn mặt từ ảnh giấy tờ và ảnh `liveness` (0.0 - 1.0). |
-    | `liveness_check_result` | `BOOLEAN`                | Kết quả kiểm tra người thật (`true` nếu là người thật). |
-    | `kyc_result`            | `STRING`                 | Kết quả xác minh cuối cùng (`Approved`, `Rejected`, `Under Review`, `Retry Needed`). |
-    | `rejection_reason`      | `ARRAY<STRING>`          | Danh sách các lý do từ chối (ví dụ: `Blurred Document`, `Face Mismatch`, `Document Expired`). |
-    | `processing_time_seconds` | `INT`                  | Thời gian xử lý `KYC` tự động/thủ công. |
-    | `agent_id`              | `STRING`                 | `ID` của nhân viên xử lý thủ công (nếu có). |
-    | `number_of_retries`     | `INT`                    | Số lần người dùng phải nộp lại `KYC` cho lần này. |
+    | Field Name (Field Name) | Data Type (Data Type) | Description (Description) |
+    | :---------------------- | :-------------------- | :---------------------- |
+    | `event_id`              | `STRING`              | Unique identifier for each event. |
+    | `user_id`               | `STRING`              | `Foreign Key`, links to `dim_users`. |
+    | `event_timestamp`       | `TIMESTAMP`           | Timestamp of the event. |
+    | `event_name`            | `STRING`              | Name of the event (`KYC_STARTED`, `ID_DOCUMENT_UPLOADED`, `LIVENESS_CHECK_FAILED`, `ACCOUNT_ACTIVATED`). |
+    | `onboarding_step`       | `INT`                 | Step number in the onboarding journey (e.g., `1` for registration, `2` for document upload). |
+    | `step_description`      | `STRING`              | Detailed description of the step. |
+    | `event_status`          | `STRING`              | Status of the event (`SUCCESS`, `FAILURE`, `PENDING`, `RETRY`). |
+    | `error_code`            | `STRING`              | Error code (if any) for failed events. |
+    | `error_message`         | `STRING`              | User-friendly error description (if any). |
+    | `session_id`            | `STRING`              | `ID` of the session the event occurred in. |
+    | `duration_in_step_seconds` | `INT`                 | Time user spent at this step before transitioning or exiting. |
 
   ---
 
-  ##### 🚨 Bảng: `fact_risk_assessments` (Đánh Giá Rủi Ro)
+  ##### 📋 Table: `fact_kyc_verification_details` (KYC Details)
   ---
-  - **Mục đích:** Ghi lại kết quả các đánh giá rủi ro `AML`/`PEP`/`Sanction` cho người dùng.
-  - **Mối quan hệ:** Liên kết với `dim_users` qua `user_id`.
-  - **Cấu trúc bảng:**
+  - **Purpose:** Stores detailed information about each KYC submission and biometric verification.
+  - **Relationship:** Linked to `dim_users` through `user_id`.
+  - **Structure:**
 
-    | Tên Trường (Field Name) | Kiểu Dữ Liệu (Data Type) | Mô Tả (Description) |
-    | :---------------------- | :----------------------- | :------------------ |
-    | `risk_assessment_id`    | `STRING`                 | `Khóa chính`, mã định danh duy nhất cho mỗi lần đánh giá rủi ro. |
-    | `user_id`               | `STRING`                 | `Khóa ngoại`, liên kết đến `dim_users`. |
-    | `assessment_timestamp`  | `TIMESTAMP`              | Thời điểm đánh giá rủi ro được thực hiện. |
-    | `risk_score`            | `INT`                    | Điểm rủi ro tổng thể của người dùng (ví dụ: 1-100). |
-    | `pep_flag`              | `BOOLEAN`                | `True` nếu người dùng được xác định là `PEP` (Người có ảnh hưởng chính trị). |
-    | `sanction_flag`         | `BOOLEAN`                | `True` nếu người dùng nằm trong danh sách trừng phạt. |
-    | `aml_status`            | `STRING`                 | Trạng thái kiểm tra `AML` (`Clear`, `Match Found`, `Under Investigation`). |
-    | `final_risk_decision`   | `STRING`                 | Quyết định rủi ro cuối cùng (`Approved`, `Manual Review`, `Rejected`). |
-    | `decision_reason`       | `ARRAY<STRING>`          | Các lý do cụ thể cho quyết định rủi ro. |
-
-  ---
-
-  ##### 📧 Bảng: `fact_user_communications` (Tương Tác & Giao Tiếp Người Dùng)
-  ---
-  - **Mục đích:** Ghi lại tất cả các thông điệp hệ thống hoặc từ bộ phận hỗ trợ gửi đến người dùng trong quá trình `onboarding`.
-  - **Mối quan hệ:** Liên kết với `dim_users` qua `user_id`.
-  - **Cấu trúc bảng:**
-
-    | Tên Trường (Field Name) | Kiểu Dữ Liệu (Data Type) | Mô Tả (Description) |
-    | :---------------------- | :----------------------- | :------------------ |
-    | `communication_id`      | `STRING`                 | `Khóa chính`, mã định danh duy nhất cho mỗi lần giao tiếp. |
-    | `user_id`               | `STRING`                 | `Khóa ngoại`, liên kết đến `dim_users`. |
-    | `communication_timestamp` | `TIMESTAMP`            | Thời điểm gửi tin nhắn/thông báo. |
-    | `communication_type`    | `STRING`                 | Loại giao tiếp (`Email`, `SMS`, `Push Notification`, `In-App Message`). |
-    | `message_content`       | `STRING`                 | Nội dung chính của tin nhắn (có thể cắt ngắn hoặc mã hóa). |
-    | `delivery_status`       | `STRING`                 | Trạng thái gửi (`Sent`, `Delivered`, `Failed`, `Opened`). |
-    | `user_interaction_status` | `STRING`               | Trạng thái tương tác của người dùng (`Clicked`, `Ignored`, `Responded`). |
-    | `support_ticket_id`     | `STRING`                 | `ID` của `ticket` hỗ trợ liên quan (nếu có). |
-
-  ---
-  ##### 📄 Bảng: `fact_manual_review_logs` (Nhật Ký Duyệt Thủ Công)
-  ---
-  - **Mục đích:** Ghi lại thông tin chi tiết về quá trình duyệt `KYC` thủ công bởi nhân viên.
-  - **Mối quan hệ:** Liên kết với `dim_users` qua `user_id` và có thể liên kết với `fact_kyc_verification_details` qua `kyc_submission_id`.
-  - **Cấu trúc bảng:**
-
-    | Tên Trường (Field Name) | Kiểu Dữ Liệu (Data Type) | Mô Tả (Description) |
-    | :---------------------- | :----------------------- | :------------------ |
-    | `review_id`             | `STRING`                 | `Khóa chính`, mã định danh duy nhất cho mỗi lần duyệt thủ công. |
-    | `user_id`               | `STRING`                 | `Khóa ngoại`, liên kết đến `dim_users`. |
-    | `kyc_submission_id`     | `STRING`                 | `Khóa ngoại`, liên kết đến `fact_kyc_verification_details`. |
-    | `review_start_time`     | `TIMESTAMP`              | Thời điểm bắt đầu quá trình duyệt. |
-    | `review_end_time`       | `TIMESTAMP`              | Thời điểm kết thúc quá trình duyệt. |
-    | `review_result`         | `STRING`                 | Kết quả duyệt (`Approved`, `Rejected`, `Needs More Info`). |
-    | `review_notes`          | `STRING`                 | Ghi chú của người duyệt về trường hợp này. |
-    | `reviewer_id`           | `STRING`                 | `ID` của nhân viên thực hiện duyệt. |
+    | Field Name (Field Name) | Data Type (Data Type) | Description (Description) |
+    | :---------------------- | :-------------------- | :---------------------- |
+    | `kyc_submission_id`     | `STRING`              | Unique identifier for each KYC submission. |
+    | `user_id`               | `STRING`              | `Foreign Key`, links to `dim_users`. |
+    | `submission_timestamp`  | `TIMESTAMP`           | Time user submitted KYC information. |
+    | `document_type`         | `STRING`              | Type of document submitted (`Passport`, `National ID`, `Driver's License`). |
+    | `ocr_status`            | `STRING`              | OCR status (`Success`, `Failure`, `Partial`). |
+    | `ocr_confidence_score`  | `FLOAT`               | Confidence score of OCR result (0.0 - 1.0). |
+    | `face_match_score`      | `FLOAT`               | Face match score from ID photo and `liveness` photo (0.0 - 1.0). |
+    | `liveness_check_result` | `BOOLEAN`             | Result of liveness check (`true` if real user). |
+    | `kyc_result`            | `STRING`              | Final KYC result (`Approved`, `Rejected`, `Under Review`, `Retry Needed`). |
+    | `rejection_reason`      | `ARRAY<STRING>`        | List of reasons for rejection (e.g., `Blurred Document`, `Face Mismatch`, `Document Expired`). |
+    | `processing_time_seconds` | `INT`                 | Time taken for KYC processing (automatic/manual). |
+    | `agent_id`              | `STRING`              | `ID` of manual reviewer (if applicable). |
+    | `number_of_retries`     | `INT`                 | Number of times user needs to resubmit KYC for this attempt. |
 
   ---
 
-  ##### 📊 Sơ đồ quan hệ giữa các bảng (ERD)
+  ##### 🚨 Table: `fact_risk_assessments` (Risk Assessment)
+  ---
+  - **Purpose:** Records risk assessment results for AML/PEP/Sanction for users.
+  - **Relationship:** Linked to `dim_users` through `user_id`.
+  - **Structure:**
+
+    | Field Name (Field Name) | Data Type (Data Type) | Description (Description) |
+    | :---------------------- | :-------------------- | :---------------------- |
+    | `risk_assessment_id`    | `STRING`              | Unique identifier for each risk assessment. |
+    | `user_id`               | `STRING`              | `Foreign Key`, links to `dim_users`. |
+    | `assessment_timestamp`  | `TIMESTAMP`           | Time risk assessment was conducted. |
+    | `risk_score`            | `INT`                 | Overall risk score of the user (e.g., 1-100). |
+    | `pep_flag`              | `BOOLEAN`             | `True` if user is identified as PEP (politically exposed person). |
+    | `sanction_flag`         | `BOOLEAN`             | `True` if user is on sanction lists. |
+    | `aml_status`            | `STRING`              | Status of AML check (`Clear`, `Match Found`, `Under Investigation`). |
+    | `final_risk_decision`   | `STRING`              | Final risk decision (`Approved`, `Manual Review`, `Rejected`). |
+    | `decision_reason`       | `ARRAY<STRING>`        | Specific reasons for risk decisions. |
+
+  ---
+
+  ##### 💬 Table: `fact_user_communications` (User Communications)
+  ---
+  - **Purpose:** Records all system-generated messages or support tickets sent to users during onboarding.
+  - **Relationship:** Linked to `dim_users` through `user_id`.
+  - **Structure:**
+
+    | Field Name (Field Name) | Data Type (Data Type) | Description (Description) |
+    | :---------------------- | :-------------------- | :---------------------- |
+    | `communication_id`      | `STRING`              | Unique identifier for each communication. |
+    | `user_id`               | `STRING`              | `Foreign Key`, links to `dim_users`. |
+    | `communication_timestamp` | `TIMESTAMP`           | Time message/notification sent. |
+    | `communication_type`    | `STRING`              | Type of communication (`Email`, `SMS`, `Push Notification`, `In-App Message`). |
+    | `message_content`       | `STRING`              | Main content of the message (can be shortened or encrypted). |
+    | `delivery_status`       | `STRING`              | Status of delivery (`Sent`, `Delivered`, `Failed`, `Opened`). |
+    | `user_interaction_status` | `STRING`             | Status of user interaction (`Clicked`, `Ignored`, `Responded`). |
+    | `support_ticket_id`     | `STRING`              | `ID` of support ticket related (if any). |
+
+  ---
+  ##### 📄 Table: `fact_manual_review_logs` (Manual Review Logs)
+  ---
+  - **Purpose:** Records detailed information about manual KYC review process by staff.
+  - **Relationship:** Linked to `dim_users` through `user_id` and may be linked to `fact_kyc_verification_details` through `kyc_submission_id`.
+  - **Structure:**
+
+    | Field Name (Field Name) | Data Type (Data Type) | Description (Description) |
+    | :---------------------- | :-------------------- | :---------------------- |
+    | `review_id`             | `STRING`              | Unique identifier for each manual review. |
+    | `user_id`               | `STRING`              | `Foreign Key`, links to `dim_users`. |
+    | `kyc_submission_id`     | `STRING`              | `Foreign Key`, links to `fact_kyc_verification_details`. |
+    | `review_start_time`     | `TIMESTAMP`           | Time manual review process started. |
+    | `review_end_time`       | `TIMESTAMP`           | Time manual review process ended. |
+    | `review_result`         | `STRING`              | Result of review (`Approved`, `Rejected`, `Needs More Info`). |
+    | `review_notes`          | `STRING`              | Notes from reviewer about this case. |
+    | `reviewer_id`           | `STRING`              | `ID` of staff member conducting review. |
+
+  ---
+
+  ##### 📊 Relationship Diagram between Tables (ERD)
   ---
 
   ```mermaid
@@ -510,504 +494,502 @@ title: report_a05_customer_onboarding_analytics
       fact_kyc_verification_details ||--o{ fact_manual_review_logs : triggers
   ```
 ---
-- Với thiết kế schema như trên, chúng ta có thể dễ dàng xây dựng các truy vấn phục vụ phân tích funnel (`drop-off rate`, `completion rate`), phân tích thời gian (`time-to-verify`), cũng như đánh giá hiệu quả quy trình `KYC/AML` và `manual review`.
-- Đây là nền tảng vững chắc cho các bước xử lý tiếp theo: logic biến đổi dữ liệu, tính KPI và xây dựng dashboard.
+- With this schema design, we can easily build queries to support funnel analysis (`drop-off rate`, `completion rate`), time analysis (`time-to-verify`), as well as assessing the effectiveness of KYC/AML and manual review processes.
+- This forms a robust foundation for subsequent steps: data transformation, KPI calculation, and dashboard building.
 
 ---
 
 </details>
 
 ---
-
-## 5. Logic Chuyển Đổi Dữ Liệu
+## 5. Data Transformation Logic
 ---
 <details>
-<summary>Mô Tả Các Quy Trình Làm Sạch, Chuẩn Hóa và Tổng Hợp Dữ Liệu</summary>
+<summary>Description of Data Cleaning, Standardization, and Aggregation Processes</summary>
 
 ---
-#### 5.1 – Tổng Quan Về Luồng Dữ Liệu (Data Flow Overview)
+#### 5.1 – Data Flow Overview
 ---
 
-- Mục tiêu của phần này là cung cấp một cái nhìn toàn cảnh về quá trình dữ liệu được thu thập, xử lý và chuyển đổi để phục vụ phân tích hành trình `onboarding` khách hàng và `KYC/AML`.
-- Luồng dữ liệu được thiết kế theo mô hình `ELT (Extract, Load, Transform)` hiện đại, cho phép linh hoạt trong việc xử lý dữ liệu quy mô lớn trên nền tảng `cloud data warehouse`.
-- Các giai đoạn chính của luồng dữ liệu bao gồm:
+- The goal of this section is to provide a comprehensive view of the data collection, processing, and transformation to support the onboarding journey and KYC/AML analysis.
+- The data flow is designed following the modern ELT (Extract, Load, Transform) model, allowing for flexible processing of large-scale data on cloud data warehouse platforms.
+- The main stages of the data flow include:
 
-  - **1. Thu Thập Dữ Liệu Thô (Raw Data Ingestion):**
-    - Dữ liệu được thu thập liên tục hoặc theo đợt từ các hệ thống nguồn khác nhau như: hệ thống đăng ký, hệ thống `KYC/Biometric`, hệ thống `Risk/Compliance`, hệ thống giao tiếp, và nhật ký sự kiện ứng dụng.
-    - Phương thức thu thập đa dạng bao gồm `API integration`, `database replication`, và `log forwarding`.
+  - **1. Raw Data Ingestion:**
+    - Data is collected continuously or in batches from various sources such as: registration systems, KYC/Biometric systems, risk/compliance systems, communication systems, and app event logs.
+    - Collection methods include `API integration`, `database replication`, and `log forwarding`.
 
-  - **2. Khu Vực Lưu Trữ Dữ Liệu Thô (Raw Data Landing Zone / Data Lake):**
-    - Dữ liệu thô được lưu trữ nguyên trạng tại đây, thường là trên các dịch vụ `Cloud Storage` (ví dụ: `GCS`, `S3`), đảm bảo tính toàn vẹn và khả năng `re-processing` khi cần.
+  - **2. Raw Data Storage:**
+    - Data is stored in its raw form here, often on cloud storage services like `Google Cloud Storage` (GCS) or `Amazon S3`, ensuring data integrity and `re-processing` capabilities when needed.
 
-  - **3. Tải Dữ Liệu Vào Kho Dữ Liệu (Data Loading to Data Warehouse):**
-    - Dữ liệu từ `Landing Zone` được tải vào một `Data Warehouse` mạnh mẽ (`Google BigQuery`, Snowflake, Redshift), tạo nền tảng cho các bước chuyển đổi hiệu suất cao.
+  - **3. Loading Data into Data Warehouse:**
+    - Data from `Landing Zone` is loaded into a powerful data warehouse (`Google BigQuery`, Snowflake, Redshift), providing a solid foundation for high-performance data processing.
 
-  - **4. Chuyển Đổi Dữ Liệu (Data Transformation):**
-    - Giai đoạn này thực hiện các phép làm sạch, chuẩn hóa, làm giàu và tổng hợp dữ liệu ngay trong `Data Warehouse` để xây dựng các bảng `dim` và `fact` theo `schema` đã thiết kế.
+  - **4. Data Transformation:**
+    - This stage performs cleaning, standardization, enrichment, and aggregation of data directly in the `Data Warehouse` to build `dim` and `fact` tables according to the designed schema.
 
-  - **5. Lớp Dữ Liệu Phân Tích (Analytical Data Layer):**
-    - Các bảng `dim` và `fact` đã được xử lý và tối ưu hóa nằm trong `Data Warehouse`, sẵn sàng cho các mục đích phân tích và báo cáo.
+  - **5. Analytical Data Layer:**
+    - The `dim` and `fact` tables are processed and optimized, ready for analytical purposes and reporting.
 
-  - **6. Lớp Tiêu Thụ Dữ Liệu (Data Consumption / Reporting):**
-    - Dữ liệu từ lớp phân tích được sử dụng bởi các công cụ `Business Intelligence` (BI) để tạo ra các `dashboard`, báo cáo và tính toán các `KPI`.
+  - **6. Data Consumption / Reporting:**
+    - Data from the analytical layer is used by BI tools (`Business Intelligence`) to create `dashboards`, reports, and calculate KPIs.
 
-- Luồng dữ liệu tổng quát có thể được hình dung qua sơ đồ sau:
+- The overall data flow can be visualized as follows:
 ---
 
   ```mermaid
     flowchart TD
-  subgraph Source_Systems [Hệ thống nguồn]
-    A[Hệ thống đăng ký] --> RawData
-    B[Hệ thống KYC/Biometric] --> RawData
-    C[Hệ thống Risk/Compliance] --> RawData
-    D[Hệ thống Giao tiếp] --> RawData
+  subgraph Source_Systems [Source Systems]
+    A[Registration System] --> RawData
+    B[KYC/Biometric System] --> RawData
+    C[Risk/Compliance System] --> RawData
+    D[Communication System] --> RawData
     E[App Event Logs] --> RawData
-    F[Hệ thống Duyệt thủ công] --> RawData
+    F[Manual Review System] --> RawData
   end
 
-  RawData["Khu vực lưu trữ dữ liệu thô (GCS/S3)"] --> Load["Tải vào Data Warehouse (BigQuery)"]
-  Load --> Transform["Chuyển đổi dữ liệu (dbt/SQL)"]
-  Transform --> AnalyticalLayer["Lớp dữ liệu phân tích (Dim & Fact Tables)"]
-  AnalyticalLayer --> Consumption["Báo cáo & Dashboard (Looker Studio/Power BI)"]
+  RawData["Raw Data Storage (GCS/S3)"] --> Load["Load into Data Warehouse (BigQuery)"]
+  Load --> Transform["Data Transformation (dbt/SQL)"]
+  Transform --> AnalyticalLayer["Analytical Data Layer (Dim & Fact Tables)"]
+  AnalyticalLayer --> Consumption["Reports & Dashboards (Looker Studio/Power BI)"]
   ```
 ---
 
-- Luồng dữ liệu này được thiết kế để đảm bảo tính toàn vẹn, khả năng mở rộng và hiệu quả, cung cấp nền tảng vững chắc cho mọi hoạt động phân tích về hành trình `onboarding` khách hàng.
+- This data flow is designed to ensure data integrity, scalability, and efficiency, providing a solid foundation for all analytical activities related to the onboarding journey and KYC/AML.
 
 ---
-#### 5.2 – Chi Tiết Các Bước Chuyển Đổi (Detailed Transformation Steps)
+#### 5.2 – Detailed Transformation Steps
 ---
 
-##### 5.2.1 – Thu Thập Dữ Liệu Thô (Raw Data Ingestion)
+##### 5.2.1 – Raw Data Ingestion
 ---
 
 <details>
-<summary>Mô tả cách dữ liệu thô được thu thập từ nhiều hệ thống nguồn</summary>
+<summary>Description of data collection from multiple source systems</summary>
 
 ---
+- The first step in the ELT pipeline is **ingestion of raw data from various source systems**, ensuring that the data is comprehensive and accurate for subsequent processing steps.
+- Data comes from **multiple distributed systems**, each with different formats and update rates.
 
-- Giai đoạn đầu tiên trong pipeline ELT là **thu thập dữ liệu thô từ các hệ thống nguồn**, đảm bảo dữ liệu đầy đủ và chính xác cho các bước xử lý tiếp theo.
-- Dữ liệu đến từ **nhiều hệ thống phân tán**, mỗi hệ thống có định dạng và tốc độ cập nhật khác nhau.
+- **Main source systems:**
+    - Data is collected from the following systems:
+        - **User Registration System**: user profile and onboarding start time.
+        - **KYC & Biometric System**: includes ID documents, OCR status, face match, and liveness.
+        - **Risk & Compliance System**: PEP/sanction data, internal risk score, and risk decision.
+        - **Communication System**: email, SMS, push notifications, and support ticket status.
+        - **Mobile App**: event logs for onboarding steps, abandonments, and session durations.
 
-- **Hệ thống nguồn chính:**
-    - Dữ liệu được thu thập từ các nhóm hệ thống sau:
-        - **Hệ thống Đăng ký người dùng**: thông tin hồ sơ và thời điểm bắt đầu hành trình onboarding.
-        - **Hệ thống KYC & Biometric**: bao gồm ảnh giấy tờ, trạng thái OCR, kết quả kiểm tra khuôn mặt và liveness.
-        - **Hệ thống Risk & Compliance**: dữ liệu PEP/sanction, điểm rủi ro nội bộ, kết quả đánh giá.
-        - **Hệ thống Giao tiếp & CSKH**: email, SMS, push notification, nhật ký ticket hỗ trợ.
-        - **Ứng dụng & Mobile App**: dữ liệu sự kiện hành vi như chuyển bước, thoát giữa chừng, thời lượng thao tác.
+- **Proposed ingestion methods:**
 
-- **Phương thức thu thập đề xuất:**
+| Source Type | Integration Method | Technology Fit |
+|------------|--------------------|----------------|
+| API endpoints | Periodic API calls or triggered by events | `Airflow`, `Cloud Functions` |
+| Database logs | Realtime streaming or CDC (Change Data Capture) | `Debezium`, `Kafka`, `BigQuery Data Transfer` |
+| File-based logs | Batch upload from storage (CSV, JSON, Parquet) | `Cloud Storage + dbt`, `Fivetran` |
+| Event tracking | Sent from client/app via events | `Segment`, `Snowplow`, `GA4`, `Firebase` |
+| Manual review logs | Manually entered or synced from CRM system | `CSV`, `Google Sheets`, `App Script` |
 
-| Loại nguồn | Phương thức tích hợp | Công nghệ phù hợp |
-|------------|----------------------|--------------------|
-| API endpoints | Tự động gọi API định kỳ hoặc theo sự kiện | `Airflow`, `Cloud Functions` |
-| Database logs | Realtime streaming hoặc CDC (Change Data Capture) | `Debezium`, `Kafka`, `BigQuery Data Transfer` |
-| File-based logs | Tải theo lô (batch) từ storage (CSV, JSON, Parquet) | `Cloud Storage + dbt`, `Fivetran` |
-| Event tracking | Gửi từ client/app theo sự kiện | `Segment`, `Snowplow`, `GA4`, `Firebase` |
-| Manual review logs | Nhập tay hoặc đồng bộ từ hệ thống CRM nội bộ | `CSV`, `Google Sheets`, `App Script` |
-
-- **Các điểm cần lưu ý:**
-    - Đảm bảo **định danh người dùng thống nhất** (`user_id`) giữa các hệ thống (dùng UUID hoặc hashed ID).
-    - Tất cả thời gian phải được **chuyển đổi sang UTC** để đồng bộ khi phân tích.
-    - Dữ liệu thô nên được lưu vào **Landing Zone** theo format nguyên gốc, không biến đổi, để đảm bảo khả năng xử lý lại (`replayable`) và kiểm tra sai lệch.
+- **Notes:**
+    - Ensure **consistent user identification** (`user_id`) across systems (using UUID or hashed ID).
+    - All timestamps must be **converted to UTC** for consistent analysis.
+    - Raw data should be stored in **Landing Zone** in its original format, without transformation, to ensure re-processability and error checking.
 ...
 
 ---
 
-- Giai đoạn thu thập dữ liệu là nền tảng quan trọng, ảnh hưởng trực tiếp đến độ tin cậy của hệ thống phân tích. Việc thiết kế ingestion pipeline phải đảm bảo:
-  - Tự động hóa cao
-  - Kiểm soát lỗi tốt
-  - Dễ mở rộng khi hệ thống tăng trưởng
+- The data ingestion phase is crucial, as it directly impacts the reliability of the analytics system. The design must ensure:
+  - High automation
+  - Good error handling
+  - Scalability as the system grows
 
 ---
 </details>
 
 
 ---
-##### 5.2.2 – Làm Sạch & Chuẩn Hóa Dữ Liệu (Data Cleaning & Standardization)
+##### 5.2.2 – Data Cleaning & Standardization
 ---
 
 <details>
-<summary>Mô tả các quy trình làm sạch, chuẩn hóa và xử lý dữ liệu thô để đảm bảo chất lượng và tính nhất quán</summary>
+<summary>Description of data cleaning, standardization, and data processing steps to ensure data quality and consistency</summary>
 
 ---
 
-- Mục tiêu của giai đoạn này là biến dữ liệu thô, có thể lộn xộn và không nhất quán, thành một định dạng sạch sẽ, chuẩn hóa và sẵn sàng cho phân tích.
-- Đây là bước cực kỳ quan trọng vì nếu đầu vào là dữ liệu "rác" (Garbage In), thì đầu ra của phân tích cũng sẽ sai lệch nghiêm trọng (Garbage Out).
+- The goal of this phase is to transform raw data into a clean, standardized format that is ready for analysis.
+- If the input data is "garbage" (Garbage In), the output of the analysis will be significantly skewed (Garbage Out).
 
 ---
 
-##### 🎯 Lý do cần làm sạch và chuẩn hóa
+##### 🎯 Reasons for cleaning and standardization
 
-| Vấn đề phổ biến | Hậu quả nếu không xử lý |
-|------------------|--------------------------|
-| Dữ liệu thiếu / NULL | Gây sai lệch thống kê, lỗi khi join bảng |
-| Định dạng không chuẩn | Không thể chuyển đổi hoặc so sánh |
-| Trùng lặp bản ghi | Gây trùng đếm, sai kết quả phân tích |
-| Giá trị ngoại lệ | Kéo lệch trung bình, gây hiểu nhầm |
-| Không thống nhất | Gây khó khăn khi lọc, phân nhóm |
-
----
-
-##### 🧹 Các bước làm sạch dữ liệu
-
-| Vấn đề | Phương pháp xử lý |
-|--------|--------------------|
-| **NULL/thiếu dữ liệu** | Gán mặc định (`unknown`), loại bỏ nếu critical, đánh cờ `is_incomplete` |
-| **Trùng lặp bản ghi** | Xác định dựa trên `user_id + event_name + timestamp`, giữ bản mới nhất |
-| **Giá trị bất hợp lệ** | Dùng kiểm tra biên (boundary check), loại bỏ hoặc đánh cờ `invalid` |
-| **Timestamp sai** | Chuẩn hóa về `UTC`, bỏ bản ghi có timestamp tương lai quá xa |
-| **Dữ liệu phân tán** | Gộp trường tương đương, chuẩn hóa biến thể tên |
+| Common Issue | Consequence if not addressed |
+|--------------|------------------------------|
+| Missing / NULL data | Causes statistical errors and issues with joins across tables |
+| Non-standard formatting | Cannot be converted or compared |
+| Duplicate records | Causes double counting and incorrect analysis results |
+| Outliers | Causes average to be skewed and leads to misinterpretation |
+| Lack of consistency | Causes issues with filtering and grouping |
 
 ---
 
-##### 🛠 Chuẩn hóa định dạng và chuỗi
+##### 🧹 Data cleaning steps
 
-| Đối tượng | Quy tắc chuẩn hóa |
-|----------|--------------------|
-| **Text fields** | lowercase hóa, trim space, viết hoa chuẩn (`Ho Chi Minh`) |
-| **Country / Region** | Ánh xạ về ISO-3166 (`VN`, `Viet Nam`, `Vietnam` → `Vietnam`) |
-| **Device / OS / Browser** | Dùng bảng mapping chuẩn (`chrome`, `iOS 17`, `Android`) |
-| **Thời gian** | Chuyển về `ISO 8601` UTC (`2025-06-17T08:00:00Z`) |
-| **Mã định danh** | Format chuẩn: UUID hoặc hashed, không rỗng, không trùng |
-
----
-
-##### 🔧 Công cụ và kỹ thuật được đề xuất
-
-| Công đoạn | Công cụ đề xuất |
-|-----------|------------------|
-| Làm sạch cơ bản | SQL (BigQuery Standard SQL) |
-| Chuẩn hóa chuỗi | Python (`pandas`, `str.lower()`, `regex`, `fuzzywuzzy`) |
-| Phát hiện trùng | `ROW_NUMBER() OVER`, `DISTINCT`, `pandas.duplicated()` |
-| Kiểm tra thời gian | `TIMESTAMP_DIFF`, kiểm tra `> NOW()` |
-| Mapping chuẩn | Python dict / SQL CASE / JOIN bảng tham chiếu |
+| Issue | Data processing method |
+|-------|----------------------|
+| **Missing / NULL data** | Default value (`unknown`), mark as critical if missing, set `is_incomplete` flag |
+| **Duplicate records** | Identify based on `user_id + event_name + timestamp`, keep latest record |
+| **Invalid values** | Use boundary checks, mark as invalid or set `invalid` flag |
+| **Incorrect timestamps** | Normalize to `UTC`, discard records with timestamps too far in the future |
+| **Disparate data** | Aggregate related fields, standardize variable names |
 
 ---
 
-- Ngoài ra, cần thêm cột **đánh cờ chất lượng** vào bảng dữ liệu để phân tích sau này, ví dụ:
+##### 🛠 Standardization of formats and strings
+
+| Subject | Standardization rules |
+|---------|----------------------|
+| **Text fields** | lowercase, trim spaces, capitalize correctly (`Ho Chi Minh`) |
+| **Country / Region** | Map to ISO-3166 (`VN`, `Viet Nam`, `Vietnam` → `Vietnam`) |
+| **Device / OS / Browser** | Use standardized mapping (`chrome`, `iOS 17`, `Android`) |
+| **Time** | Convert to `ISO 8601` UTC (`2025-06-17T08:00:00Z`) |
+| **ID** | Standard format: UUID or hashed, not empty, not duplicate |
+
+---
+
+##### 🔧 Tools and techniques proposed
+
+| Step | Proposed tool |
+|------|---------------|
+| Basic cleaning | SQL (BigQuery Standard SQL) |
+| String standardization | Python (`pandas`, `str.lower()`, `regex`, `fuzzywuzzy`) |
+| Deduplication | `ROW_NUMBER() OVER`, `DISTINCT`, `pandas.duplicated()` |
+| Time check | `TIMESTAMP_DIFF`, check `> NOW()` |
+| Standardization | Python dict / SQL CASE / JOIN reference table |
+
+---
+
+- Additionally, a **quality flag** column is added to the data for future analysis, e.g.:
   - `is_valid` (TRUE/FALSE)
   - `data_quality_flag`
   - `cleaning_note`
 
-- Việc làm sạch và chuẩn hóa không chỉ giúp tạo ra dữ liệu tin cậy, mà còn làm nền tảng cho việc xây dựng bảng `fact`/`dim` chất lượng cao và KPI chính xác.
+- Cleaning and standardization not only help create reliable data but also lay the groundwork for high-quality `fact`/`dim` tables and accurate KPIs.
 
 ---
 </details>
 
 
 ---
-##### 5.2.3 – Làm Giàu Dữ Liệu (Data Enrichment)
+##### 5.2.3 – Data Enrichment
 ---
 
 <details>
-<summary>Bổ sung thông tin bổ trợ vào dữ liệu để nâng cao giá trị phân tích</summary>
+<summary>Adding supplementary information to data to enhance analytical value</summary>
 
 ---
 
-- Sau khi dữ liệu được làm sạch và chuẩn hóa, bước tiếp theo là **làm giàu dữ liệu** (enrichment).
-- Mục tiêu của giai đoạn này là bổ sung thêm các trường thông tin có giá trị phân tích cao, phục vụ trực tiếp cho việc tính toán `KPIs`, theo dõi hành vi người dùng, và phân khúc hiệu quả.
+- After data has been cleaned and standardized, the next step is **enrichment**.
+- The goal of this phase is to add valuable information that helps calculate KPIs, track user behavior, and analyze effectiveness.
 
 ---
 
-##### 🔍 Các chiến lược enrichment phổ biến
+##### 🔍 Common enrichment strategies
 
-| Nhóm dữ liệu | Kỹ thuật làm giàu áp dụng |
+| Data Group | Application of enrichment techniques |
 |-------------|---------------------------|
-| **User registration** | Tính `registration_duration` = `completion_time - start_time` |
-| **Device & region** | Tra cứu `geo-IP`, phân tích thiết bị từ `User-Agent` |
-| **App events** | Gắn `event_stage`, tính `step_duration` trung bình |
-| **KYC/AML** | Tính `is_high_risk_user`, phân loại `risk_level` |
-| **Communication** | Xác định `response_delay_bucket`, hành vi phản hồi |
-| **Session** | Tính toán `session_count`, `avg_session_duration` |
+| **User registration** | Calculate `registration_duration` = `completion_time - start_time` |
+| **Device & region** | Lookup `geo-IP`, analyze device usage from `User-Agent` |
+| **App events** | Add `event_stage`, calculate average `step_duration` |
+| **KYC/AML** | Calculate `is_high_risk_user`, categorize `risk_level` |
+| **Communication** | Determine `response_delay_bucket`, analyze user response |
+| **Session** | Calculate `session_count`, `avg_session_duration` |
 
 ---
 
-##### 🧠 Enrichment theo logic kinh doanh
+##### 🧠 Enrichment based on business logic
 
-- Phân khúc người dùng: theo quốc gia, thiết bị, nguồn kênh đăng ký
-- Cohort tuần đăng ký: `W25_2025`
-- Cờ hành vi đặc biệt: `first_pass_KYC`, `likely_churn = true`
+- User segmentation: by country, device, registration channel
+- Cohort by registration week: `W25_2025`
+- Special behavior flag: `first_pass_KYC`, `likely_churn = true`
 
 ---
 
-##### 🛠 Công cụ hỗ trợ
+##### 🛠 Support tools
 
-| Mục đích | Công cụ gợi ý |
+| Purpose | Suggested tool |
 |---------|---------------|
-| Enrich dạng text | SQL `LOWER()`, `REGEXP`, Python `re` |
-| Ghép bảng | SQL `JOIN`, `LEFT JOIN` |
-| Phân loại logic | SQL `CASE`, Python `if-else` |
-| Kết nối API ngoài | Python `requests`, Spark `UDF` |
+| Enrich text format | SQL `LOWER()`, `REGEXP`, Python `re` |
+| Join tables | SQL `JOIN`, `LEFT JOIN` |
+| Logical categorization | SQL `CASE`, Python `if-else` |
+| External API integration | Python `requests`, Spark `UDF` |
 
 ---
 
-📌 **Xem thêm các chiến lược nâng cao bên dưới**:
+📌 **See additional advanced strategies below**:
 
 </details>
 
 <details>
-<summary>📌 Chi tiết mở rộng: Các chiến lược enrichment nâng cao</summary>
+<summary>📌 Extended: Advanced enrichment strategies</summary>
 
 ---
 
-##### ✅ Enrichment từ nguồn ngoài
+##### ✅ Enrichment from external sources
 
-##### 🌍 Vị trí địa lý từ IP
-- **Cách làm**: IP → country, city, timezone
-- **Nguồn**: MaxMind GeoIP2, IP2Location API
-- **Lý do**: phân tích drop-off theo vùng, compliance địa phương
+##### 🌍 Geographic location from IP
+- **Method**: IP → country, city, timezone
+- **Source**: MaxMind GeoIP2, IP2Location API
+- **Reason**: Analyzing drop-off by region, local compliance
 
-##### 💻 Thiết bị & hệ điều hành
-- Trích từ User-Agent string
-- Ví dụ enrich thêm: `device_category`, `os_version`, `browser_family`
-- Hữu ích để kiểm tra liệu tỷ lệ thất bại KYC có liên quan đến thiết bị?
+##### 💻 Device & operating system
+- Extracted from User-Agent string
+- Example: enrich with `device_category`, `os_version`, `browser_family`
+- Useful for checking if KYC failure rate is related to device?
 
-##### 📣 Thông tin chiến dịch Marketing
-- Source/medium/campaign từ Firebase, Adjust
-- Gắn thêm trường: `marketing_channel`, `is_paid_user`
+##### 📣 Marketing campaign insights
+- Source/medium/campaign from Firebase, Adjust
+- Add fields: `marketing_channel`, `is_paid_user`
 
 ---
 
-##### ✅ Enrichment tính toán nội bộ
+##### ✅ Enrichment based on calculations
 
-| Trường mới | Mô tả | Mục tiêu |
+| New field | Description | Objective |
 |------------|--------|----------|
-| `duration_in_step_seconds` | Thời gian mỗi bước | UX tracking |
-| `kyc_attempt_number` | Tổng lần gửi lại | Đánh giá friction |
-| `risk_level_category` | Nhóm hóa risk_score | Báo cáo dễ hiểu hơn |
-| `day_of_week`, `hour_of_day` | Trích từ timestamp | Phân tích theo hành vi giờ/ngày |
-| `kyc_verification_status_granular` | Chi tiết hóa trạng thái KYC | Nhìn rõ điểm nghẽn |
+| `duration_in_step_seconds` | Time per step | UX tracking |
+| `kyc_attempt_number` | Total number of retries | Friction analysis |
+| `risk_level_category` | Group risk_score | More understandable report |
+| `day_of_week`, `hour_of_day` | Extracted from timestamp | Analyze behavior by time of day/day of week |
+| `kyc_verification_status_granular` | Granularize KYC status | Identify bottlenecks |
 
 ---
 
-##### ✅ Kỹ thuật chuyên sâu
+##### ✅ Advanced techniques
 
-- **User-defined enrichment logic**: gắn `user_type` = `trusted`, `new`, `risky`
-- **Predictive enrichment** (gợi ý nếu đi xa hơn): Xác suất `conversion_likelihood`, `likely_to_drop`
+- **User-defined enrichment logic**: add `user_type` = `trusted`, `new`, `risky`
+- **Predictive enrichment** (if further out): Probability `conversion_likelihood`, `likely_to_drop`
 
 ---
 
-- Các enrichment này giúp tạo thêm bối cảnh cho phân tích, góp phần làm **phễu onboarding chính xác hơn**, **phân tích cohort sâu hơn**, và hỗ trợ **ra quyết định kinh doanh hiệu quả**.
+- These enrichments add context to the analysis, contributing to a more **accurate onboarding funnel**, **deep cohort analysis**, and **business-driven decision-making**.
 
 ---
 </details>
 
 
 ---
-##### 5.2.4 – Xây Dựng Các Bảng Fact (Fact Table Construction)
+##### 5.2.4 – Fact Table Construction
 ---
 
 <details>
-<summary>Mô tả logic và các bước để tạo ra các bảng fact từ dữ liệu đã được làm sạch và làm giàu</summary>
+<summary>Description of logic and steps to create fact tables from cleaned and enriched data</summary>
 
 ---
 
-- Các bảng **fact** lưu trữ dữ liệu định lượng hoặc sự kiện theo dòng thời gian, là nền tảng cho hầu hết các phân tích như: `funnel`, `conversion rate`, `drop-off analysis`, `retention`, `failure reason`, `risk decision`, v.v.
-- Chúng có **khóa ngoại `user_id`** liên kết đến `dim_users` và thường gắn với thời gian (`timestamp`) để phân tích theo phiên/chu kỳ.
+- **Fact** tables store quantitative or event data over time, forming the backbone for most analyses such as: `funnel`, `conversion rate`, `drop-off analysis`, `retention`, `failure reason`, `risk decision`, etc.
+- They have **foreign key `user_id`** linked to `dim_users` and are often tied to time (`timestamp`).
 
 ---
 
-##### ✅ Các bảng fact chính cần xây dựng
+##### ✅ Key fact tables to be constructed
 
 ---
 
-##### 📊 `fact_onboarding_events` – Các sự kiện trong hành trình Onboarding
+##### 📊 `fact_onboarding_events` – Events in the Onboarding Journey
 
-- **Nguồn dữ liệu:** Nhật ký sự kiện từ app/web (`app_event_logs`)
-- **Mỗi bản ghi:** Một hành động cụ thể của người dùng trong hành trình onboarding
+- **Data source:** Event logs from app/web (`app_event_logs`)
+- **Each record:** A specific action taken by a user during onboarding
 
-| Trường | Diễn giải logic |
-|--------|------------------|
-| `event_name` | Được ánh xạ từ mã sự kiện gốc, chuẩn hóa thành nhóm `KYC_STARTED`, `ID_UPLOAD`, `LIVENESS_PASS`, `ACCOUNT_ACTIVATED`, v.v. |
-| `onboarding_step` | Gán số thứ tự cho từng bước trong phễu onboarding (ví dụ: `1` = đăng ký, `2` = upload giấy tờ) |
-| `duration_in_step_seconds` | Tính toán bằng `event_end_time - event_start_time` hoặc thời gian giữa hai sự kiện |
-| `event_status` | Gắn nhãn `SUCCESS`, `FAILURE`, `PENDING`, `RETRY` |
-| `error_code`, `error_message` | Lấy từ hệ thống khi bước thất bại |
-| `session_id`, `device_type` | Từ app logs hoặc cookie headers |
+| Field | Explanation of logic |
+|-------|---------------------|
+| `event_name` | Mapped from original event code, standardized into groups like `KYC_STARTED`, `ID_UPLOAD`, `LIVENESS_PASS`, `ACCOUNT_ACTIVATED`, etc. |
+| `onboarding_step` | Assigns a step number in the onboarding funnel (e.g., `1` for registration, `2` for document upload) |
+| `duration_in_step_seconds` | Calculated as `event_end_time - event_start_time` or time between events |
+| `event_status` | Labels `SUCCESS`, `FAILURE`, `PENDING`, `RETRY` |
+| `error_code`, `error_message` | Pulled from system when event fails |
+| `session_id`, `device_type` | From app logs or cookie headers |
 
-- **Phép tổng hợp:** Có thể `COUNT(DISTINCT step)` để tính tỷ lệ hoàn tất.
-
----
-
-##### 📋 `fact_kyc_verification_details` – Chi tiết quá trình KYC
-
-- **Nguồn dữ liệu:** Hệ thống xác minh giấy tờ, OCR, liveness
-- **Mỗi bản ghi:** Một lần gửi thông tin xác minh
-
-| Trường | Diễn giải logic |
-|--------|------------------|
-| `kyc_submission_id` | Mã hóa từ hệ thống nội bộ hoặc UUID |
-| `document_type`, `ocr_status`, `face_match_score` | Trích xuất từ kết quả trả về của provider |
-| `kyc_result` | Mapping lại trạng thái thô thành `Approved`, `Rejected`, `Retry`, `Under Review` |
-| `rejection_reason` | Có thể là `ARRAY<STRING>` nếu lý do phức tạp |
-| `number_of_retries` | Tính bằng `COUNT(*)` theo `user_id` |
-| `processing_time_seconds` | `submission_end_time - start_time`, hoặc thời gian hệ thống xử lý log |
-
-- **Gắn cờ enrichment:** `is_first_pass_success = TRUE` nếu chỉ có 1 bản ghi và `kyc_result = Approved`
+- **Aggregation:** Can use `COUNT(DISTINCT step)` to calculate completion rate.
 
 ---
 
-##### 🚨 `fact_risk_assessments` – Đánh giá rủi ro AML/PEP
+##### 📋 `fact_kyc_verification_details` – KYC Details
 
-- **Nguồn dữ liệu:** Hệ thống risk scoring nội bộ, hoặc tích hợp bên ngoài (API sanction check)
-- **Mỗi bản ghi:** Một lượt đánh giá rủi ro trên user
+- **Data source:** KYC system, OCR, liveness check
+- **Each record:** A submission of KYC information
 
-| Trường | Diễn giải |
-|--------|-----------|
-| `risk_score` | 0–100, từ hệ thống scoring |
+| Field | Explanation of logic |
+|-------|---------------------|
+| `kyc_submission_id` | Encoded from internal system or UUID |
+| `document_type`, `ocr_status`, `face_match_score` | Extracted from provider response |
+| `kyc_result` | Mapped to `Approved`, `Rejected`, `Retry`, `Under Review` |
+| `rejection_reason` | Can be `ARRAY<STRING>` if multiple reasons |
+| `number_of_retries` | Calculated as `COUNT(*)` per `user_id` |
+| `processing_time_seconds` | `submission_end_time - start_time`, or system log processing time |
+
+- **Enrichment flag:** `is_first_pass_success = TRUE` if only one record exists and `kyc_result = Approved`
+
+---
+
+##### 🚨 `fact_risk_assessments` – Risk Assessment
+
+- **Data source:** Internal risk scoring system, or external integration (API sanction check)
+- **Each record:** A risk assessment for a user
+
+| Field | Explanation |
+|-------|-----------|
+| `risk_score` | 0–100, based on scoring system |
 | `pep_flag`, `sanction_flag` | Boolean |
-| `final_risk_decision` | Mapping `Clear`, `Review`, `Reject` |
-| `decision_reason` | `ARRAY<STRING>` nếu có nhiều lý do |
+| `final_risk_decision` | Mapped to `Clear`, `Review`, `Reject` |
+| `decision_reason` | `ARRAY<STRING>` if multiple reasons |
 
 ---
 
-##### 💬 `fact_user_communications` – Tương tác với người dùng
+##### 💬 `fact_user_communications` – User Communications
 
-- **Nguồn dữ liệu:** CRM, hệ thống gửi Email/SMS, ticket support
-- **Mỗi bản ghi:** Một lượt gửi thông báo hoặc phản hồi hỗ trợ
+- **Data source:** CRM, email/SMS/push notification system, support tickets
+- **Each record:** A communication sent to a user
 
-| Trường | Diễn giải |
-|--------|-----------|
-| `communication_type` | `Email`, `Push`, `In-app`, `SMS` |
+| Field | Explanation |
+|-------|-----------|
+| `communication_type` | `Email`, `SMS`, `Push`, `In-App Message` |
 | `delivery_status` | `Delivered`, `Failed`, `Opened` |
-| `user_interaction_status` | Gắn enrichment `Clicked`, `Ignored`, `Responded` |
-| `support_ticket_id` | Liên kết đến bảng `ticket`, nếu có |
+| `user_interaction_status` | Enriched with `Clicked`, `Ignored`, `Responded` |
+| `support_ticket_id` | Linked to `ticket` table if applicable |
 
 ---
 
-##### 📎 `fact_manual_review_logs` – Lượt xử lý thủ công
+##### 📎 `fact_manual_review_logs` – Manual Review Logs
 
-- **Nguồn:** Hệ thống nội bộ ghi lại các hành động của đội kiểm duyệt người thật
-- **Mỗi bản ghi:** Một lượt truy cập hồ sơ để xem xét bằng tay
+- **Data source:** Internal system logs of manual KYC reviews
+- **Each record:** Access to a user's profile for manual review
 
-| Trường | Diễn giải |
-|--------|-----------|
-| `reviewer_id` | Mã hóa ID nhân sự xử lý |
+| Field | Explanation |
+|-------|-----------|
+| `reviewer_id` | Encoded ID of staff member conducting review |
 | `action_type` | `Approve`, `Escalate`, `Reject` |
-| `notes`, `review_duration` | Dữ liệu vận hành dùng để đánh giá năng suất & consistency |
+| `notes`, `review_duration` | Operational data used to assess productivity & consistency |
 
 ---
 
-##### 🔗 Mối quan hệ với Dimension Tables
+##### 🔗 Relationships with Dimension Tables
 
-- Mỗi bảng fact sẽ có các khóa ngoại:  
+- Each fact table will have foreign keys:  
   - `user_id` → `dim_users`  
-  - `session_id` → (nếu cần, tách bảng `dim_sessions`)  
-  - `document_type`, `communication_type`, v.v. có thể là `dim_code` (tùy dự án)
+  - `session_id` → (if needed, split `dim_sessions`)  
+  - `document_type`, `communication_type`, etc. may be `dim_code` (depending on project)
 
 ---
 
-##### 🛠 Công cụ / Kỹ thuật thực hiện
+##### 🛠 Tools and Techniques
 
-| Bước | Công cụ gợi ý |
+| Step | Suggested tool |
 |------|----------------|
 | Join, transform | SQL (BigQuery), dbt |
-| Xử lý enrich phức tạp | Python (pandas), Spark |
-| Tự động hóa ETL | dbt model, Airflow DAG |
-| Kiểm tra | Great Expectations, dbt tests |
+| Handle complex enrichments | Python (pandas), Spark |
+| Automated ETL | dbt model, Airflow DAG |
+| Validation | Great Expectations, dbt tests |
 
 ---
 
-- Việc xây dựng tốt các bảng fact giúp **rút ngắn thời gian phân tích**, **giảm lỗi logic**, và **mở rộng được hệ thống phân tích trong tương lai**.
+- Building good fact tables help **reduce analysis time**, **minimize logic errors**, and **scale the analytics system in the future**.
 
 ---
 </details>
 
 
 ---
-##### 5.2.5 – Xây Dựng Các Bảng Dimension (Dimension Table Construction)
+##### 5.2.5 – Dimension Table Construction
 ---
 
 <details>
-<summary>Mô tả logic và các bước để tạo ra các bảng dimension từ dữ liệu đã được làm sạch và làm giàu</summary>
+<summary>Description of logic and steps to create dimension tables from cleaned and enriched data</summary>
 
 ---
 
-- Các bảng dimension (**dim tables**) cung cấp ngữ cảnh mô tả chi tiết cho các sự kiện và phép đo lường trong các bảng fact.
-- Chúng chứa các thuộc tính (attributes) được dùng để lọc, nhóm và phân tích dữ liệu – ví dụ: người dùng nào, thời gian nào, qua kênh nào, sử dụng thiết bị gì.
-- Mỗi bảng dim có một **khóa chính (Primary Key)** duy nhất, và các bảng fact sẽ tham chiếu tới thông qua **khóa ngoại (Foreign Key)**.
+- **Dimension** tables provide contextual information about events and metrics in fact tables.
+- They contain attributes used for filtering, grouping, and analyzing data – e.g., which user, when, through which channel, using which device.
+- Each dimension table has a **primary key (Primary Key)** and fact tables will reference them through **foreign keys (Foreign Key)**.
 
 ---
 
-##### 📘 `dim_users` – Thông Tin Người Dùng
+##### 📘 `dim_users` – User Information
 
-- **Mục đích:** Lưu trữ thông tin mô tả và trạng thái của người dùng trong hành trình onboarding.
-- **Nguồn dữ liệu:**  
-  - Hệ thống đăng ký (registration system)  
-  - Dữ liệu xác minh KYC/Biometric  
-  - Dữ liệu Risk & Compliance  
+- **Purpose:** Stores descriptive and static user attributes and state.
+- **Data sources:**  
+  - User registration system  
+  - KYC/Biometric verification data  
+  - Risk & Compliance data  
 
-- **Logic xây dựng:**
-  - Đảm bảo mỗi `user_id` duy nhất.
-  - **SCD Type 1:** Dùng cho các thuộc tính cập nhật liên tục như `email`, `phone_number`.
-  - **SCD Type 2:** Cho các thuộc tính cần theo dõi lịch sử như `risk_category`, `user_segment`.
+- **Building logic:**
+  - Ensure each `user_id` is unique.
+  - **SCD Type 1:** Suitable for continuously updated attributes like `email`, `phone_number`.
+  - **SCD Type 2:** For attributes needing historical tracking like `risk_category`, `user_segment`.
 
-- **Các trường đặc trưng:**
+- **Characteristics:**
   - `user_id`, `registration_time`, `first_kyc_success_time`
   - `latest_kyc_status`, `risk_category`, `is_active_user`
   - `user_segment`, `geo_country`, `language_preference`
 
 ---
 
-##### 📅 `dim_time` – Thông Tin Thời Gian
+##### 📅 `dim_time` – Time Information
 
-- **Mục đích:** Phân tích thời gian theo ngày/tuần/tháng/quý/năm.
-- **Nguồn dữ liệu:** Sinh tự động bằng SQL/Python.
+- **Purpose:** Analyze time-based data by day/week/month/quarter/year.
+- **Data sources:** Generated automatically via SQL/Python.
 
-- **Trường dữ liệu:**
+- **Data fields:**
   - `date_key` (YYYYMMDD), `date`, `day_of_week`, `week_num`, `month`, `quarter`, `year`
   - `is_weekend`, `holiday_name`
 
-- **Ứng dụng:** Hỗ trợ slice/dice dữ liệu theo thời gian trong dashboard.
+- **Application:** Helps slice/dice data in the dashboard.
 
 ---
 
-##### 📶 `dim_channel` – Kênh Đăng Ký / Marketing
+##### 📶 `dim_channel` – Registration Channel / Marketing
 
-- **Mục đích:** Cung cấp ngữ cảnh về nguồn người dùng đến từ đâu.
-- **Nguồn dữ liệu:** Từ marketing attribution (`GA`, `Firebase`, `AppsFlyer`...)
+- **Purpose:** Provides context about where users come from.
+- **Data sources:** From marketing attribution (`GA`, `Firebase`, `AppsFlyer`...)
 
-- **Logic xây dựng:**
-  - Chuẩn hóa các giá trị `channel`, `source`, `medium`
-  - Gom nhóm thành `channel_group` như: `Paid`, `Organic`, `Referral`
+- **Building logic:**
+  - Standardize `channel`, `source`, `medium` values
+  - Group them into `channel_group` categories like `Paid`, `Organic`, `Referral`
 
-- **Trường dữ liệu:**
+- **Data fields:**
   - `channel_id`, `channel_name`, `channel_group`, `source`, `campaign_id`
 
 ---
 
-##### 📱 `dim_device` – Thiết Bị Người Dùng
+##### 📱 `dim_device` – User Device
 
-- **Mục đích:** Phân tích trải nghiệm onboarding theo từng thiết bị.
-- **Nguồn dữ liệu:** Trích từ `User-Agent` hoặc event logs.
+- **Purpose:** Analyze user experience on different devices.
+- **Data sources:** Extracted from `User-Agent` strings or event logs.
 
-- **Logic enrichment:**
-  - Trích xuất từ chuỗi `user_agent` → `device_type`, `os`, `browser`, `device_model`
+- **Enrichment logic:**
+  - Extract from `user_agent` string → `device_type`, `os`, `browser`, `device_model`
 
-- **Trường dữ liệu:**
+- **Data fields:**
   - `device_id`, `device_type`, `os_version`, `browser_type`, `device_model`
 
 ---
 
-##### 💬 `dim_communication_type` – Loại Giao Tiếp
+##### 💬 `dim_communication_type` – Communication Type
 
-- **Mục đích:** Chuẩn hóa loại tin nhắn trong `fact_user_communications`
-- **Giá trị ví dụ:** `Email`, `SMS`, `Push`, `In-App Message`
-
----
-
-##### 📄 `dim_document_type` – Loại Giấy Tờ
-
-- **Mục đích:** Chuẩn hóa và phân loại các loại giấy tờ người dùng cung cấp.
-- **Giá trị ví dụ:** `Passport`, `National ID`, `Driver's License`
+- **Purpose:** Standardize communication types in `fact_user_communications`
+- **Example values:** `Email`, `SMS`, `Push`, `In-App Message`
 
 ---
 
-##### 🔗 Mối Quan Hệ Giữa Fact và Dimension Tables
+##### 📄 `dim_document_type` – Document Type
 
-| Fact Table | Dimension Table Tham Chiếu |
+- **Purpose:** Standardize and categorize user-provided documents.
+- **Example values:** `Passport`, `National ID`, `Driver's License`
+
+---
+
+##### 🔗 Relationships Between Fact and Dimension Tables
+
+| Fact Table | Referenced Dimension Table |
 |------------|-----------------------------|
 | `fact_onboarding_events` | `dim_users`, `dim_time`, `dim_channel`, `dim_device` |
 | `fact_kyc_verification_details` | `dim_users`, `dim_document_type`, `dim_time` |
@@ -1016,134 +998,134 @@ title: report_a05_customer_onboarding_analytics
 
 ---
 
-##### 🛠 Công Cụ / Kỹ Thuật Đề Xuất
+##### 🛠 Tools and Techniques
 
-| Tác vụ | Công cụ gợi ý |
-|-------|----------------|
-| Xây dựng `dim_users` | SQL (BigQuery), `dbt` (cho SCD Type 2), Python |
-| Sinh `dim_time` | SQL (`GENERATE_DATE_ARRAY` – BigQuery), Python |
-| Chuẩn hóa `dim_channel`, `dim_device` | SQL `CASE`, `UDF`, thư viện `user_agents` |
-| Quản lý pipeline | dbt models, Airflow DAGs |
-
----
-
-##### ✅ Tổng Kết
-
-- Việc xây dựng các bảng dimension chuẩn xác là yếu tố then chốt để phân tích sâu, slice/dice hiệu quả, và xây dựng dashboard thân thiện cho stakeholder.
-- Mỗi bảng dimension cần đảm bảo: dữ liệu sạch, không trùng, chuẩn hóa và dễ `JOIN` với các bảng fact.
-- Dimension Tables là lớp “ngữ cảnh” bổ sung giá trị phân tích mà dữ liệu sự kiện (event) đơn lẻ không thể mang lại.
-
----
-</details>
-
-
----
-#### 5.3 – Đảm Bảo Chất Lượng Dữ Liệu (Data Quality Assurance)
----
-
-<details>
-<summary>Mô tả các biện pháp và công cụ để duy trì chất lượng dữ liệu xuyên suốt Data Pipeline</summary>
+| Task | Suggested tool |
+|------|----------------|
+| Build `dim_users` | SQL (BigQuery), `dbt` (for SCD Type 2), Python |
+| Generate `dim_time` | SQL (`GENERATE_DATE_ARRAY` – BigQuery), Python |
+| Standardize `dim_channel`, `dim_device` | SQL `CASE`, `UDF`, `user_agents` library |
+| Manage pipelines | dbt models, Airflow DAGs |
 
 ---
 
-##### 🎯 Mục Tiêu & Tầm Quan Trọng
+##### ✅ Summary
 
-- **Data Quality Assurance (DQA)** là yếu tố then chốt để xây dựng niềm tin vào hệ thống phân tích.
-- Đặc biệt trong môi trường tuân thủ nghiêm ngặt như `KYC/AML`, dữ liệu sai lệch có thể dẫn đến:
-  - Đánh giá rủi ro sai
-  - Phân tích hành vi sai lệch
-  - Báo cáo không đạt chuẩn kiểm toán
-
----
-
-##### 🔍 5 Yếu Tố Cốt Lõi của Chất Lượng Dữ Liệu
-
-- **Accuracy**: Dữ liệu phản ánh đúng thực tế nghiệp vụ (ví dụ: `user_id`, `event_time` phải chính xác).
-- **Completeness**: Dữ liệu không thiếu trường bắt buộc (`kyc_result`, `registration_channel`...).
-- **Consistency**: Không mâu thuẫn giữa các hệ thống, các bản ghi (ví dụ: KYC status không thay đổi bất hợp lý).
-- **Timeliness**: Dữ liệu có mặt đúng lúc để phân tích (ví dụ: dashboard cập nhật hàng ngày).
-- **Validity**: Tuân thủ định dạng, kiểu dữ liệu, quy tắc nghiệp vụ (`email`, `risk_score`, `status`...).
-
----
-
-##### 🧱 Kiểm Tra DQA Theo Tầng (Layered QA Strategy)
-
-##### ✅ 1. Source Layer – Tại Nguồn
-
-- **Mục tiêu**: Phát hiện sớm dữ liệu bẩn trước khi vào pipeline.
-- **Ví dụ**:
-  - Kiểm tra số cột trong file CSV.
-  - Đảm bảo schema của file JSON đúng định dạng.
-
-##### ✅ 2. Transformation Layer – Khi Làm Sạch & Làm Giàu
-
-- **Mục tiêu**: Đảm bảo tính toàn vẹn, chính xác sau mỗi bước xử lý.
-- **Ví dụ**:
-  - `user_id` là duy nhất trong `dim_users`.
-  - `kyc_result` chỉ chứa giá trị hợp lệ.
-  - `foreign keys` của `fact_*` đều tồn tại trong `dim_*`.
-
-##### ✅ 3. Consumption Layer – Trước Khi Phân Tích
-
-- **Mục tiêu**: Đảm bảo dữ liệu sẵn sàng cho BI/dashboard.
-- **Ví dụ**:
-  - So sánh `conversion rate` giữa dashboard và query SQL gốc.
-  - Tổng số user mới trong ngày không đột ngột = 0.
-
----
-
-##### 🛠️ Các Kiểm Tra Cụ Thể và Công Cụ Gợi Ý
-
-| Loại Kiểm Tra            | Mô Tả & Mục Tiêu                                                                 | Công Cụ / Kỹ Thuật                                      |
-|--------------------------|-----------------------------------------------------------------------------------|----------------------------------------------------------|
-| **Uniqueness**           | Đảm bảo khóa chính (user_id, event_id) là duy nhất                              | `dbt tests: unique`, `SQL COUNT(DISTINCT)`              |
-| **Completeness**         | Các trường bắt buộc không NULL                                                   | `dbt not_null`, `SQL WHERE col IS NULL`                 |
-| **Validity**             | Giá trị hợp lệ, đúng định dạng                                                   | `dbt accepted_values`, `SQL REGEXP`, `CASE WHEN`        |
-| **Referential Integrity**| `FK` trong fact tồn tại trong dim                                                | `dbt relationships`, `LEFT JOIN NULL CHECK`             |
-| **Volume/Growth**        | Phát hiện sụt giảm/tăng bất thường về số lượng bản ghi                           | `BigQuery Monitoring`, `Looker Health`, `dbt metrics`   |
-| **Timeliness**           | Dữ liệu có được cập nhật đúng lịch không                                         | `Airflow DAG SLA`, `last_updated_at`, `alert rules`     |
-| **Consistency**          | So sánh KPI giữa hệ thống nguồn và kết quả phân tích                             | `dbt snapshots`, `SQL JOIN + ASSERT`, `data diff`       |
-
----
-
-##### 🔄 Quy Trình Xử Lý Lỗi DQA
-
-1. **Phát hiện lỗi**: Tự động qua dbt test hoặc cảnh báo từ hệ giám sát.
-2. **Cảnh báo**: Gửi thông báo qua Email/Slack đến nhóm liên quan.
-3. **Root Cause Analysis**: Tìm nguyên nhân: lỗi source, parsing, logic transformation?
-4. **Khắc phục & Backfill**: Sửa lỗi và chạy lại phần dữ liệu bị ảnh hưởng.
-5. **Theo dõi sau khắc phục**: Đảm bảo không tái diễn.
-
----
-
-##### ✅ Tổng Kết
-
-- DQA không phải là “chốt kiểm tra” cuối cùng, mà là **điểm giám sát xuyên suốt pipeline**.
-- Việc xây dựng hệ thống kiểm tra toàn diện ở mọi tầng giúp:
-  - Ngăn lỗi từ sớm → tiết kiệm chi phí.
-  - Tăng uy tín của đội Data đối với Compliance, Product.
-  - Bảo vệ doanh nghiệp khỏi rủi ro pháp lý, đặc biệt với KYC/AML.
+- Building accurate dimension tables is crucial for deep analysis, slice/dice effectiveness, and building user-friendly dashboards.
+- Each table needs to ensure: clean data, no duplicates, standardized format, and easy `JOIN` with fact tables.
+- Dimension tables add value to the analysis by providing context that single event data cannot convey.
 
 ---
 </details>
 
 
-#### 5.4 – Công Cụ và Công Nghệ Đề Xuất (Recommended Tools & Technologies)
+---
+#### 5.3 – Data Quality Assurance
+---
+
+<details>
+<summary>Description of various measures and tools to maintain data quality throughout the Data Pipeline</summary>
+
+---
+
+##### 🎯 Objectives and Importance
+
+- **Data Quality Assurance (DQA)** is crucial for building trust in the analytics system.
+- Especially important in highly regulated environments like `KYC/AML`, data inaccuracies can lead to:
+  - Incorrect risk assessment
+  - Biased behavioral analysis
+  - Audit non-compliance
+
+---
+
+##### 🔍 5 Key Elements of Data Quality
+
+- **Accuracy**: Data accurately reflects business operations (e.g., `user_id`, `event_time` must be correct).
+- **Completeness**: Data does not miss required fields (`kyc_result`, `registration_channel`...).
+- **Consistency**: No inconsistencies between systems, records (e.g., KYC status should not change unexpectedly).
+- **Timeliness**: Data is present at the right time for analysis (e.g., dashboard updates daily).
+- **Validity**: Adherence to data format, data type, and business rules (`email`, `risk_score`, `status`...).
+
+---
+
+##### 🧱 Layered QA Strategy
+
+##### ✅ 1. Source Layer – At Source
+
+- **Objective**: Detect dirty data before entering the pipeline.
+- **Examples**:
+  - Check number of columns in CSV file.
+  - Ensure schema of JSON file is correct.
+
+##### ✅ 2. Transformation Layer – When Cleaning & Enriching
+
+- **Objective**: Ensure data integrity and accuracy after each processing step.
+- **Examples**:
+  - `user_id` is unique in `dim_users`.
+  - `kyc_result` only contains valid values.
+  - All `foreign keys` in `fact_*` exist in `dim_*`.
+
+##### ✅ 3. Consumption Layer – Before Analysis
+
+- **Objective**: Ensure data is ready for BI/dashboard use.
+- **Examples**:
+  - Compare `conversion rate` between dashboard and SQL query.
+  - Total new users per day should not suddenly be zero.
+
+---
+
+##### 🛠 Specific Checks and Suggestive Tools
+
+| Type of Check | Description & Objective | Tool / Technique |
+|----------------|------------------------|----------------|
+| **Uniqueness** | Ensure primary key (user_id, event_id) is unique | `dbt tests: unique`, `SQL COUNT(DISTINCT)` |
+| **Completeness** | All required fields are not NULL | `dbt not_null`, `SQL WHERE col IS NULL` |
+| **Validity** | Values are valid and conform to expected format | `dbt accepted_values`, `SQL REGEXP`, `CASE WHEN` |
+| **Referential Integrity** | `FK` in fact tables exist in dim | `dbt relationships`, `LEFT JOIN NULL CHECK` |
+| **Volume/Growth** | Detect unusual drops/increases in record count | `BigQuery Monitoring`, `Looker Health`, `dbt metrics` |
+| **Timeliness** | Is data being updated on schedule? | `Airflow DAG SLA`, `last_updated_at`, `alert rules` |
+| **Consistency** | Compare KPIs between source system and analysis results | `dbt snapshots`, `SQL JOIN + ASSERT`, `data diff` |
+
+---
+
+##### 🔄 Error Handling Process
+
+1. **Identify errors**: Automatically via dbt test or alert from monitoring system.
+2. **Alert**: Send notification via email/Slack to relevant team.
+3. **Root Cause Analysis**: Identify: is it a data source issue, parsing error, or logic transformation?
+4. **Fix & Backfill**: Correct errors and re-run affected data.
+5. **Post-fix monitoring**: Ensure no recurrence.
+
+---
+
+##### ✅ Summary
+
+- DQA is not "final QA" but rather **continuous monitoring across the pipeline**.
+- Building comprehensive checks at all levels helps:
+  - Catch issues early → save costs.
+  - Increase trust with Compliance, Product teams.
+  - Protect the company from legal risks, especially in KYC/AML.
+
+---
+</details>
+
+
+#### 5.4 – Recommended Tools & Technologies
 ---
 <details>
-<summary>Liệt kê và giải thích các công cụ, công nghệ được lựa chọn cho việc xây dựng Data Pipeline</summary>
+<summary>Listing and explaining the tools and technologies chosen for building the Data Pipeline</summary>
 
 ---
 
-##### 🎯 Mục Tiêu
+##### 🎯 Objectives
 
-- Xây dựng một hệ thống xử lý dữ liệu onboarding/KYC hiện đại, mạnh mẽ, dễ mở rộng và duy trì.
-- Ưu tiên các công cụ cloud-native (Google Cloud Platform) kết hợp với các công cụ mã nguồn mở nổi bật (dbt, Airflow).
-- Đảm bảo pipeline hỗ trợ các nhu cầu phân tích đa dạng, theo thời gian thực và theo lô.
+- Build a modern, robust onboarding/KYC analytics system that is scalable and maintainable.
+- Prioritize cloud-native tools (Google Cloud Platform) in combination with open-source tools (dbt, Airflow).
+- Ensure the pipeline supports a variety of analytical needs, real-time and batch.
 
 ---
 
-##### 🏗️ Kiến Trúc Tổng Thể và Luồng Dữ Liệu
+##### 🏗️ Overall Architecture and Data Flow
 
 ```mermaid
 flowchart TD
@@ -1159,404 +1141,406 @@ flowchart TD
 
 ---
 
-##### 📌 Công Cụ Theo Chức Năng
+##### 📌 Tools by Function
 
 ---
 
-##### 1. Nền Tảng Lưu Trữ Dữ Liệu Thô (Raw Data Landing Zone / Data Lake)
+##### 1. Raw Data Storage (Raw Data Landing Zone / Data Lake)
 
-- **Công cụ:** Google Cloud Storage (GCS)
-- **Lý do lựa chọn:**
-  - Khả năng mở rộng không giới hạn
-  - Tích hợp sâu với BigQuery, Airflow, Cloud Functions
-  - Chi phí thấp và bền vững
-
----
-
-##### 2. Kho Dữ Liệu (Data Warehouse)
-
-- **Công cụ:** Google BigQuery
-- **Lý do lựa chọn:**
-  - Serverless, xử lý dữ liệu quy mô lớn nhanh chóng
-  - Chuẩn SQL và hỗ trợ BigQuery ML
-  - Kết nối trực tiếp với Looker Studio, Power BI
+- **Tool:** Google Cloud Storage (GCS)
+- **Reason for choice:**
+  - Unlimited scalability
+  - Deep integration with BigQuery, Airflow, Cloud Functions
+  - Low cost and durability
 
 ---
 
-##### 3. Công Cụ Tích Hợp / Thu Thập Dữ Liệu (Ingestion Tools)
+##### 2. Data Warehouse
 
-- **Công cụ:**
+- **Tool:** Google BigQuery
+- **Reason for choice:**
+  - Serverless, handles large-scale data processing quickly
+  - Standard SQL and BigQuery ML support
+  - Direct integration with Looker Studio, Power BI
+
+---
+
+##### 3. Data Ingestion Tools
+
+- **Tools:**
   - BigQuery Data Transfer Service
   - Cloud Functions, Cloud Run
   - Kafka, Google Cloud Pub/Sub
   - Fivetran, Airbyte
 
-- **Lý do lựa chọn:** Hỗ trợ ingestion từ SaaS, API, và streaming event logs hiệu quả
+- **Reason for choice:** Efficiently handles ingestion from SaaS, API, and streaming event logs
 
 ---
 
-##### 4. Công Cụ Chuyển Đổi Dữ Liệu (Transformation)
+##### 4. Data Transformation
 
-- **Công cụ:** dbt + BigQuery SQL
-- **Tùy chọn:** Python / PySpark (Cloud Dataflow)
+- **Tool:** dbt + BigQuery SQL
+- **Options:** Python / PySpark (Cloud Dataflow)
 
-- **Lý do lựa chọn:**
+- **Reason for choice:**
   - Modular modeling, version control
-  - Auto-documentation và testing
-  - In-warehouse processing tối ưu hiệu suất
+  - Auto-documentation and testing
+  - In-warehouse processing optimization
 
 ---
 
-##### 5. Công Cụ Điều Phối (Orchestration)
+##### 5. Orchestration
 
-- **Công cụ:** Apache Airflow (Cloud Composer)
-- **Lý do lựa chọn:**
-  - Quản lý DAGs rõ ràng
-  - Tích hợp cảnh báo khi pipeline lỗi
-  - Cộng đồng lớn, dễ mở rộng
-
----
-
-
-##### 6. Công Cụ Đảm Bảo Chất Lượng Dữ Liệu (DQA)
-
-- **Công cụ:** dbt tests, Great Expectations, Soda Core
-- **Lý do lựa chọn:**
-  - Kiểm tra `not_null`, `unique`, `relationships`
-  - Định nghĩa các expectation rõ ràng, tạo báo cáo tình trạng dữ liệu
-  - Tích hợp vào CI/CD
+- **Tool:** Apache Airflow (Cloud Composer)
+- **Reason for choice:**
+  - Clear DAG management
+  - Integration with alerting system
+  - Large community, easy to scale
 
 ---
 
-##### 7. Công Cụ BI / Trực Quan Hóa (Visualization)
 
-- **Công cụ:** Looker Studio (hoặc Power BI, Tableau)
-- **Lý do lựa chọn:**
-  - Miễn phí, dễ dùng, phù hợp stakeholder không kỹ thuật
-  - Kết nối gốc BigQuery, tương tác real-time
-  - Tạo dashboard động, chia sẻ dễ dàng
+##### 6. Data Quality Assurance (DQA)
 
----
-
-##### ✅ Tổng Kết Công Cụ Đề Xuất
-
-| Thành phần                      | Công cụ chính                              | Ghi chú                                              |
-|--------------------------------|--------------------------------------------|------------------------------------------------------|
-| Data Lake                      | Google Cloud Storage (GCS)                 | Lưu trữ dữ liệu thô, mở rộng tốt                    |
-| Data Warehouse                 | BigQuery                                   | Phân tích dữ liệu lớn, hiệu suất cao                |
-| Ingestion                      | Pub/Sub, Fivetran, Cloud Functions         | Hỗ trợ cả batch và streaming ingestion              |
-| Transformation                 | dbt + SQL, Python                          | Modular hóa logic xử lý, dễ kiểm thử và maintain    |
-| Orchestration                  | Airflow / Cloud Composer                   | Điều phối pipeline linh hoạt và có kiểm soát lỗi    |
-| Data Quality Assurance (DQA)  | dbt tests, Great Expectations              | Giám sát chất lượng dữ liệu toàn pipeline           |
-| Visualization / BI            | Looker Studio, Power BI, Tableau           | Tạo báo cáo và dashboard cho các bên liên quan      |
+- **Tool:** dbt tests, Great Expectations, Soda Core
+- **Reason for choice:**
+  - Checks `not_null`, `unique`, `relationships`
+  - Defines clear expectations, generates data quality reports
+  - Integrated into CI/CD
 
 ---
 
-</details>
+##### 7. BI / Visualization
+
+- **Tool:** Looker Studio (or Power BI, Tableau)
+- **Reason for choice:**
+  - Free, user-friendly, suitable for non-technical stakeholders
+  - Connects directly to BigQuery, supports real-time interaction
+  - Creates dynamic, shareable dashboards
 
 ---
 
-#### 5.5 – Tổng Kết Giai Đoạn Chuyển Đổi Dữ Liệu (Summary of Transformation Logic)
----
-<details>
-<summary>Tóm lược toàn bộ giai đoạn ETL/ELT trước khi chuyển sang phân tích</summary>
+##### ✅ Summary of Recommended Tools
 
----
-
-- Giai đoạn chuyển đổi dữ liệu (Section 5) đã mô tả chi tiết luồng xử lý từ thô đến phân tích, bao gồm:
-  - ✅ Thu thập và làm sạch dữ liệu từ nhiều nguồn không đồng nhất.
-  - ✅ Làm giàu dữ liệu bằng thông tin bên ngoài và biến phái sinh.
-  - ✅ Xây dựng các bảng `fact` (sự kiện, hành vi) và `dim` (ngữ cảnh mô tả).
-  - ✅ Áp dụng kiểm soát chất lượng dữ liệu toàn diện.
-  - ✅ Lựa chọn công cụ hiện đại, cloud-native, chi phí tối ưu và dễ mở rộng (BigQuery, dbt, Airflow, Looker).
-
-- Luồng dữ liệu này đảm bảo rằng toàn bộ nền tảng phân tích cho hành trình `onboarding` và `KYC/AML` là:
-  - 🔍 **Chính xác** về nghiệp vụ
-  - 💡 **Sẵn sàng phân tích sâu** để khám phá insight
-  - 🧱 **Mở rộng được** khi nhu cầu tăng trưởng
-
-- Đây là tiền đề vững chắc để bước sang **Chương 6 – Khung phân tích và KPI**, nơi dữ liệu sẽ thực sự phát huy sức mạnh hỗ trợ ra quyết định kinh doanh.
-
----
-</details>
-
-</details>
-
----
-## 6. Khung Phân Tích và Các KPIs
----
-<details>
-<summary>Định Nghĩa Các Chỉ Số Hiệu Suất Chính và Các Phương Pháp Phân Tích</summary>
-
-#### 6.1 – Thiết kế Cấu Trúc Phễu Onboarding (Funnel Modeling)
----
-<details>
-<summary>Thiết kế phễu hành trình khách hàng và các điểm rơi quan trọng</summary>
-
----
-
-- **Mục tiêu:** Hiểu hành vi người dùng trong từng bước của quá trình onboarding và phát hiện các điểm gây gián đoạn để tối ưu hóa trải nghiệm.
-
-- **Định nghĩa các bước chính trong hành trình onboarding:**
-
-  | Bước | Mô tả Hành Vi                       | Điều kiện trong Dữ Liệu                          | Nguồn Dữ Liệu                |
-  |------|--------------------------------------|--------------------------------------------------|------------------------------|
-  | B1   | Bắt đầu đăng ký                     | `event_name = 'REGISTRATION_STARTED'`            | `fact_onboarding_events`     |
-  | B2   | Tải giấy tờ xác minh                | `event_name = 'ID_DOCUMENT_UPLOADED'`            | `fact_onboarding_events`     |
-  | B3   | Hoàn tất xác minh khuôn mặt         | `event_name = 'LIVENESS_CHECK_COMPLETED'`        | `fact_onboarding_events`     |
-  | B4   | KYC được phê duyệt                 | `kyc_result = 'Approved'`                        | `fact_kyc_verification_details` |
-  | B5   | Kích hoạt tài khoản thành công      | `event_name = 'ACCOUNT_ACTIVATED'`               | `fact_onboarding_events`     |
-
-- **Các chỉ số phân tích chính trong phễu:**
-
-  | Tên Chỉ Số                         | Công Thức / Logic                                                      |
-  |------------------------------------|------------------------------------------------------------------------|
-  | `step_completion_rate`            | Tỷ lệ hoàn thành mỗi bước: `count(Bn) / count(B1)`                    |
-  | `drop_off_rate_Bn`                | Tỷ lệ rớt tại bước Bn: `1 - step_completion_rate(Bn)`                 |
-  | `avg_time_between_steps`          | Thời gian trung bình giữa hai bước: `AVG(Timestamp(Bn+1) - Timestamp(Bn))` |
-  | `kyc_retry_ratio`                 | `COUNT(retry > 0) / COUNT(all)` trong bảng `fact_kyc_verification_details` |
-  | `conversion_rate`                 | `count(B5) / count(B1)` – tỷ lệ hoàn tất onboarding thành công         |
-
-- **Lợi ích của phân tích phễu:**
-  - Xác định các điểm "thắt cổ chai" gây gián đoạn onboarding.
-  - Đưa ra cải tiến giao diện người dùng, UX hoặc quy trình xác minh.
-  - Theo dõi hiệu suất onboarding theo thời gian, thiết bị, kênh đăng ký...
+| Component | Main Tool | Notes |
+|-----------|-----------|-------|
+| Data Lake | Google Cloud Storage (GCS) | Stores raw data, good scalability |
+| Data Warehouse | BigQuery | Analyzes large datasets, high performance |
+| Ingestion | Pub/Sub, Fivetran, Cloud Functions | Supports both batch and streaming ingestion |
+| Transformation | dbt + SQL, Python | Modularizes logic, easy to test and maintain |
+| Orchestration | Airflow / Cloud Composer | Orchestrates pipeline, handles errors |
+| Data Quality Assurance (DQA) | dbt tests, Great Expectations | Monitors data quality across the pipeline |
+| Visualization / BI | Looker Studio, Power BI, Tableau | Generates reports and dashboards for stakeholders |
 
 ---
 
 </details>
 
 ---
-#### 6.2 – Phân Tích Thực Tế Dữ Liệu Funnel (Funnel Metrics Analysis)
+
+#### 5.5 – Summary of Transformation Logic
 ---
 <details>
-<summary>Phân tích hành trình người dùng qua các bước chính trong quá trình onboarding</summary>
+<summary>Summary of ETL/ELT process before transitioning to analytics</summary>
 
 ---
 
-##### 🎯 Mục Tiêu
+- The data transformation section (Section 5) detailed the process from raw data to analytical processing, including:
+  - ✅ Collecting and cleaning data from multiple heterogeneous sources.
+  - ✅ Enriching data with external information and derived variables.
+  - ✅ Building `fact` (event, behavior) and `dim` (contextual) tables.
+  - ✅ Applying comprehensive data quality control.
+  - ✅ Selecting modern, cloud-native tools that are cost-effective and scalable (BigQuery, dbt, Airflow, Looker).
 
-- Hiểu rõ nơi người dùng rời bỏ (drop-off) trong quá trình onboarding.
-- Đánh giá hiệu quả của từng bước chuyển đổi (conversion).
-- Hỗ trợ tối ưu hóa quy trình onboarding, giảm thiểu điểm ma sát (friction points).
+- This data flow ensures that the entire analytics foundation for onboarding and KYC/AML is:
+  - 🔍 **Accurate** in terms of business operations
+  - 💡 **Ready for deep analysis** to uncover insights
+  - 🧱 **Scalable** as needs grow
+
+- This lays the solid foundation for moving on to **Chapter 6 – Analytics Framework and KPIs**, where data will truly shine as a powerful support for business decision-making.
+
+---
+</details>
+
+</details>
+
+---
+## 6. Analytics Framework and KPIs
+---
+<details>
+<summary>Defining Key Performance Indicators and Analytical Methods</summary>
+
+#### 6.1 – Funnel Modeling
+---
+<details>
+<summary>Designing the customer journey funnel and key pain points</summary>
 
 ---
 
-##### 🧭 Các Bước Chính Trong Phễu Onboarding
+- **Objective:** Understand user behavior at each step of the onboarding process and identify friction points to optimize the experience.
 
-- Các bước chính có thể được xác định như sau (tuỳ theo logic business thực tế):
-  1. **Đăng ký bắt đầu** (`registration_started`)
-  2. **Gửi giấy tờ xác minh** (`document_uploaded`)
-  3. **Xác minh khuôn mặt / liveness check** (`liveness_completed`)
-  4. **Được duyệt KYC** (`kyc_approved`)
-  5. **Tài khoản được kích hoạt** (`account_activated`)
+- **Key steps in the onboarding journey:**
 
----
+  | Step | Description of User Behavior | Data Criteria in Datalayer | Data Source |
+  |------|-----------------------------|---------------------------|-------------|
+  | B1   | Start registration          | `event_name = 'REGISTRATION_STARTED'` | `fact_onboarding_events` |
+  | B2   | Upload KYC documents       | `event_name = 'ID_DOCUMENT_UPLOADED'` | `fact_onboarding_events` |
+  | B3   | Complete KYC verification | `event_name = 'LIVENESS_CHECK_COMPLETED'` | `fact_onboarding_events` |
+  | B4   | KYC approved               | `kyc_result = 'Approved'` | `fact_kyc_verification_details` |
+  | B5   | Account activated          | `event_name = 'ACCOUNT_ACTIVATED'` | `fact_onboarding_events` |
 
-##### 📊 Chỉ Số Cốt Lõi Trong Funnel
+- **Key performance indicators in the funnel:**
 
-| Bước                        | Số Người Dùng | Tỷ Lệ Chuyển Đổi Từng Bước | Tỷ Lệ Drop-off | Ghi Chú |
-|----------------------------|----------------|------------------------------|----------------|----------|
-| Đăng ký bắt đầu            | 100,000        | –                            | –              |          |
-| Gửi giấy tờ                | 85,000         | 85%                          | 15%            | Một số người rời bỏ ngay sau đăng ký |
-| Hoàn tất liveness          | 78,000         | 91.8%                        | 8.2%           |          |
-| Được duyệt KYC             | 63,000         | 80.7%                        | 19.3%          |          |
-| Tài khoản được kích hoạt   | 60,000         | 95.2%                        | 4.8%           | Một số bị treo do kiểm tra bổ sung |
+  | Indicator Name | Formula / Logic |
+  |----------------|-----------------|
+  | `step_completion_rate` | Completion rate of each step: `count(Bn) / count(B1)` |
+  | `drop_off_rate_Bn` | Drop-off rate at step Bn: `1 - step_completion_rate(Bn)` |
+  | `avg_time_between_steps` | Average time between steps: `AVG(Timestamp(Bn+1) - Timestamp(Bn))` |
+  | `kyc_retry_ratio` | `COUNT(retry > 0) / COUNT(all)` in `fact_kyc_verification_details` |
+  | `conversion_rate` | `count(B5) / count(B1)` – successful onboarding completion rate |
 
----
-
-##### 🧩 Segmenting Funnel – Phân Khúc Phễu
-
-- Phân tích theo hệ điều hành:
-  - iOS vs Android: Có sự khác biệt về tỷ lệ từ bỏ sau bước liveness?
-- Phân tích theo kênh đăng ký:
-  - Paid Ads vs Organic vs Referral – nhóm nào có conversion tốt hơn?
-- Phân tích theo khu vực địa lý:
-  - Có quốc gia hoặc khu vực nào có drop-off cao bất thường không?
+- **Benefits of funnel analysis:**
+  - Identify bottlenecks in the onboarding process.
+  - Provide UI improvements, UX enhancements, or changes to KYC verification process.
+  - Track onboarding effectiveness over time, by device, channel, etc.
 
 ---
 
-##### 📈 Biểu Đồ Funnel (Minh Họa Mermaid)
+</details>
+
+---
+#### 6.2 – Funnel Metrics Analysis
+---
+<details>
+<summary>Analyzing user journey through key steps in the onboarding process</summary>
+
+---
+
+##### 🎯 Objectives
+
+- Understand where users are dropping off (drop-off) in the onboarding process.
+- Evaluate the effectiveness of each step transition.
+- Help optimize the onboarding process, reducing friction points.
+
+---
+
+##### 🧭 Key Steps in the Onboarding Funnel
+
+- Key steps can be determined as follows (depending on business logic):
+  1. **Start of Registration** (`registration_started`)
+  2. **Upload KYC Documents** (`document_uploaded`)
+  3. **Complete KYC Verification** (`liveness_completed`)
+  4. **KYC Approved** (`kyc_approved`)
+  5. **Account Activated** (`account_activated`)
+
+---
+
+##### 📊 Key Performance Indicator in the Funnel
+
+| Step | Number of Users | Conversion Rate | Drop-off Rate | Notes |
+|------|----------------|-----------------|----------------|---------|
+| Start of Registration | 100,000 | – | – | |
+| Upload KYC Documents | 85,000 | 85% | 15% | Some users drop out immediately after registration |
+| Complete KYC Verification | 78,000 | 91.8% | 8.2% | |
+| KYC Approved | 63,000 | 80.7% | 19.3% | |
+| Account Activated | 60,000 | 95.2% | 4.8% | Some accounts are pending due to additional checks |
+
+---
+
+##### 🧩 Segmenting Funnel – Segmenting the Funnel
+
+- Analyze by operating system:
+  - iOS vs Android: Is there a difference in drop-off rate after liveness check?
+- Analyze by registration channel:
+  - Paid Ads vs Organic vs Referral – which group has a better conversion rate?
+- Analyze by geographic region:
+  - Are there any countries or regions with unusually high drop-off rates?
+
+---
+
+##### 📈 Funnel Chart (Mermaid Example)
 
 ```mermaid
 graph TD
-    A[Đăng ký bắt đầu<br/>100,000] --> B[Upload giấy tờ<br/>85,000]
-    B --> C[Liveness check<br/>78,000]
-    C --> D[KYC được duyệt<br/>63,000]
-    D --> E[Tài khoản kích hoạt<br/>60,000]
+    A[Start of Registration<br/>100,000] --> B[Upload KYC Documents<br/>85,000]
+    B --> C[Complete KYC Verification<br/>78,000]
+    C --> D[KYC Approved<br/>63,000]
+    D --> E[Account Activated<br/>60,000]
 ```
 ---
 
-##### 💡 Gợi Ý Hành Động
-- Xác định và xử lý các điểm ma sát lớn nhất trong funnel.
-- Thử nghiệm A/B với thiết kế UI hoặc hướng dẫn người dùng tại bước drop-off cao.
-- Thiết kế lại thông báo lỗi hoặc hỗ trợ realtime tại bước xác minh KYC để giảm tỷ lệ retry và từ bỏ.
+##### 💡 Suggested Actions
+- Identify and address the biggest friction points in the funnel.
+- Conduct A/B testing with UI improvements or user guidance at high drop-off steps.
+- Design real-time error notifications or support at KYC verification steps to reduce retry rates and drop-off.
+
+---
 
 </details>
 
 ---
 
-#### 6.3 – Chỉ Số KPI Cốt Lõi (Key Performance Indicators)
+#### 6.3 – Key Performance Indicators
 ---
 <details>
-<summary>Tập hợp các chỉ số chính đo lường hiệu suất (approval rate, retry count, KYC time...) và đề xuất công thức tính toán</summary>
+<summary>Aggregating key performance metrics (approval rate, retry count, KYC time...) and proposing calculation formulas</summary>
 
 ---
 
-##### 🎯 Mục Tiêu
+##### 🎯 Objectives
 
-- Định nghĩa hệ thống các chỉ số hiệu suất cốt lõi (`Key Performance Indicators – KPIs`) giúp đo lường chất lượng, tốc độ, hiệu quả và khả năng mở rộng của quy trình `onboarding`, `KYC`, và kiểm soát `rủi ro`.
-- Các chỉ số này là nền tảng để ra quyết định tối ưu hóa hành trình người dùng, cải tiến hệ thống xác minh và đo lường hiệu quả vận hành.
-
----
-
-##### 📌 Bảng KPI Chính
-
-| **Tên KPI** | **Định nghĩa** | **Công thức (Pseudo SQL / Logic)** | **Nguồn dữ liệu** | **Ý nghĩa kinh doanh** |
-|-------------|----------------|------------------------------------|-------------------|-------------------------|
-| **Registration Completion Rate** | Tỷ lệ người dùng kích hoạt tài khoản thành công trên tổng số đăng ký. | `COUNT(DISTINCT user_id WHERE event = 'account_activated') / COUNT(DISTINCT user_id WHERE event = 'registration_started')` | `fact_onboarding_events` | Đo hiệu quả tổng thể của quy trình onboarding. |
-| **KYC Approval Rate** | Tỷ lệ hồ sơ KYC được duyệt. | `COUNT(*) WHERE kyc_result = 'Approved' / COUNT(*)` | `fact_kyc_verification_details` | Đánh giá hiệu quả hệ thống xác minh danh tính. |
-| **Avg. Time to KYC Approval** | Thời gian trung bình từ đăng ký đến lúc KYC thành công. | `AVG(TIMESTAMP_DIFF(kyc_approved_time, registration_time, MINUTE))` | `fact_onboarding_events`, `fact_kyc_verification_details` | Đo tốc độ xác minh và trải nghiệm người dùng. |
-| **KYC Retry Rate** | Tỷ lệ người dùng phải thử KYC > 1 lần. | `COUNT(user_id HAVING COUNT(kyc_submission_id) > 1) / COUNT(DISTINCT user_id)` | `fact_kyc_verification_details` | Đo tính rõ ràng của hướng dẫn xác minh. |
-| **Face Match Failure Rate** | Tỷ lệ thất bại đối sánh khuôn mặt. | `COUNT(*) WHERE face_match_score < 0.5 / COUNT(*)` | `fact_kyc_verification_details` | Đo hiệu quả công nghệ nhận diện. |
-| **Document Rejection Rate by Reason** | Phân tích nguyên nhân từ chối giấy tờ. | `COUNT(*) WHERE rejection_reason = 'Blurred Document' / TOTAL` | `fact_kyc_verification_details` | Xác định vấn đề phổ biến trong xác minh. |
-| **Risky User % (by Category)** | Tỷ lệ người dùng có rủi ro cao. | `COUNT(*) WHERE risk_score >= 80 / COUNT(*)` | `fact_risk_assessments` | Theo dõi mức độ rủi ro chung của hệ thống. |
-| **Manual Review Queue Volume** | Số hồ sơ cần xem xét thủ công. | `COUNT(*) WHERE kyc_result = 'Under Review'` | `fact_kyc_verification_details`, `fact_manual_review_logs` | Quản lý khối lượng công việc đội vận hành. |
-| **Avg. Manual Review Time** | Thời gian xử lý thủ công trung bình. | `AVG(review_end - review_start)` | `fact_manual_review_logs` | Đánh giá năng suất đội review. |
-| **Drop-off Rate by Step** | Tỷ lệ rơi rụng theo từng bước trong phễu. | `1 - (users_at_step_n / users_at_step_n-1)` | `fact_onboarding_events` | Tìm điểm ma sát cần cải tiến. |
+- Define a system of core performance indicators (`Key Performance Indicators – KPIs`) to measure quality, speed, effectiveness, and scalability of the onboarding, KYC, and risk management processes.
+- These KPIs form the basis for optimizing the user journey, improving the KYC system, and assessing operational efficiency.
 
 ---
 
-##### 🧮 Phân Tích Đa Chiều Cho KPI
+##### 📌 Main KPIs
 
-- **Theo kênh đăng ký:** `registration_channel` → Xác định kênh hiệu quả nhất.
-- **Theo thiết bị:** `device_type`, `os_version` → Đánh giá hiệu năng theo nền tảng.
-- **Theo địa lý:** `geo_country`, `geo_city` → Phát hiện chênh lệch khu vực.
-- **Theo thời gian:** `date_key`, `day_of_week`, `hour_of_day` → Tìm xu hướng theo lịch.
+| **KPI Name** | **Definition** | **Formula (Pseudo SQL / Logic)** | **Data Source** | **Business Impact** |
+|---------------|----------------|------------------------------------|-------------------|---------------------|
+| **Registration Completion Rate** | Percentage of users successfully activating accounts out of total registrations. | `COUNT(DISTINCT user_id WHERE event = 'account_activated') / COUNT(DISTINCT user_id WHERE event = 'registration_started')` | `fact_onboarding_events` | Measures overall effectiveness of onboarding. |
+| **KYC Approval Rate** | Rate of KYC applications approved. | `COUNT(*) WHERE kyc_result = 'Approved' / COUNT(*)` | `fact_kyc_verification_details` | Evaluates effectiveness of KYC system. |
+| **Avg. Time to KYC Approval** | Average time from registration to KYC approval. | `AVG(TIMESTAMP_DIFF(kyc_approved_time, registration_time, MINUTE))` | `fact_onboarding_events`, `fact_kyc_verification_details` | Measures speed and user experience. |
+| **KYC Retry Rate** | Rate of users needing to retry KYC > 1 time. | `COUNT(user_id HAVING COUNT(kyc_submission_id) > 1) / COUNT(DISTINCT user_id)` | `fact_kyc_verification_details` | Measures clarity of KYC instructions. |
+| **Face Match Failure Rate** | Rate of failed face matches. | `COUNT(*) WHERE face_match_score < 0.5 / COUNT(*)` | `fact_kyc_verification_details` | Measures technology effectiveness. |
+| **Document Rejection Rate by Reason** | Analyzes reasons for document rejections. | `COUNT(*) WHERE rejection_reason = 'Blurred Document' / TOTAL` | `fact_kyc_verification_details` | Identifies common issues in KYC. |
+| **Risky User % (by Category)** | Percentage of users with high risk. | `COUNT(*) WHERE risk_score >= 80 / COUNT(*)` | `fact_risk_assessments` | Tracks overall risk level of the system. |
+| **Manual Review Queue Volume** | Number of KYC reviews pending. | `COUNT(*) WHERE kyc_result = 'Under Review'` | `fact_kyc_verification_details`, `fact_manual_review_logs` | Manages workload of KYC team. |
+| **Avg. Manual Review Time** | Average time spent on manual KYC reviews. | `AVG(review_end - review_start)` | `fact_manual_review_logs` | Evaluates productivity of KYC team. |
+| **Drop-off Rate by Step** | Drop-off rate for each step in the funnel. | `1 - (users_at_step_n / users_at_step_n-1)` | `fact_onboarding_events` | Identifies steps needing improvement. |
 
 ---
 
-##### 🎯 Thiết Lập Mục Tiêu & Giám Sát
+##### 🧮 Multidimensional Analysis for KPIs
 
-- Nên gắn mỗi KPI với **một mục tiêu kinh doanh** (OKR) cụ thể.
-- Ví dụ:
+- **By registration channel:** `registration_channel` → Identify most effective channel.
+- **By device:** `device_type`, `os_version` → Assess performance by platform.
+- **By geography:** `geo_country`, `geo_city` → Identify regional differences.
+- **By time:** `date_key`, `day_of_week`, `hour_of_day` → Identify trends over time.
+
+---
+
+##### 🎯 Setting Targets & Monitoring
+
+- Each KPI should be linked to a specific **business objective** (OKR).
+- Examples:
   - `KYC Approval Rate` ≥ 85%
-  - `Time to KYC Approval` ≤ 15 phút
-  - `Drop-off ở bước 2` < 10%
-- **Tần suất theo dõi:** Hàng ngày/tuần/tháng → Hiển thị trên dashboard Looker/Power BI.
+  - `Time to KYC Approval` ≤ 15 minutes
+  - `Drop-off at step 2` < 10%
+- **Frequency of monitoring:** Daily/weekly/monthly → Display on dashboard Looker/Power BI.
 
 ---
 
-##### 🛠️ Công Cụ Gợi Ý
+##### 🛠 Specific Tools
 
-| Công cụ | Ứng dụng |
-|--------|----------|
-| **SQL (BigQuery)** | Tính toán KPIs, lọc theo dimensions |
-| **dbt metrics** | Quản lý KPIs dưới dạng model chuẩn, versioned |
-| **Looker Studio / Power BI** | Hiển thị và chia sẻ KPIs động |
-| **Airflow** | Tự động refresh số liệu định kỳ |
+| Tool | Application |
+|------|-------------|
+| **SQL (BigQuery)** | Calculate KPIs, filter by dimensions |
+| **dbt metrics** | Manage KPIs as standard models, versioned |
+| **Looker Studio / Power BI** | Display and share live KPIs |
+| **Airflow** | Automatically refresh scheduled data |
 
 ---
 
 </details>
 
 ---
-#### 6.4 – Phân Tích Hành Vi Người Dùng (User Behavior Analytics)
+#### 6.4 – User Behavior Analytics
 ---
 <details>
-<summary>Segment hành vi theo thiết bị, kênh đăng ký, thời gian, và phân tích các hành vi cụ thể</summary>
+<summary>Segmenting user behavior by device, channel, time, and analyzing specific behaviors</summary>
 
 ---
 
-##### 🎯 Mục Tiêu
+##### 🎯 Objectives
 
-- Hiểu được cách người dùng tương tác với hệ thống trong từng bước `onboarding` và `KYC/AML`.
-- Phát hiện các yếu tố dẫn đến thành công hoặc thất bại khi người dùng đi qua các bước onboarding.
-- Tối ưu hóa trải nghiệm người dùng và giảm tỷ lệ `drop-off`.
-
----
-
-##### 🧩 Các Hướng Phân Tích Cụ Thể
+- Understand how users interact with the system at each step of onboarding and KYC/AML.
+- Identify factors leading to success or failure as users progress through the onboarding process.
+- Optimize user experience and reduce drop-off rates.
 
 ---
 
-###### 1. Phân đoạn hành vi (Behavioral Segmentation)
-
-- **Theo thiết bị, OS, trình duyệt:**
-  - Sử dụng `dim_device` để nhóm hành vi người dùng theo `device_type`, `os_version`, `browser`.
-  - *Ví dụ phân tích:* Người dùng iOS có tỷ lệ thành công KYC cao hơn Android? Tỷ lệ lỗi cao hơn khi dùng Firefox?
-
-- **Theo kênh đăng ký (`dim_channel`):**
-  - So sánh thời gian hoàn tất onboarding và tỷ lệ drop-off theo kênh (`Organic`, `Paid`, `Referral`).
-  - Phân tích ROI theo từng channel kết hợp với attribution data.
-
-- **Theo thời gian (`dim_time`):**
-  - Tỷ lệ thành công KYC theo từng giờ trong ngày (heatmap).
-  - Phân tích `trễ xử lý` theo ngày trong tuần hoặc giờ cao điểm.
-
-- **Theo vị trí địa lý (`geo_country`, `geo_city`):**
-  - Cross-tab hiệu suất onboarding theo vị trí, sử dụng map chart để hiển thị.
-  - Phân tích khu vực có tỷ lệ từ chối giấy tờ cao (ảnh mờ, thiếu dữ liệu...).
-
-- **Theo kết quả trạng thái:**
-  - Hành vi khác nhau giữa `KYC Passed` lần đầu và nhóm `Retry nhiều lần`.
-  - Phân nhóm người dùng có `risk_score` cao và xem hành vi tương tác khác biệt ra sao.
+##### 🧩 Specific Analysis Areas
 
 ---
 
-###### 2. Phân tích hành vi Retry KYC/AML
+###### 1. Behavioral Segmentation
 
-- **Mục tiêu:** Xác định nguyên nhân người dùng phải retry KYC/AML và tác động đến tỷ lệ chuyển đổi.
+- **By device, OS, browser:**
+  - Use `dim_device` to group user behavior by `device_type`, `os_version`, `browser`.
+  - *Example analysis:* Are users with iOS more likely to succeed on KYC than Android? Higher error rate with Firefox?
 
-- **Chỉ số bổ sung gợi ý:**
+- **By registration channel (`dim_channel`):**
+  - Compare completion time and drop-off rate for different channels (`Organic`, `Paid`, `Referral`).
+  - Analyze ROI in combination with attribution data.
+
+- **By time (`dim_time`):**
+  - KYC success rate by hour of day (heatmap).
+  - Analyze `processing delays` by day of week or peak hours.
+
+- **By geographic location (`geo_country`, `geo_city`):**
+  - Cross-tab performance by location, using map charts to display.
+  - Analyze regions with high rejection rates (low-quality images, data issues...).
+
+- **By result of KYC status:**
+  - Differences in behavior between first-time `KYC Passed` and `Retry multiple times` groups.
+  - Group users with high `risk_score` and see how their interactions differ.
+
+---
+
+###### 2. Analyzing Retry KYC/AML
+
+- **Objective:** Determine why users need to retry KYC/AML and its impact on conversion rate.
+
+- **Additional insight indicators:**
   - `Avg Retry Count per User`
   - `Median Time Between Retries`
-  - `Top 3 Rejection Reasons`
-  - `Retry Success Rate`: % user thành công sau retry đầu tiên, thứ 2...
+  - `Top 3 Reasons for Rejection`
+  - `Retry Success Rate`: % of users successful after first retry, second...
 
-- **Phân tích theo `user cohort`:** Nhóm người dùng retry ≥ 2 lần có tỷ lệ chuyển đổi thấp hơn bao nhiêu %?
-
----
-
-###### 3. Phân tích lỗi hệ thống và trải nghiệm người dùng
-
-- **Heatmap Error by Step + Device:**
-  - Tạo biểu đồ hiển thị lỗi theo bước và loại thiết bị.
-  - Phân tích xem lỗi cụ thể nào thường xuyên xuất hiện tại cùng bước onboarding.
-
-- **Tỷ lệ lỗi dẫn đến `abandonment`:**
-  - Lỗi nào có xác suất cao nhất làm người dùng rời bỏ phễu?
+- **Analysis by `user cohort`:** What percentage of users who retry ≥ 2 times have a lower conversion rate?
 
 ---
 
-###### 4. Phân tích Active vs Inactive
+###### 3. Analyzing system errors and user experience
 
-- **Mục tiêu:** Hiểu người dùng có tiếp tục quay lại sau khi onboarding không?
+- **Heatmap of Errors by Step + Device:**
+  - Create a chart showing errors by step and device type.
+  - Analyze which specific errors are common across onboarding steps.
 
-- **Gợi ý phân tích:**
+- **Drop-off rate due to system issues:**
+  - Which error has the highest probability of causing user abandonment?
+
+---
+
+###### 4. Analyzing Active vs. Inactive Users
+
+- **Objective:** Understand if users return after onboarding has been completed.
+
+- **Insight suggestions:**
   - `D1`, `D7`, `D30` Retention Rate
   - `Avg Time to First Transaction`
-  - `Active Rate by Onboarding Speed`: Người hoàn thành KYC trong <15 phút có tỷ lệ D7 active cao hơn?
+  - `Active Rate by Onboarding Speed`: Users completing KYC in <15 minutes have higher D7 active rate?
 
 ---
 
-##### 🛠️ Công Cụ và Kỹ Thuật
+##### 🛠 Tools and Techniques
 
-| Công cụ | Ứng dụng |
-|--------|----------|
-| **BigQuery SQL** | Phân tích hành vi, tính retry, cohort, retention |
-| **dbt models** | Tạo bảng `user_behavior_metrics`, `user_retention_flags` |
-| **Python + Pandas + Seaborn** | Vẽ heatmap, histograms, clustering hành vi |
+| Tool | Application |
+|------|-------------|
+| **BigQuery SQL** | Analyze behavior, calculate retries, cohort analysis, retention |
+| **dbt models** | Create `user_behavior_metrics`, `user_retention_flags` tables |
+| **Python + Pandas + Seaborn** | Create heatmaps, histograms, clustering of behaviors |
 | **BI tools (Looker Studio, Power BI)** | Dashboard funnel by segment, retry analysis |
-| **Segment / Mixpanel (tuỳ tổ chức)** | Track hành vi realtime, hỗ trợ A/B testing hành trình |
+| **Segment / Mixpanel (customizable)** | Track real-time behavior, support A/B testing of onboarding flow |
 
 ---
 
-##### 📈 Gợi ý Dashboard Hành Vi (Dashboard Ideas)
+##### 📈 Suggested Dashboard Ideas
 
 - **Funnel by Device Type / Channel**
 - **Retry Rate Heatmap by Day**
-- **KYC Completion vs Drop-off Timeline**
+- **KYC Completion vs. Drop-off Timeline**
 - **User Flow Sankey Diagram**
 - **Error Root Cause TreeMap**
 
@@ -1565,120 +1549,120 @@ graph TD
 </details>
 
 ---
-#### 6.5 – Phân Tích Tuân Thủ & Rủi Ro (Compliance & Risk Insights)
+#### 6.5 – Compliance & Risk Insights
 ---
 <details>
-<summary>Phân tích dữ liệu PEP, sanction, risk_score và các yếu tố liên quan đến tuân thủ AML/KYC</summary>
+<summary>Analyzing PEP, sanction, risk_score, and related factors for AML/KYC compliance</summary>
 
 ---
 
-##### 🎯 Mục Tiêu
+##### 🎯 Objectives
 
-- Xác định và phân tích rủi ro liên quan đến hành vi onboarding của người dùng.
-- Đảm bảo quy trình tuân thủ các yêu cầu pháp lý liên quan đến AML/KYC.
-- Cải thiện hiệu quả vận hành của các bước kiểm tra thủ công và tự động.
-
----
-
-##### 📊 Các Phân Tích & Chỉ Số Chính
+- Identify and analyze risks associated with user onboarding behavior.
+- Ensure adherence to KYC/AML regulatory requirements.
+- Improve operational efficiency of manual and automated checks.
 
 ---
 
-###### 1. Phân Tích Phân Bố Điểm Rủi Ro (Risk Score Analysis)
+##### 📊 Key Metrics and Analysis
 
-- **Chỉ số gợi ý:**
+---
+
+###### 1. Risk Score Distribution Analysis
+
+- **Insight indicators:**
   - `Avg. Risk Score`, `Median Risk Score`
   - `Risk Score Distribution by Channel/Geo`
   - `% High-Risk Users (> threshold)`
 
-- **Gợi ý visualization:** Histogram hoặc Boxplot theo nhóm `geo_country`, `registration_channel`.
+- **Visualization:** Histogram or Boxplot by `geo_country`, `registration_channel`.
 
-- **Phân tích nâng cao:**
-  - Tìm mối tương quan giữa `device_type`, `time_of_day`, `doc_type` với điểm rủi ro.
+- **Advanced analysis:**
+  - Identify correlations between `device_type`, `time_of_day`, `doc_type` and risk level.
 
-- **Nguồn dữ liệu:** `fact_risk_assessments`, `dim_users`, `dim_channel`, `dim_device`.
+- **Data sources:** `fact_risk_assessments`, `dim_users`, `dim_channel`, `dim_device`.
 
 ---
 
-###### 2. Phân Tích PEP & Sanction (Screening Effectiveness)
+###### 2. PEP & Sanction Screening Effectiveness
 
-- **Chỉ số:**
+- **Metrics:**
   - `PEP Match Rate`, `Sanction Match Rate`
   - `False Positive Rate`
   - `Median Time to Resolve Flagged Users`
 
-- **Phân tích nâng cao:**
-  - Tỷ lệ cảnh báo PEP sai lệch giữa các quốc gia (false positive by country).
-  - Mức độ ảnh hưởng của việc gắn cờ đến tỷ lệ chuyển đổi.
+- **Advanced analysis:**
+  - Rate of false positives between countries (false positive by country).
+  - Impact of flagging on conversion rate.
 
-- **Nguồn dữ liệu:** `fact_risk_assessments`, `fact_manual_review_logs`, `dim_users`.
+- **Data sources:** `fact_risk_assessments`, `fact_manual_review_logs`, `dim_users`.
 
 ---
 
-###### 3. Phân Tích Lý Do Từ Chối KYC (Rejection vs Risk Insight)
+###### 3. Analysis of KYC Rejection Reasons (Rejection vs. Risk Insight)
 
-- **Chỉ số:**
+- **Metrics:**
   - `Top Rejection Reasons for High-Risk Users`
-  - `Risk Score vs. KYC Approval Probability` (phân tích hồi quy logistic)
+  - `Risk Score vs. KYC Approval Probability` (logistic regression analysis)
   - `KYC Drop-off vs. Rejection Risk`
 
-- **Phân tích nâng cao:**
-  - Dùng clustering để nhóm người dùng bị từ chối nhiều lần & điểm rủi ro cao → xác định “profile nguy cơ cao”.
+- **Advanced analysis:**
+  - Use clustering to group users who are rejected multiple times and have high risk → identify "high-risk profile".
 
-- **Nguồn dữ liệu:** `fact_kyc_verification_details`, `fact_risk_assessments`, `dim_users`.
+- **Data sources:** `fact_kyc_verification_details`, `fact_risk_assessments`, `dim_users`.
 
 ---
 
-###### 4. Phân Tích Manual Review (Manual Handling Efficiency)
+###### 4. Manual Review Analysis (Manual Handling Efficiency)
 
-- **Chỉ số:**
+- **Metrics:**
   - `Avg. Review Duration`, `Volume per Agent`
-  - `Escalation Rate`: % hồ sơ được chuyển lên cấp cao hơn
-  - `Decision Accuracy`: So sánh quyết định thủ công và đánh giá ML/Rule
+  - `Escalation Rate`: % of cases escalated to higher level
+  - `Decision Accuracy`: Comparing manual review vs. ML/Rule decision
 
-- **Phân tích nâng cao:**
-  - Phân tích performance theo từng agent (agent-level benchmarking).
-  - Gợi ý dashboard realtime: “Queue by risk level”, “Agent workload heatmap”.
+- **Advanced analysis:**
+  - Performance analysis at agent level (agent-level benchmarking).
+  - Suggest real-time dashboard: "Queue by risk level", "Agent workload heatmap".
 
-- **Nguồn dữ liệu:** `fact_manual_review_logs`, `fact_risk_assessments`.
+- **Data sources:** `fact_manual_review_logs`, `fact_risk_assessments`.
 
 ---
 
-###### 5. Phân Tích Anomaly và Cảnh Báo Realtime (Realtime Fraud Monitoring)
+###### 5. Anomaly Detection and Realtime Alerts (Real-time Fraud Monitoring)
 
-- **Tình huống điển hình cần cảnh báo:**
+- **Scenario:**
   - `Multiple Failed KYC Attempts from Same IP`
   - `Sudden Surge in High-Risk Signups (per geo/channel)`
   - `Spike in Sanction Hits`
 
-- **Kỹ thuật:**
+- **Techniques:**
   - `Streaming detection`: Pub/Sub + Dataflow
-  - `Rule engine`: Trigger cảnh báo nếu vượt ngưỡng
-  - `ML-based anomaly detection`: Isolation Forest hoặc Autoencoder (dùng BigQuery ML hoặc Vertex AI)
+  - `Rule engine`: Trigger alert if threshold exceeded
+  - `ML-based anomaly detection`: Isolation Forest or Autoencoder (using BigQuery ML or Vertex AI)
 
-- **Gợi ý dashboard cảnh báo:**
+- **Suggested dashboard alerts:**
   - ⚠️ **Fraud Spike Alert Panel**
   - 🔎 **Suspicious Behavior Timeline**
 
 ---
 
-##### 🛠️ Công Cụ & Kỹ Thuật
+##### 🛠 Tools and Techniques
 
-| Thành phần | Công cụ đề xuất | Ứng dụng |
-|------------|-----------------|----------|
-| Data Query & Transform | BigQuery SQL, dbt | Phân tích bảng `risk`, `KYC`, `review` |
-| Anomaly Detection | Python (Scikit-learn), BigQuery ML | Xây mô hình ML phát hiện bất thường |
-| Realtime Monitoring | Cloud Pub/Sub, Dataflow | Dòng sự kiện & rule-based alert |
-| Dashboard & Reporting | Looker Studio, Power BI | Báo cáo cho team Compliance & Ops |
-| Review Logs Tracking | Google Sheets / BigQuery + Data Studio | Đơn giản hóa giám sát performance agent |
+| Component | Proposed tool | Application |
+|------------|-----------------|-------------|
+| Data Query & Transform | BigQuery SQL, dbt | Analyze `risk`, `KYC`, `review` tables |
+| Anomaly Detection | Python (Scikit-learn), BigQuery ML | Build ML model for anomaly detection |
+| Realtime Monitoring | Cloud Pub/Sub, Dataflow | Event stream & rule-based alerts |
+| Dashboard & Reporting | Looker Studio, Power BI | Reports for Compliance & Ops team |
+| Review Logs Tracking | Google Sheets / BigQuery + Data Studio | Simplifies performance monitoring for agents |
 
 ---
 
-##### 💡 Gợi Ý Mở Rộng
+##### 💡 Suggested Extensions
 
-- Kết hợp dữ liệu KYC, Risk, và User Behavior → xây dựng **Risk Profiling Engine**.
-- Triển khai bảng `user_risk_summary` (dbt model) để chuẩn hóa báo cáo Compliance.
-- Đánh giá tác động business của cảnh báo sai (`false positive cost`) và tối ưu thuật toán.
+- Combine KYC, Risk, and User Behavior data → build **Risk Profiling Engine**.
+- Implement `user_risk_summary` (dbt model) for standardized Compliance reporting.
+- Evaluate the business impact of false positives (`false positive cost`) and optimize the algorithm.
 
 ---
 
@@ -1689,226 +1673,226 @@ graph TD
 
 
 ---
-## 7. Chiến Lược Báo Cáo và Dashboard
+## 7. Reporting and Dashboard Strategy
 ---
 <details>
-<summary>Các Hình Ảnh Trực Quan và Cấu Trúc Báo Cáo Đề Xuất cho Các Bên Liên Quan</summary>
+<summary>Visual representations and structure of reports for stakeholders</summary>
 
 ---
 
-### 🎯 Mục Tiêu
+### 🎯 Objectives
 
-- Cung cấp thông tin phân tích rõ ràng, kịp thời và có thể hành động cho các bên liên quan.
-- Thiết kế các dashboard theo từng nhóm người dùng: Điều hành (C-level), Vận hành, Risk & Compliance, Marketing, Product.
-- Tập trung vào các chủ đề: Hành trình onboarding, hiệu quả KYC, giám sát rủi ro và hiệu suất xử lý thủ công.
-
----
-
-### 📐 Nguyên Tắc Thiết Kế Dashboard
-
-- **Phân tách theo chủ đề:** Mỗi dashboard chỉ tập trung vào một nhóm câu hỏi cụ thể.
-- **Tương tác động (interactive):** Cho phép người dùng lọc theo thời gian, kênh, thiết bị, khu vực, risk level...
-- **Trực quan hóa phù hợp:** Chọn biểu đồ đúng với loại dữ liệu (funnel, line chart, bar, stacked column, table…).
-- **Cấu trúc thông tin phân cấp:** Từ tổng quan đến chi tiết (drill-down).
+- Provide clear, timely, actionable insights for all stakeholders.
+- Design dashboards tailored to each stakeholder group: Operations, Risk, Compliance, Marketing, Product.
+- Focus on themes: Onboarding journey, KYC effectiveness, operational monitoring, manual review process.
 
 ---
 
-#### 7.1 – Cấu Trúc Dashboard Đề Xuất Theo Chủ Đề (Theme-Oriented Dashboard Structure)
+### 📐 Design Principles
+
+- **Thematic segmentation:** Each dashboard focuses on a specific question set.
+- **Interactive (two-way):** Allows users to filter by time, channel, device, location, risk level, etc.
+- **Visualization appropriate:** Choose the right chart type for the data type (funnel, line chart, bar, stacked column, table, etc.).
+- **Information hierarchy:** From high-level overview to detailed drill-down.
+
+---
+
+#### 7.1 – Theme-Oriented Dashboard Structure
 ---
 <details>
-<summary>Tổng quan về các dashboard chính dựa trên các lĩnh vực phân tích cốt lõi</summary>
+<summary>Overview of main dashboards based on core analytical areas</summary>
 
 ---
 
 ##### 📊 Dashboard 1: Onboarding Funnel Overview
-- **Mục tiêu:** Theo dõi tỷ lệ hoàn thành onboarding và các điểm rớt chính.
-- **Thành phần:**
-  - Funnel Chart: Từ `Started Registration` → `KYC Started` → `Liveness Check` → `Account Activated`.
+- **Objective:** Track completion rate of onboarding and key drop-off points.
+- **Components:**
+  - Funnel Chart: From `Started Registration` → `KYC Started` → `Liveness Check` → `Account Activated`.
   - Drop-off Rate by Step (bar chart)
   - Segment by Channel / Device / Country
-  - Trendline: Completion Rate theo ngày
+  - Trendline: Completion Rate by day
 
 ##### 📈 Dashboard 2: KYC Performance
-- **Mục tiêu:** Đo lường hiệu suất và chất lượng xử lý hồ sơ xác minh.
-- **Thành phần:**
+- **Objective:** Measure KYC effectiveness and operational quality.
+- **Components:**
   - KYC Approval Rate & Retry Rate (KPI cards)
-  - Avg. Time to Approval (line)
+  - Avg. Time to Approval (line chart)
   - Document Rejection Reasons (pie chart)
   - KYC Attempts Distribution
 
 ##### ⚠️ Dashboard 3: Risk & Compliance Monitoring
-- **Mục tiêu:** Giám sát người dùng rủi ro, xử lý cảnh báo PEP/Sanction.
-- **Thành phần:**
+- **Objective:** Monitor user risk, PEP/Sanction alerts.
+- **Components:**
   - Distribution of Risk Scores (histogram)
   - PEP / Sanction Flagged User Trend
   - Manual Review Volume by Category
   - Decision Breakdown (Approved, Rejected, Escalated)
 
 ##### 🔄 Dashboard 4: Manual Review Operations
-- **Mục tiêu:** Theo dõi hiệu suất đội vận hành xử lý thủ công.
-- **Thành phần:**
+- **Objective:** Track performance of KYC review team.
+- **Components:**
   - Avg. Manual Review Time
   - Queue Size over Time
   - Review Outcome by Agent
   - SLA Compliance Rate
 
 ##### 📢 Dashboard 5: Channel Effectiveness
-- **Mục tiêu:** Đánh giá hiệu quả các kênh marketing trong việc mang lại người dùng chất lượng.
-- **Thành phần:**
+- **Objective:** Evaluate effectiveness of marketing channels in attracting new users.
+- **Components:**
   - Completion Rate by Channel
   - Avg. Time to KYC by Channel
   - Risk Score by Channel
-  - Conversion Funnel theo Channel
+  - Conversion Funnel by Channel
 
 ---
 </details>
 
-#### 7.2 – Phân Loại Dashboard Theo Đối Tượng Người Dùng (Stakeholder-Oriented Dashboards)
+#### 7.2 – Stakeholder-Oriented Dashboards
 ---
 <details>
-<summary>Thiết kế dashboard phù hợp với từng nhóm người dùng trong tổ chức</summary>
+<summary>Designing dashboards tailored to each stakeholder group within the organization</summary>
 
 ---
 
-- Mỗi bên liên quan (stakeholder) trong tổ chức có nhu cầu thông tin và góc nhìn khác nhau. Việc xây dựng các dashboard chuyên biệt cho từng nhóm giúp đảm bảo dữ liệu được hiểu đúng và ra quyết định nhanh chóng.
+- Each stakeholder group within the organization has different information needs and perspectives. Designing specific dashboards for each group helps ensure data is understood correctly and decisions are made quickly.
 
 ---
 
-##### 🎯 1. Executive Dashboard – Dành cho C-Level
+##### 🎯 1. Executive Dashboard – For C-Level
 
-- **Mục tiêu:** Cung cấp cái nhìn tổng quan về hiệu suất hệ thống onboarding & KYC/AML.
-- **Chỉ số chính:**
-  - Tổng số người dùng mới theo ngày/tuần/tháng
-  - Conversion rate toàn phễu
+- **Objective:** Provide a high-level view of onboarding and KYC/AML system performance.
+- **Key metrics:**
+  - Total new users per day/week/month
+  - Onboarding funnel conversion rate
   - KYC approval rate
-  - Risky user % theo thời gian
-- **Đặc điểm:**
-  - Hiển thị tối giản, ưu tiên các KPI chính dạng số
-  - Có biểu đồ xu hướng (trend) theo thời gian
-  - Thiết kế gọn, không cần drill-down quá chi tiết
+  - Risky user % over time
+- **Characteristics:**
+  - Minimalist design, prioritizing key performance indicators in numeric form
+  - Trend line (chart) over time
+  - Compact, no need for excessive drill-down
 
 ---
 
 ##### 👮 2. Risk & Compliance Dashboard
 
-- **Mục tiêu:** Theo dõi tuân thủ AML/KYC và các chỉ số rủi ro.
-- **Chỉ số chính:**
-  - Số người bị flag PEP/Sanction
-  - Risk score trung bình và phân phối
+- **Objective:** Track compliance with AML/KYC regulations and key risk indicators.
+- **Key metrics:**
+  - Number of users flagged PEP/Sanction
+  - Average risk score and distribution
   - Manual review volume
   - False positive rate
-- **Đặc điểm:**
-  - Biểu đồ heatmap, histogram để phân tích phân phối
-  - Drill-down đến hồ sơ rủi ro cụ thể
-  - Có thể gắn cảnh báo nếu vượt ngưỡng
+- **Characteristics:**
+  - Heatmap, histogram for visual distribution analysis
+  - Drill-down to specific risk cases
+  - Ability to set alerts if thresholds are exceeded
 
 ---
 
-##### ⚙️ 3. Operational Dashboard – Dành cho Nhóm KYC/Manual Review
+##### ⚙️ 3. Operational Dashboard – For KYC/Manual Review Team
 
-- **Mục tiêu:** Theo dõi khối lượng và hiệu suất xử lý hồ sơ KYC hàng ngày.
-- **Chỉ số chính:**
-  - Số hồ sơ cần xem xét
-  - Thời gian xử lý trung bình
+- **Objective:** Track daily KYC volume and operational efficiency.
+- **Key metrics:**
+  - Number of cases pending review
+  - Average processing time
   - KYC retry rate
-  - Backlog theo ngày
-- **Đặc điểm:**
-  - Biểu đồ bar theo ngày, table chi tiết theo nhân viên
-  - Cảnh báo khi backlog vượt ngưỡng
-  - Có tính năng lọc theo nhân viên, loại hồ sơ
+  - Backlog by day
+- **Characteristics:**
+  - Bar chart by day, detailed table by staff member
+  - Alert if backlog exceeds threshold
+  - Filtering options by staff member, document type
 
 ---
 
-##### 📱 4. Product/UX Dashboard – Dành cho Nhóm Phát Triển Sản Phẩm
+##### 📱 4. Product/UX Dashboard – For Product Development Team
 
-- **Mục tiêu:** Phân tích hành vi người dùng, phát hiện điểm ma sát (friction points).
-- **Chỉ số chính:**
-  - Drop-off rate theo từng bước onboarding
-  - Thời gian trung bình ở mỗi bước
-  - Retry reasons phân tích theo device/channel
-- **Đặc điểm:**
-  - Funnel chart, line chart, phân tích phân đoạn theo OS, thiết bị
-  - Có thể dùng để A/B testing UI mới
+- **Objective:** Analyze user behavior, identify friction points.
+- **Key metrics:**
+  - Drop-off rate per onboarding step
+  - Average time spent per step
+  - Analysis of retry reasons by device/channel
+- **Characteristics:**
+  - Funnel chart, line chart, step-by-step breakdown by OS, device
+  - Ability to conduct A/B testing on new UI
 
 ---
 
 ##### 📣 5. Marketing Dashboard
 
-- **Mục tiêu:** Đánh giá hiệu quả các chiến dịch thu hút người dùng mới.
-- **Chỉ số chính:**
-  - New user acquisition theo channel
-  - Conversion rate theo campaign
-  - Cost per acquisition (CPA) nếu có tích hợp chi phí
-- **Đặc điểm:**
-  - Biểu đồ stacked bar, line chart, pie chart
-  - Có thể tích hợp với dữ liệu attribution từ Google Ads, Firebase, AppsFlyer...
+- **Objective:** Assess effectiveness of marketing campaigns in attracting new users.
+- **Key metrics:**
+  - New user acquisition by channel
+  - Conversion rate by campaign
+  - CPA if integrated with cost data
+- **Characteristics:**
+  - Stacked bar chart, line chart, pie chart
+  - Ability to integrate with data from Google Ads, Firebase, AppsFlyer...
 
 ---
 
 </details>
 
-### 🧰 Công Cụ Triển Khai
+### 🧰 Deployment Tools
 
-| Thành phần             | Công cụ gợi ý            | Lý do                                                                 |
-|------------------------|--------------------------|----------------------------------------------------------------------|
-| BI Tool                | Looker Studio            | Dễ sử dụng, tích hợp gốc với BigQuery                               |
-| Alternative            | Power BI, Tableau        | Đáp ứng nhu cầu doanh nghiệp nâng cao                               |
-| Visualization Libraries| matplotlib, seaborn      | Dùng trong phân tích chuyên sâu hoặc notebooks                      |
-| Drill-down logic       | SQL (BigQuery), dbt      | Chuẩn bị data layer tối ưu cho dashboard                            |
+| Component | Suggested tool | Reason |
+|-----------|----------------|--------|
+| BI Tool | Looker Studio | Easy to use, integrates with BigQuery |
+| Alternative | Power BI, Tableau | Meet business needs at higher levels |
+| Visualization Libraries | matplotlib, seaborn | Useful for in-depth analysis or notebooks |
+| Drill-down logic | SQL (BigQuery), dbt | Prepare data layer for dashboards |
 
 ---
-#### 7.3 – Quy Ước Trực Quan Hóa Dữ Liệu (Visualization Guidelines)
+#### 7.3 – Visualization Guidelines
 ---
 <details>
-<summary>Hướng dẫn lựa chọn biểu đồ, màu sắc, định dạng để đảm bảo dashboard dễ đọc, nhất quán và chuyên nghiệp</summary>
+<summary>Guidelines for selecting charts, colors, and formatting to ensure dashboards are clear, consistent, and professional</summary>
 
 ---
 
-- **Mục tiêu:** Đảm bảo tính nhất quán và dễ hiểu trong tất cả các dashboard, giúp các bên liên quan dễ dàng tiếp nhận thông tin, tránh hiểu sai số liệu hoặc quá tải thị giác.
+- **Objective:** Ensure consistency and clarity across all dashboards, allowing stakeholders to easily understand and interpret data without misinterpretation or visual overload.
 
 ---
 
-##### 🎨 1. Lựa Chọn Biểu Đồ Theo Ngữ Cảnh
+##### 🎨 1. Chart Selection Based on Context
 
-| Mục đích trực quan                     | Biểu đồ phù hợp                             | Ghi chú                                                                 |
+| Purpose | Appropriate Chart | Notes |
 |----------------------------------------|---------------------------------------------|-------------------------------------------------------------------------|
-| Theo dõi tỷ lệ chuyển đổi từng bước    | Funnel Chart                                 | Dùng cho onboarding hoặc conversion funnels                            |
-| So sánh tỷ lệ (giữa các nhóm/kênh)     | Stacked Bar Chart, Grouped Bar Chart         | Dùng cho tỷ lệ giữa các kênh, thiết bị, quốc gia                       |
-| Phân tích xu hướng theo thời gian      | Line Chart, Area Chart                       | Dùng cho các chỉ số như Completion Rate theo ngày, Retry Rate theo tuần |
-| Phân phối dữ liệu                      | Histogram, Box Plot                          | Dùng cho Risk Score, Time to Approve                                   |
-| So sánh cấu phần (composition)         | Pie Chart, Donut Chart                       | Dùng cho Document Rejection Reasons                                    |
-| Phân tích chi tiết, drill-down         | Table, Tree Map                              | Dùng khi cần hiển thị dữ liệu theo chiều sâu (ví dụ theo từng agent)   |
+| Tracking completion rate of each step    | Funnel Chart                                 | Suitable for onboarding or conversion funnels                            |
+| Comparing rates (between groups/channels) | Stacked Bar Chart, Grouped Bar Chart         | Used for rates between groups, devices, countries                        |
+| Analyzing trends over time               | Line Chart, Area Chart                       | Used for KPIs like Completion Rate over time, Retry Rate over weeks     |
+| Distributing data                       | Histogram, Box Plot                          | Used for Risk Score, Time to Approve                                   |
+| Analyzing composition (composition)     | Pie Chart, Donut Chart                       | Used for Document Rejection Reasons                                    |
+| Detailed drill-down                     | Table, Tree Map                              | Used when detailed data is needed (e.g., data by individual agent)       |
 
 ---
 
-##### 🎯 2. Màu Sắc và Định Dạng Gợi Ý
+##### 🎯 2. Color Scheme and Formatting Suggestions
 
-- **Màu sắc theo ngữ nghĩa:**
-  - `Xanh lá`: Thành công, đã hoàn thành (approved, activated…)
-  - `Đỏ`: Lỗi, bị từ chối (rejected, error…)
-  - `Cam`: Cảnh báo, chờ xử lý (under review, pending…)
-  - `Xanh dương`: Trung lập, mặc định (default, ongoing…)
+- **Color based on semantic meaning:**
+  - `Green`: Success, completed (approved, activated...)
+  - `Red`: Error, rejected (rejected, error...)
+  - `Orange`: Warning, pending (under review, pending...)
+  - `Blue`: Neutral, default (ongoing, neutral...)
 
-- **Tránh sử dụng quá 5-6 màu chính trên 1 dashboard.**
+- **Avoid using more than 5-6 main colors on one dashboard.**
 
-- **Định dạng số liệu:**
-  - Dùng `,` để ngăn cách hàng nghìn (ví dụ: `12,345`).
-  - Sử dụng `%` cho tỷ lệ và định dạng một cách nhất quán (`76.4%`, không viết `76,4 phần trăm`).
-  - Dữ liệu thời gian nên có định dạng chuẩn `YYYY-MM-DD`, hoặc `DD/MM/YYYY` tùy theo ngôn ngữ người dùng.
-
----
-
-##### ✅ 3. Các Quy Tắc Bổ Sung
-
-- **Đặt tiêu đề rõ ràng** cho từng biểu đồ, bảng số liệu.
-- **Gắn nhãn trục (axis labels)** đầy đủ, tránh viết tắt gây khó hiểu.
-- **Tooltips / Hover labels** nên được bật trong các công cụ BI để hỗ trợ thông tin bổ sung mà không làm rối biểu đồ.
-- **Filter mặc định** nên là `7 ngày gần nhất` hoặc `tháng hiện tại`, nhưng cho phép chọn tùy ý.
-- **Các KPI quan trọng** nên được đặt lên đầu dashboard dưới dạng thẻ (`KPI cards`) dễ nhìn.
+- **Data formatting:**
+  - Use `,` for thousands separator (e.g., `12,345`).
+  - Use `%` for percentages and consistent formatting (`76.4%`, not `76,4 percent`).
+  - Date format should be standardized `YYYY-MM-DD`, or `DD/MM/YYYY` depending on user language.
 
 ---
 
-> ⚠️ Việc duy trì quy chuẩn trực quan giúp các dashboard trở nên nhất quán, dễ bảo trì, và được người dùng tin tưởng.
+##### ✅ 3. Additional Guidelines
+
+- **Provide clear titles** for each chart/table.
+- **Label axes (axis labels)** comprehensively, avoiding abbreviations.
+- **Tooltips / Hover labels** should be enabled in BI tools to provide supplementary information without cluttering the chart.
+- **Default filter** should be `7 days ago` or `current month`, but allow customization.
+- **Important KPIs** should be prominently displayed at the top of the dashboard.
+
+---
+
+> ⚠️ Maintaining visual consistency helps dashboards stay consistent, easy to maintain, and trusted by users.
 
 ---
 </details>
@@ -1918,63 +1902,63 @@ graph TD
 
 
 ---
-## 8. Tác Động Kinh Doanh và Khuyến Nghị
+## 8. Business Impact and Recommendations
 ---
 <details>
-<summary>Phân tích tác động kinh doanh và khuyến nghị triển khai cải tiến</summary>
+<summary>Analyzing business impact and suggesting improvements</summary>
 
 ---
 
-- Phần này trình bày các hành động có thể thực hiện nhằm cải thiện hiệu suất của hệ thống `onboarding` và `KYC/AML`, dựa trên dữ liệu phân tích từ chương 6–7.
-- Đồng thời, phần này cũng đề xuất khung đo lường hiệu quả triển khai và duy trì quy trình theo vòng phản hồi liên tục.
+- This section presents specific actions that can be taken to improve the performance of the onboarding and KYC/AML systems, based on data analysis from Chapters 6–7.
+- At the same time, this section also proposes a framework for measuring the effectiveness of ongoing improvements and maintaining the process through continuous feedback loops.
 
 ---
 
-### 8.1 – Khuyến Nghị Dựa Trên Phân Tích (Analysis-Driven Recommendations)
+### 8.1 – Analysis-Driven Recommendations
 <details>
-<summary>Đề xuất các hành động cụ thể từ phân tích dữ liệu</summary>
+<summary>Proposing specific actions from data analysis</summary>
 
 ---
 
-#### Tối ưu hóa Phễu Chuyển Đổi (Onboarding Funnel Optimization)
+#### Optimizing Onboarding Funnel (Onboarding Funnel Optimization)
 
-- **Phát hiện**: Tỷ lệ `drop-off` cao tại bước `Liveness Check` và `Document Upload`.
-- **Hành động đề xuất**:
-  - Tích hợp video hướng dẫn trực quan ngay trong ứng dụng.
-  - Giảm bớt số lượng trường thông tin yêu cầu ban đầu.
-  - Triển khai `A/B testing` giao diện người dùng.
-  - Cải thiện hiển thị lỗi bằng hướng dẫn đơn giản, dễ hiểu.
-
----
-
-#### Cải thiện Hiệu suất KYC (KYC Performance)
-
-- **Phát hiện**: `KYC Retry Rate` cao do lỗi hệ thống hoặc ảnh không đạt yêu cầu.
-- **Hành động đề xuất**:
-  - Nâng cấp công cụ `OCR`, sử dụng mô hình học máy chuyên biệt.
-  - Tăng cường phản hồi rõ ràng và hỗ trợ người dùng sửa lỗi.
-  - Mở rộng danh sách tài liệu được chấp nhận.
-  - Cải thiện giao diện tải ảnh, tránh lỗi do thao tác.
+- **Discovery:** High drop-off rate at `Liveness Check` and `Document Upload` steps.
+- **Proposed actions:**
+  - Embed video tutorials directly in the app for visual guidance.
+  - Reduce the number of required initial data fields.
+  - Conduct `A/B testing` with different user interfaces.
+  - Improve error handling with clear, easy-to-follow instructions.
 
 ---
 
-#### Nâng cao Hiệu quả Vận hành (Operational Efficiency)
+#### Improving KYC Performance
 
-- **Phát hiện**: Thời gian xử lý thủ công cao, xuất hiện tình trạng backlog.
-- **Hành động đề xuất**:
-  - Tự động phê duyệt hồ sơ có `risk_score` thấp.
-  - Phân loại và ưu tiên hồ sơ theo mức độ khẩn cấp.
-  - Xây dựng dashboard hỗ trợ ra quyết định cho reviewer.
+- **Discovery:** High `KYC Retry Rate` due to system issues or inadequate images.
+- **Proposed actions:**
+  - Upgrade OCR technology to machine learning models.
+  - Enhance clear and immediate user feedback.
+  - Expand the list of acceptable documents.
+  - Improve image upload UX, avoid errors from user actions.
 
 ---
 
-#### Quản lý Rủi ro & Tuân thủ (Risk & Compliance)
+#### Enhancing Operational Efficiency
 
-- **Phát hiện**: Tỷ lệ `false positive` cao trong sàng lọc `PEP/Sanction`.
-- **Hành động đề xuất**:
-  - Tối ưu thuật toán đánh giá rủi ro.
-  - Tích hợp thêm nguồn dữ liệu từ hành vi người dùng.
-  - Áp dụng `audit log` cho quy trình quyết định rủi ro.
+- **Discovery:** High manual processing time, backlog issues.
+- **Proposed actions:**
+  - Automatically approve low-risk profiles.
+  - Prioritize and categorize cases based on urgency.
+  - Build a dashboard to assist reviewers.
+
+---
+
+#### Managing Risks & Compliance
+
+- **Discovery:** High `false positive` rate in PEP/Sanction screening.
+- **Proposed actions:**
+  - Optimize risk scoring algorithm.
+  - Add data from user behavior to risk assessment.
+  - Implement `audit log` for risk decision process.
 
 ---
 
@@ -1982,19 +1966,19 @@ graph TD
 
 ---
 
-### 8.2 – Tác Động Kinh Doanh Mong Đợi (Expected Business Impact)
+### 8.2 – Expected Business Impact
 <details>
-<summary>Định lượng giá trị và lợi ích kỳ vọng</summary>
+<summary>Quantifying value and expected benefits</summary>
 
 ---
 
-| **Mục tiêu**               | **Tác động mong đợi**                           | **Chỉ số đo lường**                                     | **Lợi ích kinh doanh**                                      |
-|----------------------------|--------------------------------------------------|----------------------------------------------------------|--------------------------------------------------------------|
-| Tăng chuyển đổi            | Tăng tỷ lệ người dùng hoàn tất onboarding       | `Registration Completion Rate`, `KYC Approval Rate`      | Mở rộng tập người dùng, tăng trưởng doanh thu                |
-| Giảm chi phí vận hành      | Tự động hóa quy trình, giảm thời gian xử lý     | `Avg. Manual Review Time`, `Queue Volume`                | Giảm nhân lực thủ công, tối ưu chi phí                        |
-| Nâng cao trải nghiệm       | Giảm lỗi, tăng tốc độ xác minh KYC              | `KYC Retry Rate`, `Time to KYC Success`                  | Tăng sự hài lòng, giảm rủi ro bỏ cuộc                         |
-| Giảm thiểu rủi ro          | Tăng độ chính xác trong đánh giá                | `False Positive Rate`, `Risky User %`                    | Bảo vệ tài sản, tăng độ tin cậy với đối tác và cơ quan quản lý |
-| Ra quyết định tốt hơn      | Cung cấp dữ liệu rõ ràng qua dashboard          | Tần suất sử dụng dashboard, số quyết định dựa trên dữ liệu | Ra quyết định nhanh và chính xác hơn                         |
+| **Objective** | **Expected Impact** | **Measurement Metric** | **Business Benefits** |
+|---------------|---------------------|------------------------|----------------------|
+| Increase conversion | Increase successful onboarding rate | `Registration Completion Rate`, `KYC Approval Rate` | Expand user base, increase revenue |
+| Reduce operational costs | Automate processes, decrease manual processing time | `Avg. Manual Review Time`, `Queue Volume` | Reduce manual labor, optimize costs |
+| Improve user experience | Decrease errors, increase KYC processing speed | `KYC Retry Rate`, `Time to KYC Success` | Increase user satisfaction, reduce risk of abandonment |
+| Reduce operational risk | Increase accuracy of risk assessment | `False Positive Rate`, `Risky User %` | Protect assets, increase trust with partners and regulators |
+| Make better decisions | Provide clear data through dashboards | Frequency of dashboard use, number of decisions based on data | Make faster, more accurate decisions |
 
 ---
 
@@ -2002,39 +1986,39 @@ graph TD
 
 ---
 
-### 8.3 – Kế Hoạch Đo Lường và Theo Dõi (Measurement & Monitoring Plan)
+### 8.3 – Measurement & Monitoring Plan
 <details>
-<summary>Khung theo dõi hiệu quả triển khai cải tiến</summary>
+<summary>Framework for measuring the effectiveness of ongoing improvements</summary>
 
 ---
 
-- **Thiết lập đường cơ sở**:
-  - Đo các chỉ số KPI hiện tại trước khi thay đổi để làm benchmark.
+- **Baseline setup:**
+  - Measure current KPIs before any changes to establish a benchmark.
 
 ---
 
-- **Theo dõi liên tục qua dashboard**:
-  - Sử dụng dashboard (Chương 7) để giám sát KPI mỗi ngày/tuần/tháng.
+- **Continuous monitoring via dashboard:**
+  - Use dashboard (Chapter 7) to monitor KPIs daily/weekly/monthly.
 
 ---
 
-- **Phân tích theo Cohort**:
-  - So sánh hành vi người dùng sau khi cải tiến với trước đó theo nhóm thời gian.
+- **Cohort analysis:**
+  - Compare user behavior before and after improvements by time period.
 
 ---
 
-- **Thử nghiệm A/B**:
-  - Thực hiện kiểm thử `A/B` với các cải tiến giao diện hoặc logic để xác định tác động chính xác.
+- **A/B testing:**
+  - Conduct `A/B` tests with different interface designs or logic to determine the most effective changes.
 
 ---
 
-- **Báo cáo định kỳ**:
-  - Tổng hợp tác động mỗi tháng/quý, gửi đến các bên liên quan nội bộ.
+- **Monthly reporting:**
+  - Summarize impacts monthly/quarterly, sent to relevant stakeholders.
 
 ---
 
-- **Phản hồi vòng lặp**:
-  - Nhận phản hồi từ người dùng và các team nghiệp vụ để cải tiến tiếp theo.
+- **Feedback loop:**
+  - Receive feedback from users and operational teams to improve further.
 
 ---
 
