@@ -1482,6 +1482,126 @@ graph TD
 
 </details>
 
+---
+#### 6.5 – Phân Tích Tuân Thủ & Rủi Ro (Compliance & Risk Insights)
+---
+<details>
+<summary>Phân tích dữ liệu PEP, sanction, risk_score và các yếu tố liên quan đến tuân thủ AML/KYC</summary>
+
+---
+
+##### 🎯 Mục Tiêu
+
+- Xác định và phân tích rủi ro liên quan đến hành vi onboarding của người dùng.
+- Đảm bảo quy trình tuân thủ các yêu cầu pháp lý liên quan đến AML/KYC.
+- Cải thiện hiệu quả vận hành của các bước kiểm tra thủ công và tự động.
+
+---
+
+##### 📊 Các Phân Tích & Chỉ Số Chính
+
+---
+
+###### 1. Phân Tích Phân Bố Điểm Rủi Ro (Risk Score Analysis)
+
+- **Chỉ số gợi ý:**
+  - `Avg. Risk Score`, `Median Risk Score`
+  - `Risk Score Distribution by Channel/Geo`
+  - `% High-Risk Users (> threshold)`
+
+- **Gợi ý visualization:** Histogram hoặc Boxplot theo nhóm `geo_country`, `registration_channel`.
+
+- **Phân tích nâng cao:**
+  - Tìm mối tương quan giữa `device_type`, `time_of_day`, `doc_type` với điểm rủi ro.
+
+- **Nguồn dữ liệu:** `fact_risk_assessments`, `dim_users`, `dim_channel`, `dim_device`.
+
+---
+
+###### 2. Phân Tích PEP & Sanction (Screening Effectiveness)
+
+- **Chỉ số:**
+  - `PEP Match Rate`, `Sanction Match Rate`
+  - `False Positive Rate`
+  - `Median Time to Resolve Flagged Users`
+
+- **Phân tích nâng cao:**
+  - Tỷ lệ cảnh báo PEP sai lệch giữa các quốc gia (false positive by country).
+  - Mức độ ảnh hưởng của việc gắn cờ đến tỷ lệ chuyển đổi.
+
+- **Nguồn dữ liệu:** `fact_risk_assessments`, `fact_manual_review_logs`, `dim_users`.
+
+---
+
+###### 3. Phân Tích Lý Do Từ Chối KYC (Rejection vs Risk Insight)
+
+- **Chỉ số:**
+  - `Top Rejection Reasons for High-Risk Users`
+  - `Risk Score vs. KYC Approval Probability` (phân tích hồi quy logistic)
+  - `KYC Drop-off vs. Rejection Risk`
+
+- **Phân tích nâng cao:**
+  - Dùng clustering để nhóm người dùng bị từ chối nhiều lần & điểm rủi ro cao → xác định “profile nguy cơ cao”.
+
+- **Nguồn dữ liệu:** `fact_kyc_verification_details`, `fact_risk_assessments`, `dim_users`.
+
+---
+
+###### 4. Phân Tích Manual Review (Manual Handling Efficiency)
+
+- **Chỉ số:**
+  - `Avg. Review Duration`, `Volume per Agent`
+  - `Escalation Rate`: % hồ sơ được chuyển lên cấp cao hơn
+  - `Decision Accuracy`: So sánh quyết định thủ công và đánh giá ML/Rule
+
+- **Phân tích nâng cao:**
+  - Phân tích performance theo từng agent (agent-level benchmarking).
+  - Gợi ý dashboard realtime: “Queue by risk level”, “Agent workload heatmap”.
+
+- **Nguồn dữ liệu:** `fact_manual_review_logs`, `fact_risk_assessments`.
+
+---
+
+###### 5. Phân Tích Anomaly và Cảnh Báo Realtime (Realtime Fraud Monitoring)
+
+- **Tình huống điển hình cần cảnh báo:**
+  - `Multiple Failed KYC Attempts from Same IP`
+  - `Sudden Surge in High-Risk Signups (per geo/channel)`
+  - `Spike in Sanction Hits`
+
+- **Kỹ thuật:**
+  - `Streaming detection`: Pub/Sub + Dataflow
+  - `Rule engine`: Trigger cảnh báo nếu vượt ngưỡng
+  - `ML-based anomaly detection`: Isolation Forest hoặc Autoencoder (dùng BigQuery ML hoặc Vertex AI)
+
+- **Gợi ý dashboard cảnh báo:**
+  - ⚠️ **Fraud Spike Alert Panel**
+  - 🔎 **Suspicious Behavior Timeline**
+
+---
+
+##### 🛠️ Công Cụ & Kỹ Thuật
+
+| Thành phần | Công cụ đề xuất | Ứng dụng |
+|------------|-----------------|----------|
+| Data Query & Transform | BigQuery SQL, dbt | Phân tích bảng `risk`, `KYC`, `review` |
+| Anomaly Detection | Python (Scikit-learn), BigQuery ML | Xây mô hình ML phát hiện bất thường |
+| Realtime Monitoring | Cloud Pub/Sub, Dataflow | Dòng sự kiện & rule-based alert |
+| Dashboard & Reporting | Looker Studio, Power BI | Báo cáo cho team Compliance & Ops |
+| Review Logs Tracking | Google Sheets / BigQuery + Data Studio | Đơn giản hóa giám sát performance agent |
+
+---
+
+##### 💡 Gợi Ý Mở Rộng
+
+- Kết hợp dữ liệu KYC, Risk, và User Behavior → xây dựng **Risk Profiling Engine**.
+- Triển khai bảng `user_risk_summary` (dbt model) để chuẩn hóa báo cáo Compliance.
+- Đánh giá tác động business của cảnh báo sai (`false positive cost`) và tối ưu thuật toán.
+
+---
+
+</details>
+
 
 </details>
 
