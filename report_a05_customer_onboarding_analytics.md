@@ -14,44 +14,65 @@ title: report_a05_customer_onboarding_analytics
 ---
 
 
-| **Thuật Ngữ**                      | **Định Nghĩa**                                                                 |
-|-----------------------------------|--------------------------------------------------------------------------------|
-| **KYC**                           | Know Your Customer – Quy trình xác minh danh tính khách hàng theo quy định.  |
-| **AML**                           | Anti-Money Laundering – Chống rửa tiền, đảm bảo khách hàng không liên quan đến hoạt động tài chính phi pháp. |
-| **Onboarding**                    | Quá trình đưa người dùng mới từ đăng ký đến khi có thể sử dụng đầy đủ dịch vụ.|
-| **Chuyển đổi (Conversion)**       | Tỷ lệ người dùng hoàn tất một bước hoặc toàn bộ quá trình onboarding.         |
-| **Phễu Onboarding (Funnel)**      | Chuỗi các bước người dùng cần thực hiện trong quá trình onboarding (ví dụ: đăng ký → gửi giấy tờ → kích hoạt). |
-| **Điểm ma sát (Friction Point)**  | Các bước hoặc yếu tố trong quy trình gây cản trở, khiến người dùng dễ rời bỏ. |
-| **OCR**                           | Optical Character Recognition – Công nghệ đọc ký tự từ ảnh giấy tờ.           |
-| **Xác minh sinh trắc (Liveness Check)** | Kiểm tra khuôn mặt hoặc chuyển động để đảm bảo người thật đang thao tác. |
-| **PEP**                           | Politically Exposed Person – Cá nhân có ảnh hưởng chính trị, cần giám sát chặt chẽ hơn. |
-| **Tỷ lệ chấp thuận (Approval Rate)** | Tỷ lệ hồ sơ người dùng được duyệt qua các bước xác minh.                    |
-| **Tỷ lệ từ chối (Rejection Rate)**   | Tỷ lệ hồ sơ bị từ chối qua các bước KYC.                                   |
-| **Tỷ lệ rớt bước (Drop-off Rate)**   | Phần trăm người dùng không hoàn thành một bước nào đó trong phễu onboarding.|
-| **Chờ xử lý thủ công**             | Những hồ sơ cần nhân viên can thiệp, không thể xử lý tự động.               |
-| **user_id**                        | Mã định danh duy nhất của người dùng.                                        |
-| **registration_channel**          | Kênh mà người dùng bắt đầu đăng ký (Web, Mobile, Referral...).               |
-| **ocr_confidence**                | Mức độ tin cậy của kết quả nhận dạng ký tự từ giấy tờ.                       |
-| **face_match_score**             | Điểm đo mức độ khớp giữa ảnh selfie và giấy tờ tùy thân.                     |
-| **liveness_check**                | Quy trình kiểm tra người dùng là người thật, không phải ảnh hoặc bot.        |
-| **pep_flag / sanction_flag**      | Cờ đánh dấu người dùng nằm trong danh sách chính trị hoặc bị cấm vận.        |
-| **internal_risk_score**           | Điểm rủi ro nội bộ do hệ thống đánh giá dựa trên các chỉ báo.               |
-| **abandonment_flag**              | Biến đánh dấu người dùng đã từ bỏ quy trình tại một bước nào đó.             |
-| **retry_count**                   | Số lần người dùng gửi lại giấy tờ xác minh.                                  |
-| **dim table**                     | Bảng dimension – chứa thông tin mô tả như người dùng, thiết bị, thời gian... |
-| **fact table**                    | Bảng fact – lưu trữ các sự kiện hoặc hành vi có thể đo lường.               |
-| **session_id**                    | Mã định danh của một phiên truy cập người dùng.                              |
-| **duration_in_step_seconds**      | Thời gian người dùng ở lại tại một bước cụ thể trong quy trình onboarding.   |
-| **kyc_result**                    | Kết quả xác minh danh tính: Approved, Rejected, Pending...                   |
-| **ocr_status**                    | Trạng thái OCR: Success, Failure, Partial.                                   |
-| **risk_score**                    | Điểm đánh giá rủi ro tổng hợp của người dùng.                                |
-| **manual_review**                 | Quy trình đánh giá hồ sơ thủ công bởi con người.                             |
-| **event_name**                    | Tên của sự kiện trong log ứng dụng (VD: KYC_STARTED).                        |
-| **onboarding_step**              | Thứ tự các bước trong phễu onboarding.                                       |
-| **channel_id**                    | ID của kênh đăng ký, dùng trong phân tích attribution.                       |
-| **device_type / device_model**    | Loại và mẫu thiết bị người dùng sử dụng.                                     |
-| **time_to_kyc_completion**        | Thời gian từ khi đăng ký đến khi hoàn tất xác minh danh tính.               |
-| **funnel conversion rate**        | Tỷ lệ chuyển đổi giữa các bước trong hành trình onboarding.                 |
+| **Thuật Ngữ**                          | **Định Nghĩa**                                                                 |
+|---------------------------------------|--------------------------------------------------------------------------------|
+| **A/B Testing**                       | Phương pháp thử nghiệm hai phiên bản để đo lường tác động của thay đổi.       |
+| **abandonment_flag**                  | Biến đánh dấu người dùng đã từ bỏ quy trình tại một bước nào đó.              |
+| **AML**                               | Anti-Money Laundering – Chống rửa tiền, đảm bảo khách hàng không liên quan đến hoạt động tài chính phi pháp. |
+| **approval rate (Tỷ lệ chấp thuận)**  | Tỷ lệ hồ sơ người dùng được duyệt qua các bước xác minh.                      |
+| **audit log / audit trail**           | Nhật ký ghi lại toàn bộ hành động để phục vụ kiểm toán và tuân thủ.           |
+| **auto-approve rule**                 | Quy tắc cho phép tự động phê duyệt hồ sơ nếu thỏa điều kiện nhất định.        |
+| **baseline metrics**                  | Chỉ số cơ sở trước khi áp dụng thay đổi, dùng để so sánh sau cải tiến.        |
+| **business impact**                   | Tác động đến hoạt động hoặc mục tiêu kinh doanh.                              |
+| **channel_id**                        | ID của kênh đăng ký, dùng trong phân tích attribution.                        |
+| **churn**                             | Tỷ lệ người dùng rời bỏ hệ thống hoặc ngừng sử dụng dịch vụ.                  |
+| **cohort**                            | Nhóm người dùng có chung đặc điểm hoặc thời điểm bắt đầu hành trình.          |
+| **conversion (Chuyển đổi)**           | Tỷ lệ người dùng hoàn tất một bước hoặc toàn bộ quá trình onboarding.         |
+| **CPA (Cost per Acquisition)**        | Chi phí để có được một người dùng mới (nếu tích hợp dữ liệu chi phí).         |
+| **CSAT (Customer Satisfaction Score)**| Thước đo mức độ hài lòng của người dùng, thường thu thập qua khảo sát.        |
+| **device_model**                      | Mẫu thiết bị người dùng sử dụng.                                               |
+| **device_type**                       | Loại thiết bị người dùng sử dụng (Mobile, Desktop, Tablet...).                |
+| **dim table**                         | Bảng dimension – chứa thông tin mô tả như người dùng, thiết bị, thời gian...  |
+| **document rejection reason**         | Lý do cụ thể khiến giấy tờ bị từ chối trong quá trình KYC.                    |
+| **drop-off**                          | Hiện tượng người dùng rời bỏ quy trình onboarding tại một bước cụ thể.        |
+| **drop-off rate**                     | Phần trăm người dùng không hoàn thành một bước nào đó trong phễu onboarding.  |
+| **duration_in_step_seconds**          | Thời gian người dùng ở lại tại một bước cụ thể trong quy trình onboarding.    |
+| **event_name**                        | Tên của sự kiện trong log ứng dụng (VD: KYC_STARTED).                         |
+| **face_match_score**                 | Điểm đo mức độ khớp giữa ảnh selfie và giấy tờ tùy thân.                      |
+| **false negative**                    | Trường hợp hệ thống không phát hiện rủi ro mặc dù có.                         |
+| **false positive**                    | Trường hợp hệ thống đánh dấu sai một hồ sơ là rủi ro.                         |
+| **funnel conversion rate**            | Tỷ lệ chuyển đổi giữa các bước trong hành trình onboarding.                  |
+| **geo_country / geo_city**            | Quốc gia / thành phố mà người dùng đang sinh sống hoặc đăng ký.               |
+| **insight**                           | Thông tin có giá trị được rút ra từ dữ liệu để hỗ trợ ra quyết định.         |
+| **internal_risk_score**               | Điểm rủi ro nội bộ do hệ thống đánh giá dựa trên các chỉ báo.                |
+| **KYC**                               | Know Your Customer – Quy trình xác minh danh tính khách hàng theo quy định.  |
+| **kyc_result**                        | Kết quả xác minh danh tính: Approved, Rejected, Pending...                    |
+| **liveness_check**                    | Quy trình kiểm tra người dùng là người thật, không phải ảnh hoặc bot.         |
+| **manual_review**                     | Quy trình đánh giá hồ sơ thủ công bởi con người.                              |
+| **manual_review_queue_volume**        | Số lượng hồ sơ đang chờ xử lý thủ công tại một thời điểm.                     |
+| **monitoring dashboard**              | Bảng điều khiển trực quan giúp theo dõi và giám sát hiệu suất theo thời gian. |
+| **OCR**                               | Optical Character Recognition – Công nghệ đọc ký tự từ ảnh giấy tờ.           |
+| **ocr_confidence**                    | Mức độ tin cậy của kết quả nhận dạng ký tự từ giấy tờ.                        |
+| **ocr_status**                        | Trạng thái OCR: Success, Failure, Partial.                                    |
+| **onboarding**                        | Quá trình đưa người dùng mới từ đăng ký đến khi có thể sử dụng đầy đủ dịch vụ.|
+| **onboarding journey**                | Hành trình người dùng trải qua từ lúc đăng ký đến khi được kích hoạt hoàn toàn.|
+| **onboarding_step**                  | Thứ tự các bước trong phễu onboarding.                                        |
+| **operational efficiency**            | Hiệu quả vận hành, thể hiện qua năng suất và tối ưu hóa quy trình.            |
+| **PEP**                               | Politically Exposed Person – Cá nhân có ảnh hưởng chính trị, cần giám sát chặt chẽ hơn. |
+| **pep_flag / sanction_flag**          | Cờ đánh dấu người dùng nằm trong danh sách chính trị hoặc bị cấm vận.         |
+| **phễu onboarding (Funnel)**          | Chuỗi các bước người dùng cần thực hiện trong quá trình onboarding.           |
+| **registration_channel**              | Kênh mà người dùng bắt đầu đăng ký (Web, Mobile, Referral...).                |
+| **registration_completion_rate**      | Tỷ lệ người dùng hoàn tất toàn bộ quy trình đăng ký.                          |
+| **retry_count**                       | Số lần người dùng gửi lại giấy tờ xác minh.                                   |
+| **risk_score**                        | Điểm đánh giá rủi ro tổng hợp của người dùng.                                 |
+| **risk traceability**                 | Khả năng truy xuất các quyết định liên quan đến rủi ro từ dữ liệu gốc.        |
+| **ROI (Return on Investment)**        | Lợi tức đầu tư – giá trị thu được so với chi phí bỏ ra cho cải tiến hoặc dự án.|
+| **sanction match rate**               | Tỷ lệ người dùng khớp với danh sách trừng phạt.                               |
+| **session_id**                        | Mã định danh của một phiên truy cập người dùng.                               |
+| **stakeholder**                       | Bên liên quan – các cá nhân hoặc nhóm chịu ảnh hưởng bởi kết quả phân tích.   |
+| **time_to_kyc_completion**            | Thời gian từ khi đăng ký đến khi hoàn tất xác minh danh tính.                |
+| **time_to_kyc_success**               | Thời gian từ khi người dùng bắt đầu đến khi hoàn tất xác minh KYC.           |
+| **user_id**                           | Mã định danh duy nhất của người dùng.                                         |
 
 
 ---
