@@ -1378,6 +1378,109 @@ graph TD
 
 </details>
 
+---
+#### 6.4 – Phân Tích Hành Vi Người Dùng (User Behavior Analytics)
+---
+<details>
+<summary>Segment hành vi theo thiết bị, kênh đăng ký, thời gian, và phân tích các hành vi cụ thể</summary>
+
+---
+
+##### 🎯 Mục Tiêu
+
+- Hiểu được cách người dùng tương tác với hệ thống trong từng bước `onboarding` và `KYC/AML`.
+- Phát hiện các yếu tố dẫn đến thành công hoặc thất bại khi người dùng đi qua các bước onboarding.
+- Tối ưu hóa trải nghiệm người dùng và giảm tỷ lệ `drop-off`.
+
+---
+
+##### 🧩 Các Hướng Phân Tích Cụ Thể
+
+---
+
+###### 1. Phân đoạn hành vi (Behavioral Segmentation)
+
+- **Theo thiết bị, OS, trình duyệt:**
+  - Sử dụng `dim_device` để nhóm hành vi người dùng theo `device_type`, `os_version`, `browser`.
+  - *Ví dụ phân tích:* Người dùng iOS có tỷ lệ thành công KYC cao hơn Android? Tỷ lệ lỗi cao hơn khi dùng Firefox?
+
+- **Theo kênh đăng ký (`dim_channel`):**
+  - So sánh thời gian hoàn tất onboarding và tỷ lệ drop-off theo kênh (`Organic`, `Paid`, `Referral`).
+  - Phân tích ROI theo từng channel kết hợp với attribution data.
+
+- **Theo thời gian (`dim_time`):**
+  - Tỷ lệ thành công KYC theo từng giờ trong ngày (heatmap).
+  - Phân tích `trễ xử lý` theo ngày trong tuần hoặc giờ cao điểm.
+
+- **Theo vị trí địa lý (`geo_country`, `geo_city`):**
+  - Cross-tab hiệu suất onboarding theo vị trí, sử dụng map chart để hiển thị.
+  - Phân tích khu vực có tỷ lệ từ chối giấy tờ cao (ảnh mờ, thiếu dữ liệu...).
+
+- **Theo kết quả trạng thái:**
+  - Hành vi khác nhau giữa `KYC Passed` lần đầu và nhóm `Retry nhiều lần`.
+  - Phân nhóm người dùng có `risk_score` cao và xem hành vi tương tác khác biệt ra sao.
+
+---
+
+###### 2. Phân tích hành vi Retry KYC/AML
+
+- **Mục tiêu:** Xác định nguyên nhân người dùng phải retry KYC/AML và tác động đến tỷ lệ chuyển đổi.
+
+- **Chỉ số bổ sung gợi ý:**
+  - `Avg Retry Count per User`
+  - `Median Time Between Retries`
+  - `Top 3 Rejection Reasons`
+  - `Retry Success Rate`: % user thành công sau retry đầu tiên, thứ 2...
+
+- **Phân tích theo `user cohort`:** Nhóm người dùng retry ≥ 2 lần có tỷ lệ chuyển đổi thấp hơn bao nhiêu %?
+
+---
+
+###### 3. Phân tích lỗi hệ thống và trải nghiệm người dùng
+
+- **Heatmap Error by Step + Device:**
+  - Tạo biểu đồ hiển thị lỗi theo bước và loại thiết bị.
+  - Phân tích xem lỗi cụ thể nào thường xuyên xuất hiện tại cùng bước onboarding.
+
+- **Tỷ lệ lỗi dẫn đến `abandonment`:**
+  - Lỗi nào có xác suất cao nhất làm người dùng rời bỏ phễu?
+
+---
+
+###### 4. Phân tích Active vs Inactive
+
+- **Mục tiêu:** Hiểu người dùng có tiếp tục quay lại sau khi onboarding không?
+
+- **Gợi ý phân tích:**
+  - `D1`, `D7`, `D30` Retention Rate
+  - `Avg Time to First Transaction`
+  - `Active Rate by Onboarding Speed`: Người hoàn thành KYC trong <15 phút có tỷ lệ D7 active cao hơn?
+
+---
+
+##### 🛠️ Công Cụ và Kỹ Thuật
+
+| Công cụ | Ứng dụng |
+|--------|----------|
+| **BigQuery SQL** | Phân tích hành vi, tính retry, cohort, retention |
+| **dbt models** | Tạo bảng `user_behavior_metrics`, `user_retention_flags` |
+| **Python + Pandas + Seaborn** | Vẽ heatmap, histograms, clustering hành vi |
+| **BI tools (Looker Studio, Power BI)** | Dashboard funnel by segment, retry analysis |
+| **Segment / Mixpanel (tuỳ tổ chức)** | Track hành vi realtime, hỗ trợ A/B testing hành trình |
+
+---
+
+##### 📈 Gợi ý Dashboard Hành Vi (Dashboard Ideas)
+
+- **Funnel by Device Type / Channel**
+- **Retry Rate Heatmap by Day**
+- **KYC Completion vs Drop-off Timeline**
+- **User Flow Sankey Diagram**
+- **Error Root Cause TreeMap**
+
+---
+
+</details>
 
 
 </details>
