@@ -1614,11 +1614,171 @@ graph TD
 
 ---
 
-- Phần này sẽ đề cập đến cách các thông tin chi tiết sẽ được trình bày và các `dashboard` sẽ được thiết kế.
+### 🎯 Mục Tiêu
+
+- Cung cấp thông tin phân tích rõ ràng, kịp thời và có thể hành động cho các bên liên quan.
+- Thiết kế các dashboard theo từng nhóm người dùng: Điều hành (C-level), Vận hành, Risk & Compliance, Marketing, Product.
+- Tập trung vào các chủ đề: Hành trình onboarding, hiệu quả KYC, giám sát rủi ro và hiệu suất xử lý thủ công.
+
+---
+
+### 📐 Nguyên Tắc Thiết Kế Dashboard
+
+- **Phân tách theo chủ đề:** Mỗi dashboard chỉ tập trung vào một nhóm câu hỏi cụ thể.
+- **Tương tác động (interactive):** Cho phép người dùng lọc theo thời gian, kênh, thiết bị, khu vực, risk level...
+- **Trực quan hóa phù hợp:** Chọn biểu đồ đúng với loại dữ liệu (funnel, line chart, bar, stacked column, table…).
+- **Cấu trúc thông tin phân cấp:** Từ tổng quan đến chi tiết (drill-down).
+
+---
+
+### 🧭 Cấu Trúc Dashboard Đề Xuất
+
+#### 📊 Dashboard 1: Onboarding Funnel Overview
+
+- **Mục tiêu:** Theo dõi tỷ lệ hoàn thành onboarding và các điểm rớt chính.
+- **Thành phần:**
+  - Funnel Chart: Từ `Started Registration` → `KYC Started` → `Liveness Check` → `Account Activated`.
+  - Drop-off Rate by Step (bar chart)
+  - Segment by Channel / Device / Country
+  - Trendline: Completion Rate theo ngày
+
+#### 📈 Dashboard 2: KYC Performance
+
+- **Mục tiêu:** Đo lường hiệu suất và chất lượng xử lý hồ sơ xác minh.
+- **Thành phần:**
+  - KYC Approval Rate & Retry Rate (KPI cards)
+  - Avg. Time to Approval (line)
+  - Document Rejection Reasons (pie chart)
+  - KYC Attempts Distribution
+
+#### ⚠️ Dashboard 3: Risk & Compliance Monitoring
+
+- **Mục tiêu:** Giám sát người dùng rủi ro, xử lý cảnh báo PEP/Sanction.
+- **Thành phần:**
+  - Distribution of Risk Scores (histogram)
+  - PEP / Sanction Flagged User Trend
+  - Manual Review Volume by Category
+  - Decision Breakdown (Approved, Rejected, Escalated)
+
+#### 🔄 Dashboard 4: Manual Review Operations
+
+- **Mục tiêu:** Theo dõi hiệu suất đội vận hành xử lý thủ công.
+- **Thành phần:**
+  - Avg. Manual Review Time
+  - Queue Size over Time
+  - Review Outcome by Agent
+  - SLA Compliance Rate
+
+#### 📢 Dashboard 5: Channel Effectiveness
+
+- **Mục tiêu:** Đánh giá hiệu quả các kênh marketing trong việc mang lại người dùng chất lượng.
+- **Thành phần:**
+  - Completion Rate by Channel
+  - Avg. Time to KYC by Channel
+  - Risk Score by Channel
+  - Conversion Funnel theo Channel
+
+---
+
+### 🧰 Công Cụ Triển Khai
+
+| Thành phần | Công cụ gợi ý | Lý do |
+|------------|----------------|-------|
+| BI Tool | Looker Studio | Dễ sử dụng, tích hợp gốc với BigQuery |
+| Alternative | Power BI, Tableau | Đáp ứng nhu cầu doanh nghiệp nâng cao |
+| Visualization Libraries | matplotlib, seaborn (Python) | Dùng trong phân tích chuyên sâu hoặc notebooks |
+| Drill-down logic | SQL (BigQuery), dbt models | Chuẩn bị data layer tối ưu cho dashboard |
+
+---
+
+#### 7.1 – Phân Loại Dashboard Theo Đối Tượng Người Dùng (Stakeholder-Oriented Dashboards)
+---
+<details>
+<summary>Thiết kế dashboard phù hợp với từng nhóm người dùng trong tổ chức</summary>
+
+---
+
+- Mỗi bên liên quan (stakeholder) trong tổ chức có nhu cầu thông tin và góc nhìn khác nhau. Việc xây dựng các dashboard chuyên biệt cho từng nhóm giúp đảm bảo dữ liệu được hiểu đúng và ra quyết định nhanh chóng.
+
+---
+
+##### 🎯 1. Executive Dashboard – Dành cho C-Level
+
+- **Mục tiêu:** Cung cấp cái nhìn tổng quan về hiệu suất hệ thống onboarding & KYC/AML.
+- **Chỉ số chính:** 
+  - Tổng số người dùng mới theo ngày/tuần/tháng
+  - Conversion rate toàn phễu
+  - KYC approval rate
+  - Risky user % theo thời gian
+- **Đặc điểm:** 
+  - Hiển thị tối giản, ưu tiên các KPI chính dạng số
+  - Có biểu đồ xu hướng (trend) theo thời gian
+  - Thiết kế gọn, không cần drill-down quá chi tiết
+
+---
+
+##### 👮 2. Risk & Compliance Dashboard
+
+- **Mục tiêu:** Theo dõi tuân thủ AML/KYC và các chỉ số rủi ro.
+- **Chỉ số chính:**
+  - Số người bị flag PEP/Sanction
+  - Risk score trung bình và phân phối
+  - Manual review volume
+  - False positive rate
+- **Đặc điểm:**
+  - Biểu đồ heatmap, histogram để phân tích phân phối
+  - Drill-down đến hồ sơ rủi ro cụ thể
+  - Có thể gắn cảnh báo nếu vượt ngưỡng
+
+---
+
+##### ⚙️ 3. Operational Dashboard – Dành cho Nhóm KYC/Manual Review
+
+- **Mục tiêu:** Theo dõi khối lượng và hiệu suất xử lý hồ sơ KYC hàng ngày.
+- **Chỉ số chính:**
+  - Số hồ sơ cần xem xét
+  - Thời gian xử lý trung bình
+  - KYC retry rate
+  - Backlog theo ngày
+- **Đặc điểm:**
+  - Biểu đồ bar theo ngày, table chi tiết theo nhân viên
+  - Cảnh báo khi backlog vượt ngưỡng
+  - Có tính năng lọc theo nhân viên, loại hồ sơ
+
+---
+
+##### 📱 4. Product/UX Dashboard – Dành cho Nhóm Phát Triển Sản Phẩm
+
+- **Mục tiêu:** Phân tích hành vi người dùng, phát hiện điểm ma sát (friction points).
+- **Chỉ số chính:**
+  - Drop-off rate theo từng bước onboarding
+  - Thời gian trung bình ở mỗi bước
+  - Retry reasons phân tích theo device/channel
+- **Đặc điểm:**
+  - Funnel chart, line chart, phân tích phân đoạn theo OS, thiết bị
+  - Có thể dùng để A/B testing UI mới
+
+---
+
+##### 📣 5. Marketing Dashboard
+
+- **Mục tiêu:** Theo dõi hiệu quả các chiến dịch thu hút người dùng mới.
+- **Chỉ số chính:**
+  - New user acquisition theo channel
+  - Conversion rate theo campaign
+  - Cost per acquisition (CPA) nếu có tích hợp chi phí
+- **Đặc điểm:**
+  - Biểu đồ stacked bar, line chart, pie chart
+  - Có thể tích hợp với dữ liệu attribution từ Google Ads, Firebase, AppsFlyer...
 
 ---
 
 </details>
+
+
+
+</details>
+
 
 ---
 
