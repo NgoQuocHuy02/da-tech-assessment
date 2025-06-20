@@ -1777,6 +1777,64 @@ graph TD
 
 ---
 
+---
+#### 7.3 – Quy Ước Trực Quan Hóa Dữ Liệu (Visualization Guidelines)
+---
+<details>
+<summary>Hướng dẫn lựa chọn biểu đồ, màu sắc, định dạng để đảm bảo dashboard dễ đọc, nhất quán và chuyên nghiệp</summary>
+
+---
+
+- **Mục tiêu:** Đảm bảo tính nhất quán và dễ hiểu trong tất cả các dashboard, giúp các bên liên quan dễ dàng tiếp nhận thông tin, tránh hiểu sai số liệu hoặc quá tải thị giác.
+
+---
+
+##### 🎨 1. Lựa Chọn Biểu Đồ Theo Ngữ Cảnh
+
+| Mục đích trực quan                     | Biểu đồ phù hợp                             | Ghi chú                                                                 |
+|----------------------------------------|---------------------------------------------|-------------------------------------------------------------------------|
+| Theo dõi tỷ lệ chuyển đổi từng bước    | Funnel Chart                                 | Dùng cho onboarding hoặc conversion funnels                            |
+| So sánh tỷ lệ (giữa các nhóm/kênh)     | Stacked Bar Chart, Grouped Bar Chart         | Dùng cho tỷ lệ giữa các kênh, thiết bị, quốc gia                       |
+| Phân tích xu hướng theo thời gian      | Line Chart, Area Chart                       | Dùng cho các chỉ số như Completion Rate theo ngày, Retry Rate theo tuần |
+| Phân phối dữ liệu                      | Histogram, Box Plot                          | Dùng cho Risk Score, Time to Approve                                   |
+| So sánh cấu phần (composition)         | Pie Chart, Donut Chart                       | Dùng cho Document Rejection Reasons                                    |
+| Phân tích chi tiết, drill-down         | Table, Tree Map                              | Dùng khi cần hiển thị dữ liệu theo chiều sâu (ví dụ theo từng agent)   |
+
+---
+
+##### 🎯 2. Màu Sắc và Định Dạng Gợi Ý
+
+- **Màu sắc theo ngữ nghĩa:**
+  - `Xanh lá`: Thành công, đã hoàn thành (approved, activated…)
+  - `Đỏ`: Lỗi, bị từ chối (rejected, error…)
+  - `Cam`: Cảnh báo, chờ xử lý (under review, pending…)
+  - `Xanh dương`: Trung lập, mặc định (default, ongoing…)
+
+- **Tránh sử dụng quá 5-6 màu chính trên 1 dashboard.**
+
+- **Định dạng số liệu:**
+  - Dùng `,` để ngăn cách hàng nghìn (ví dụ: `12,345`).
+  - Sử dụng `%` cho tỷ lệ và định dạng một cách nhất quán (`76.4%`, không viết `76,4 phần trăm`).
+  - Dữ liệu thời gian nên có định dạng chuẩn `YYYY-MM-DD`, hoặc `DD/MM/YYYY` tùy theo ngôn ngữ người dùng.
+
+---
+
+##### ✅ 3. Các Quy Tắc Bổ Sung
+
+- **Đặt tiêu đề rõ ràng** cho từng biểu đồ, bảng số liệu.
+- **Gắn nhãn trục (axis labels)** đầy đủ, tránh viết tắt gây khó hiểu.
+- **Tooltips / Hover labels** nên được bật trong các công cụ BI để hỗ trợ thông tin bổ sung mà không làm rối biểu đồ.
+- **Filter mặc định** nên là `7 ngày gần nhất` hoặc `tháng hiện tại`, nhưng cho phép chọn tùy ý.
+- **Các KPI quan trọng** nên được đặt lên đầu dashboard dưới dạng thẻ (`KPI cards`) dễ nhìn.
+
+---
+
+> ⚠️ Việc duy trì quy chuẩn trực quan giúp các dashboard trở nên nhất quán, dễ bảo trì, và được người dùng tin tưởng.
+
+---
+</details>
+
+
 </details>
 
 ---
