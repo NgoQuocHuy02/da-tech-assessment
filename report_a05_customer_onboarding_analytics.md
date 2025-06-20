@@ -1605,7 +1605,6 @@ graph TD
 
 </details>
 
----
 
 ---
 ## 7. Chiến Lược Báo Cáo và Dashboard
@@ -1776,8 +1775,6 @@ graph TD
 | Drill-down logic       | SQL (BigQuery), dbt      | Chuẩn bị data layer tối ưu cho dashboard                            |
 
 ---
-
----
 #### 7.3 – Quy Ước Trực Quan Hóa Dữ Liệu (Visualization Guidelines)
 ---
 <details>
@@ -1837,17 +1834,131 @@ graph TD
 
 </details>
 
----
 
+---
 ## 8. Tác Động Kinh Doanh và Khuyến Nghị
 ---
 <details>
-<summary>Các Khuyến Nghị Cụ Thể và Kết Quả Mong Đợi để Cải Thiện Kinh Doanh</summary>
+<summary>Phân tích tác động kinh doanh và khuyến nghị triển khai cải tiến</summary>
 
 ---
 
-- Phần này sẽ tóm tắt các lời khuyên có thể hành động và những tác động tích cực dự kiến đến kinh doanh.
+- Phần này trình bày các hành động có thể thực hiện nhằm cải thiện hiệu suất của hệ thống `onboarding` và `KYC/AML`, dựa trên dữ liệu phân tích từ chương 6–7.
+- Đồng thời, phần này cũng đề xuất khung đo lường hiệu quả triển khai và duy trì quy trình theo vòng phản hồi liên tục.
+
+---
+
+### 8.1 – Khuyến Nghị Dựa Trên Phân Tích (Analysis-Driven Recommendations)
+<details>
+<summary>Đề xuất các hành động cụ thể từ phân tích dữ liệu</summary>
+
+---
+
+#### Tối ưu hóa Phễu Chuyển Đổi (Onboarding Funnel Optimization)
+
+- **Phát hiện**: Tỷ lệ `drop-off` cao tại bước `Liveness Check` và `Document Upload`.
+- **Hành động đề xuất**:
+  - Tích hợp video hướng dẫn trực quan ngay trong ứng dụng.
+  - Giảm bớt số lượng trường thông tin yêu cầu ban đầu.
+  - Triển khai `A/B testing` giao diện người dùng.
+  - Cải thiện hiển thị lỗi bằng hướng dẫn đơn giản, dễ hiểu.
+
+---
+
+#### Cải thiện Hiệu suất KYC (KYC Performance)
+
+- **Phát hiện**: `KYC Retry Rate` cao do lỗi hệ thống hoặc ảnh không đạt yêu cầu.
+- **Hành động đề xuất**:
+  - Nâng cấp công cụ `OCR`, sử dụng mô hình học máy chuyên biệt.
+  - Tăng cường phản hồi rõ ràng và hỗ trợ người dùng sửa lỗi.
+  - Mở rộng danh sách tài liệu được chấp nhận.
+  - Cải thiện giao diện tải ảnh, tránh lỗi do thao tác.
+
+---
+
+#### Nâng cao Hiệu quả Vận hành (Operational Efficiency)
+
+- **Phát hiện**: Thời gian xử lý thủ công cao, xuất hiện tình trạng backlog.
+- **Hành động đề xuất**:
+  - Tự động phê duyệt hồ sơ có `risk_score` thấp.
+  - Phân loại và ưu tiên hồ sơ theo mức độ khẩn cấp.
+  - Xây dựng dashboard hỗ trợ ra quyết định cho reviewer.
+
+---
+
+#### Quản lý Rủi ro & Tuân thủ (Risk & Compliance)
+
+- **Phát hiện**: Tỷ lệ `false positive` cao trong sàng lọc `PEP/Sanction`.
+- **Hành động đề xuất**:
+  - Tối ưu thuật toán đánh giá rủi ro.
+  - Tích hợp thêm nguồn dữ liệu từ hành vi người dùng.
+  - Áp dụng `audit log` cho quy trình quyết định rủi ro.
 
 ---
 
 </details>
+
+---
+
+### 8.2 – Tác Động Kinh Doanh Mong Đợi (Expected Business Impact)
+<details>
+<summary>Định lượng giá trị và lợi ích kỳ vọng</summary>
+
+---
+
+| **Mục tiêu**               | **Tác động mong đợi**                           | **Chỉ số đo lường**                                     | **Lợi ích kinh doanh**                                      |
+|----------------------------|--------------------------------------------------|----------------------------------------------------------|--------------------------------------------------------------|
+| Tăng chuyển đổi            | Tăng tỷ lệ người dùng hoàn tất onboarding       | `Registration Completion Rate`, `KYC Approval Rate`      | Mở rộng tập người dùng, tăng trưởng doanh thu                |
+| Giảm chi phí vận hành      | Tự động hóa quy trình, giảm thời gian xử lý     | `Avg. Manual Review Time`, `Queue Volume`                | Giảm nhân lực thủ công, tối ưu chi phí                        |
+| Nâng cao trải nghiệm       | Giảm lỗi, tăng tốc độ xác minh KYC              | `KYC Retry Rate`, `Time to KYC Success`                  | Tăng sự hài lòng, giảm rủi ro bỏ cuộc                         |
+| Giảm thiểu rủi ro          | Tăng độ chính xác trong đánh giá                | `False Positive Rate`, `Risky User %`                    | Bảo vệ tài sản, tăng độ tin cậy với đối tác và cơ quan quản lý |
+| Ra quyết định tốt hơn      | Cung cấp dữ liệu rõ ràng qua dashboard          | Tần suất sử dụng dashboard, số quyết định dựa trên dữ liệu | Ra quyết định nhanh và chính xác hơn                         |
+
+---
+
+</details>
+
+---
+
+### 8.3 – Kế Hoạch Đo Lường và Theo Dõi (Measurement & Monitoring Plan)
+<details>
+<summary>Khung theo dõi hiệu quả triển khai cải tiến</summary>
+
+---
+
+- **Thiết lập đường cơ sở**:
+  - Đo các chỉ số KPI hiện tại trước khi thay đổi để làm benchmark.
+
+---
+
+- **Theo dõi liên tục qua dashboard**:
+  - Sử dụng dashboard (Chương 7) để giám sát KPI mỗi ngày/tuần/tháng.
+
+---
+
+- **Phân tích theo Cohort**:
+  - So sánh hành vi người dùng sau khi cải tiến với trước đó theo nhóm thời gian.
+
+---
+
+- **Thử nghiệm A/B**:
+  - Thực hiện kiểm thử `A/B` với các cải tiến giao diện hoặc logic để xác định tác động chính xác.
+
+---
+
+- **Báo cáo định kỳ**:
+  - Tổng hợp tác động mỗi tháng/quý, gửi đến các bên liên quan nội bộ.
+
+---
+
+- **Phản hồi vòng lặp**:
+  - Nhận phản hồi từ người dùng và các team nghiệp vụ để cải tiến tiếp theo.
+
+---
+
+</details>
+
+---
+</details>
+
+---
