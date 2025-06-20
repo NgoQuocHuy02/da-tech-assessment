@@ -87,6 +87,40 @@ title: report_a05_customer_onboarding_analytics
 
 </details>
 
+## Mục Lục
+
+- [1. Mô Tả Bài Toán và Bối Cảnh Kinh Doanh](#1-mô-tả-bài-toán-và-bối-cảnh-kinh-doanh)
+- [2. Mục Tiêu Phân Tích](#2-mục-tiêu-phân-tích)
+- [3. Nguồn Dữ Liệu và Đặc Điểm Dữ Liệu](#3-nguồn-dữ-liệu-và-đặc-điểm-dữ-liệu)
+- [4. Thiết Kế Lược Đồ Dữ Liệu](#4-thiết-kế-lược-đồ-dữ-liệu)
+  - [4.1 – Phân Tích Yêu Cầu Nghiệp Vụ](#41--phân-tích-yêu-cầu-nghiệp-vụ)
+  - [4.2 – Thiết Kế Lược Đồ Kim Tự Tháp Kim Cương](#42--thiết-kế-lược-đồ-kim-tự-tháp-kim-cương)
+- [5. Logic Chuyển Đổi Dữ Liệu](#5-logic-chuyển-đổi-dữ-liệu)
+  - [5.1 – Tổng Quan Pipeline Chuyển Đổi](#51--tổng-quan-pipeline-chuyển-đổi)
+  - [5.2 – Các Bước Chuyển Đổi Cụ Thể](#52--các-bước-chuyển-đổi-cụ-thể)
+    - [5.2.1 – Giai đoạn Ingestion](#521--giai-đoạn-ingestion)
+    - [5.2.2 – Làm Sạch và Làm Giàu Dữ Liệu](#522--làm-sạch-và-làm-giàu-dữ-liệu)
+    - [5.2.3 – Chuẩn Hóa và Mapping Dữ Liệu](#523--chuẩn-hóa-và-mapping-dữ-liệu)
+    - [5.2.4 – Xây Dựng Các Bảng Fact](#524--xây-dựng-các-bảng-fact)
+    - [5.2.5 – Xây Dựng Các Bảng Dimension](#525--xây-dựng-các-bảng-dimension)
+  - [5.3 – Đảm Bảo Chất Lượng Dữ Liệu (DQA)](#53--đảm-bảo-chất-lượng-dữ-liệu-dqa)
+  - [5.4 – Công Cụ và Công Nghệ Đề Xuất](#54--công-cụ-và-công-nghệ-đề-xuất)
+  - [5.5 – Tổng Kết Giai Đoạn Chuyển Đổi](#55--tổng-kết-giai-đoạn-chuyển-đổi)
+- [6. Khung Phân Tích và KPIs](#6-khung-phân-tích-và-kpis)
+  - [6.1 – Mục Tiêu Phân Tích](#61--mục-tiêu-phân-tích)
+  - [6.2 – Phân Tích Phễu Onboarding](#62--phân-tích-phễu-onboarding)
+  - [6.3 – Chỉ Số KPI Cốt Lõi](#63--chỉ-số-kpi-cốt-lõi)
+  - [6.4 – Phân Tích Hành Vi Người Dùng](#64--phân-tích-hành-vi-người-dùng)
+  - [6.5 – Phân Tích Tuân Thủ & Rủi Ro](#65--phân-tích-tuân-thủ--rủi-ro)
+- [7. Chiến Lược Báo Cáo và Dashboard](#7-chiến-lược-báo-cáo-và-dashboard)
+  - [7.1 – Cấu Trúc Dashboard Theo Chủ Đề](#71--cấu-trúc-dashboard-theo-chủ-đề)
+  - [7.2 – Dashboard Theo Nhóm Người Dùng](#72--dashboard-theo-nhóm-người-dùng)
+  - [7.3 – Nguyên Tắc Thiết Kế Dashboard Hiệu Quả](#73--nguyên-tắc-thiết-kế-dashboard-hiệu-quả)
+- [8. Tác Động Kinh Doanh và Khuyến Nghị](#8-tác-động-kinh-doanh-và-khuyến-nghị)
+  - [8.1 – Khuyến Nghị Dựa Trên Phân Tích](#81--khuyến-nghị-dựa-trên-phân-tích)
+  - [8.2 – Tác Động Kinh Doanh Mong Đợi](#82--tác-động-kinh-doanh-mong-đợi)
+  - [8.3 – Kế Hoạch Đo Lường và Theo Dõi](#83--kế-hoạch-đo-lường-và-theo-dõi)
+
 ---
 
 ## 1. Phát Biểu Vấn Đề
