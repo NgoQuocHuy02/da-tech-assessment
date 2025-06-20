@@ -398,13 +398,6 @@ Each prompt includes the original query, its purpose, and where it was applied i
 </details>
 
 ---
-
-## Notes
-
-- GenAI tool used: ChatGPT (GPT-4o), Gemini (Flash 2.5)
-- The generated documents will be reformatted to suit `ctx_doc_style.md`
-
----
 ## Day 4 (English) – Advanced Documentation, Review, and Translation
 ---
 
@@ -589,3 +582,25 @@ Output: Provide the fully translated English document as ready-to-use Markdown."
 </details>
 
 ---
+
+### Prompt 9 – Note on daily prompt logging and formatting (English)
+<details>
+<summary>Update Day 4 prompt log</summary>
+
+---
+
+**Prompt:**  
+"At the end of each day, I will write down the prompts I used that day. Today is day 4, and here are my prompts: '   .....'  Each prompt is enclosed in double quotation marks "". Please read through the _prompt.md file to understand my style and add these to the end of the Day 4 section accordingly."
+
+**Purpose:**  
+- Note the daily prompt logging process, emphasizing the practice of summarizing, formatting, and following the rule of enclosing each prompt in double quotes, in line with the _prompt.md style guide.
+
+---
+</details>
+
+---
+
+## Notes
+
+- GenAI tool used: ChatGPT (GPT-4o), Gemini (Flash 2.5), Cursor
+- The generated documents will be reformatted to suit `ctx_doc_style.md`
