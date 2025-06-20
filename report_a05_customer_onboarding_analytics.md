@@ -470,8 +470,9 @@ title: report_a05_customer_onboarding_analytics
     - Dữ liệu từ lớp phân tích được sử dụng bởi các công cụ `Business Intelligence` (BI) để tạo ra các `dashboard`, báo cáo và tính toán các `KPI`.
 
 - Luồng dữ liệu tổng quát có thể được hình dung qua sơ đồ sau:
+---
 
-    ```mermaid
+  ```mermaid
     flowchart TD
   subgraph Source_Systems [Hệ thống nguồn]
     A[Hệ thống đăng ký] --> RawData
@@ -486,7 +487,8 @@ title: report_a05_customer_onboarding_analytics
   Load --> Transform["Chuyển đổi dữ liệu (dbt/SQL)"]
   Transform --> AnalyticalLayer["Lớp dữ liệu phân tích (Dim & Fact Tables)"]
   AnalyticalLayer --> Consumption["Báo cáo & Dashboard (Looker Studio/Power BI)"]
-    ```
+  ```
+---
 
 - Luồng dữ liệu này được thiết kế để đảm bảo tính toàn vẹn, khả năng mở rộng và hiệu quả, cung cấp nền tảng vững chắc cho mọi hoạt động phân tích về hành trình `onboarding` khách hàng.
 
@@ -1239,6 +1241,74 @@ flowchart TD
   - Theo dõi hiệu suất onboarding theo thời gian, thiết bị, kênh đăng ký...
 
 ---
+
+</details>
+
+---
+#### 6.2 – Phân Tích Phễu Onboarding (Funnel Analysis)
+---
+<details>
+<summary>Phân tích hành trình người dùng qua các bước chính trong quá trình onboarding</summary>
+
+---
+
+##### 🎯 Mục Tiêu
+
+- Hiểu rõ nơi người dùng rời bỏ (drop-off) trong quá trình onboarding.
+- Đánh giá hiệu quả của từng bước chuyển đổi (conversion).
+- Hỗ trợ tối ưu hóa quy trình onboarding, giảm thiểu điểm ma sát (friction points).
+
+---
+
+##### 🧭 Các Bước Chính Trong Phễu Onboarding
+
+- Các bước chính có thể được xác định như sau (tuỳ theo logic business thực tế):
+  1. **Đăng ký bắt đầu** (`registration_started`)
+  2. **Gửi giấy tờ xác minh** (`document_uploaded`)
+  3. **Xác minh khuôn mặt / liveness check** (`liveness_completed`)
+  4. **Được duyệt KYC** (`kyc_approved`)
+  5. **Tài khoản được kích hoạt** (`account_activated`)
+
+---
+
+##### 📊 Chỉ Số Cốt Lõi Trong Funnel
+
+| Bước                        | Số Người Dùng | Tỷ Lệ Chuyển Đổi Từng Bước | Tỷ Lệ Drop-off | Ghi Chú |
+|----------------------------|----------------|------------------------------|----------------|----------|
+| Đăng ký bắt đầu            | 100,000        | –                            | –              |          |
+| Gửi giấy tờ                | 85,000         | 85%                          | 15%            | Một số người rời bỏ ngay sau đăng ký |
+| Hoàn tất liveness          | 78,000         | 91.8%                        | 8.2%           |          |
+| Được duyệt KYC             | 63,000         | 80.7%                        | 19.3%          |          |
+| Tài khoản được kích hoạt   | 60,000         | 95.2%                        | 4.8%           | Một số bị treo do kiểm tra bổ sung |
+
+---
+
+##### 🧩 Segmenting Funnel – Phân Khúc Phễu
+
+- Phân tích theo hệ điều hành:
+  - iOS vs Android: Có sự khác biệt về tỷ lệ từ bỏ sau bước liveness?
+- Phân tích theo kênh đăng ký:
+  - Paid Ads vs Organic vs Referral – nhóm nào có conversion tốt hơn?
+- Phân tích theo khu vực địa lý:
+  - Có quốc gia hoặc khu vực nào có drop-off cao bất thường không?
+
+---
+
+##### 📈 Biểu Đồ Funnel (Minh Họa Mermaid)
+
+```mermaid
+graph TD
+    A[Đăng ký bắt đầu<br/>100,000] --> B[Upload giấy tờ<br/>85,000]
+    B --> C[Liveness check<br/>78,000]
+    C --> D[KYC được duyệt<br/>63,000]
+    D --> E[Tài khoản kích hoạt<br/>60,000]
+```
+---
+
+##### 💡 Gợi Ý Hành Động
+- Xác định và xử lý các điểm ma sát lớn nhất trong funnel.
+- Thử nghiệm A/B với thiết kế UI hoặc hướng dẫn người dùng tại bước drop-off cao.
+- Thiết kế lại thông báo lỗi hoặc hỗ trợ realtime tại bước xác minh KYC để giảm tỷ lệ retry và từ bỏ.
 
 </details>
 
