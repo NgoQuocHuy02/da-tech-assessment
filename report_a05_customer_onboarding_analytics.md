@@ -1312,6 +1312,74 @@ graph TD
 
 </details>
 
+---
+
+#### 6.3 – Chỉ Số KPI Cốt Lõi (Key Performance Indicators)
+---
+<details>
+<summary>Tập hợp các chỉ số chính đo lường hiệu suất (approval rate, retry count, KYC time...) và đề xuất công thức tính toán</summary>
+
+---
+
+##### 🎯 Mục Tiêu
+
+- Định nghĩa hệ thống các chỉ số hiệu suất cốt lõi (`Key Performance Indicators – KPIs`) giúp đo lường chất lượng, tốc độ, hiệu quả và khả năng mở rộng của quy trình `onboarding`, `KYC`, và kiểm soát `rủi ro`.
+- Các chỉ số này là nền tảng để ra quyết định tối ưu hóa hành trình người dùng, cải tiến hệ thống xác minh và đo lường hiệu quả vận hành.
+
+---
+
+##### 📌 Bảng KPI Chính
+
+| **Tên KPI** | **Định nghĩa** | **Công thức (Pseudo SQL / Logic)** | **Nguồn dữ liệu** | **Ý nghĩa kinh doanh** |
+|-------------|----------------|------------------------------------|-------------------|-------------------------|
+| **Registration Completion Rate** | Tỷ lệ người dùng kích hoạt tài khoản thành công trên tổng số đăng ký. | `COUNT(DISTINCT user_id WHERE event = 'account_activated') / COUNT(DISTINCT user_id WHERE event = 'registration_started')` | `fact_onboarding_events` | Đo hiệu quả tổng thể của quy trình onboarding. |
+| **KYC Approval Rate** | Tỷ lệ hồ sơ KYC được duyệt. | `COUNT(*) WHERE kyc_result = 'Approved' / COUNT(*)` | `fact_kyc_verification_details` | Đánh giá hiệu quả hệ thống xác minh danh tính. |
+| **Avg. Time to KYC Approval** | Thời gian trung bình từ đăng ký đến lúc KYC thành công. | `AVG(TIMESTAMP_DIFF(kyc_approved_time, registration_time, MINUTE))` | `fact_onboarding_events`, `fact_kyc_verification_details` | Đo tốc độ xác minh và trải nghiệm người dùng. |
+| **KYC Retry Rate** | Tỷ lệ người dùng phải thử KYC > 1 lần. | `COUNT(user_id HAVING COUNT(kyc_submission_id) > 1) / COUNT(DISTINCT user_id)` | `fact_kyc_verification_details` | Đo tính rõ ràng của hướng dẫn xác minh. |
+| **Face Match Failure Rate** | Tỷ lệ thất bại đối sánh khuôn mặt. | `COUNT(*) WHERE face_match_score < 0.5 / COUNT(*)` | `fact_kyc_verification_details` | Đo hiệu quả công nghệ nhận diện. |
+| **Document Rejection Rate by Reason** | Phân tích nguyên nhân từ chối giấy tờ. | `COUNT(*) WHERE rejection_reason = 'Blurred Document' / TOTAL` | `fact_kyc_verification_details` | Xác định vấn đề phổ biến trong xác minh. |
+| **Risky User % (by Category)** | Tỷ lệ người dùng có rủi ro cao. | `COUNT(*) WHERE risk_score >= 80 / COUNT(*)` | `fact_risk_assessments` | Theo dõi mức độ rủi ro chung của hệ thống. |
+| **Manual Review Queue Volume** | Số hồ sơ cần xem xét thủ công. | `COUNT(*) WHERE kyc_result = 'Under Review'` | `fact_kyc_verification_details`, `fact_manual_review_logs` | Quản lý khối lượng công việc đội vận hành. |
+| **Avg. Manual Review Time** | Thời gian xử lý thủ công trung bình. | `AVG(review_end - review_start)` | `fact_manual_review_logs` | Đánh giá năng suất đội review. |
+| **Drop-off Rate by Step** | Tỷ lệ rơi rụng theo từng bước trong phễu. | `1 - (users_at_step_n / users_at_step_n-1)` | `fact_onboarding_events` | Tìm điểm ma sát cần cải tiến. |
+
+---
+
+##### 🧮 Phân Tích Đa Chiều Cho KPI
+
+- **Theo kênh đăng ký:** `registration_channel` → Xác định kênh hiệu quả nhất.
+- **Theo thiết bị:** `device_type`, `os_version` → Đánh giá hiệu năng theo nền tảng.
+- **Theo địa lý:** `geo_country`, `geo_city` → Phát hiện chênh lệch khu vực.
+- **Theo thời gian:** `date_key`, `day_of_week`, `hour_of_day` → Tìm xu hướng theo lịch.
+
+---
+
+##### 🎯 Thiết Lập Mục Tiêu & Giám Sát
+
+- Nên gắn mỗi KPI với **một mục tiêu kinh doanh** (OKR) cụ thể.
+- Ví dụ:
+  - `KYC Approval Rate` ≥ 85%
+  - `Time to KYC Approval` ≤ 15 phút
+  - `Drop-off ở bước 2` < 10%
+- **Tần suất theo dõi:** Hàng ngày/tuần/tháng → Hiển thị trên dashboard Looker/Power BI.
+
+---
+
+##### 🛠️ Công Cụ Gợi Ý
+
+| Công cụ | Ứng dụng |
+|--------|----------|
+| **SQL (BigQuery)** | Tính toán KPIs, lọc theo dimensions |
+| **dbt metrics** | Quản lý KPIs dưới dạng model chuẩn, versioned |
+| **Looker Studio / Power BI** | Hiển thị và chia sẻ KPIs động |
+| **Airflow** | Tự động refresh số liệu định kỳ |
+
+---
+
+</details>
+
+
+
 </details>
 
 ---
