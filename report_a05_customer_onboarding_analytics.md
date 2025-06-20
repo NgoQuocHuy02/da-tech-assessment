@@ -57,6 +57,7 @@ title: report_a05_customer_onboarding_analytics
 ---
 </details>
 
+---
 ## Tóm Tắt Tổng Quan
 ---
 <details>
@@ -64,9 +65,23 @@ title: report_a05_customer_onboarding_analytics
 
 ---
 
-- Phần này cung cấp một bản tóm tắt ngắn gọn về vấn đề, giải pháp đề xuất và lợi ích mong đợi.
-- Nó nêu bật các thành phần cốt lõi của khung phân tích cho quy trình `onboarding` khách hàng và `KYC/AML`.
-- Tập trung vào giá trị chiến lược của dự án đối với các bên liên quan trong kinh doanh.
+- Báo cáo này tập trung vào phân tích hành trình `onboarding` và quy trình `KYC/AML` trong lĩnh vực tài chính, nhằm tối ưu chuyển đổi người dùng, tăng cường tuân thủ, và giảm thiểu rủi ro vận hành.
+
+- Dựa trên bài toán giả định từ doanh nghiệp, nhóm phân tích đã thiết kế một hệ thống phân tích toàn diện, bao gồm:
+  - **Lược đồ dữ liệu (schema)** chuẩn hóa theo mô hình Kim Tự Tháp (Star Schema).
+  - **Pipeline xử lý dữ liệu** từ thu thập, làm sạch, đến xây dựng bảng `fact/dim`, kiểm soát chất lượng (DQA).
+  - **Khung phân tích (Analytics Framework)** với các chỉ số KPI cốt lõi, phân tích hành vi, phân tích rủi ro.
+  - **Dashboard theo chủ đề và người dùng**, hỗ trợ ra quyết định cho các bộ phận Điều hành, Vận hành, Risk, Marketing và Product.
+
+- Từ các phân tích định lượng và định tính, báo cáo đưa ra **các khuyến nghị có thể hành động**, như cải tiến UI, tối ưu thuật toán OCR, tự động hóa duyệt hồ sơ rủi ro thấp.
+
+- Các tác động kinh doanh mong đợi bao gồm:
+  - **Tăng tỷ lệ chuyển đổi** người dùng đăng ký thành công.
+  - **Giảm chi phí vận hành**, đặc biệt là chi phí xử lý thủ công.
+  - **Cải thiện trải nghiệm người dùng** và mức độ hài lòng.
+  - **Tăng cường hiệu quả quản lý rủi ro và tuân thủ** quy định pháp lý.
+
+- Báo cáo này không chỉ cung cấp góc nhìn chiến lược, mà còn triển khai chi tiết về mặt kỹ thuật, quy trình và đo lường, sẵn sàng được ứng dụng vào thực tế hoặc mở rộng cho các dự án phân tích lớn hơn.
 
 ---
 
