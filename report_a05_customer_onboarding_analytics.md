@@ -58,6 +58,51 @@ title: report_a05_customer_onboarding_analytics
 </details>
 
 ---
+## Mục Lục
+---
+<details>
+<summary>Xem tổng quan các chương và phần chính của tài liệu</summary>
+
+---
+
+- [Tóm Tắt Tổng Quan](#tóm-tắt-tổng-quan)
+- [1. Phát Biểu Vấn Đề](#1-phát-biểu-vấn-đề)
+- [2. Mục Tiêu Dự Án](#2-mục-tiêu-dự-án)
+- [3. Kế Hoạch và Các Giai Đoạn Dự Án](#3-kế-hoạch-và-các-giai-đoạn-dự-án)
+- [4. Nguồn Dữ Liệu và Thiết Kế Schema](#4-nguồn-dữ-liệu-và-thiết-kế-schema)
+    - [4.1 – Nguồn Dữ Liệu Thô (Raw Data Sources)](#41--nguồn-dữ-liệu-thô-raw-data-sources)
+    - [4.2 – Thiết Kế Schema Dữ Liệu Đề Xuất (Proposed Data Schema)](#42--thiết-kế-schema-dữ-liệu-đề-xuất-proposed-data-schema)
+- [5. Logic Chuyển Đổi Dữ Liệu](#5-logic-chuyển-đổi-dữ-liệu)
+    - [5.1 – Tổng Quan Về Luồng Dữ Liệu (Data Flow Overview)](#51--tổng-quan-về-luồng-dữ-liệu-data-flow-overview)
+    - [5.2 – Chi Tiết Các Bước Chuyển Đổi (Detailed Transformation Steps)](#52--chi-tiết-các-bước-chuyển-đổi-detailed-transformation-steps)
+        - [5.2.1 – Thu Thập Dữ Liệu Thô (Raw Data Ingestion)](#521--thu-thập-dữ-liệu-thô-raw-data-ingestion)
+        - [5.2.2 – Làm Sạch & Chuẩn Hóa Dữ Liệu (Data Cleaning & Standardization)](#522--làm-sạch--chuẩn-hóa-dữ-liệu-data-cleaning--standardization)
+        - [5.2.3 – Làm Giàu Dữ Liệu (Data Enrichment)](#523--làm-giàu-dữ-liệu-data-enrichment)
+        - [5.2.4 – Xây Dựng Các Bảng Fact (Fact Table Construction)](#524--xây-dựng-các-bảng-fact-fact-table-construction)
+        - [5.2.5 – Xây Dựng Các Bảng Dimension (Dimension Table Construction)](#525--xây-dựng-các-bảng-dimension-dimension-table-construction)
+    - [5.3 – Đảm Bảo Chất Lượng Dữ Liệu (Data Quality Assurance)](#53--đảm-bảo-chất-lượng-dữ-liệu-data-quality-assurance)
+    - [5.4 – Công Cụ và Công Nghệ Đề Xuất (Recommended Tools & Technologies)](#54--công-cụ-và-công-nghệ-đề-xuất-recommended-tools--technologies)
+    - [5.5 – Tổng Kết Giai Đoạn Chuyển Đổi Dữ Liệu (Summary of Transformation Logic)](#55--tổng-kết-giai-đoạn-chuyển-đổi-dữ-liệu-summary-of-transformation-logic)
+- [6. Khung Phân Tích và Các KPIs](#6-khung-phân-tích-và-các-kpis)
+    - [6.1 – Mục Tiêu Phân Tích (Analytics Objectives)](#61--mục-tiêu-phân-tích-analytics-objectives)
+    - [6.2 – Phân Tích Phễu Onboarding (Funnel Analysis)](#62--phân-tích-phễu-onboarding-funnel-analysis)
+    - [6.3 – Chỉ Số KPI Cốt Lõi (Key Performance Indicators)](#63--chỉ-số-kpi-cốt-lõi-key-performance-indicators)
+    - [6.4 – Phân Tích Hành Vi Người Dùng (User Behavior Analytics)](#64--phân-tích-hành-vi-người-dùng-user-behavior-analytics)
+    - [6.5 – Phân Tích Tuân Thủ & Rủi Ro (Compliance & Risk Insights)](#65--phân-tích-tuân-thủ--rủi-ro-compliance--risk-insights)
+- [7. Chiến Lược Báo Cáo và Dashboard](#7-chiến-lược-báo-cáo-và-dashboard)
+    - [7.1 – Cấu Trúc Dashboard Đề Xuất Theo Chủ Đề (Theme-Oriented Dashboard Structure)](#71--cấu-trúc-dashboard-đề-xuất-theo-chủ-đề-theme-oriented-dashboard-structure)
+    - [7.2 – Phân Loại Dashboard Theo Đối Tượng Người Dùng (Stakeholder-Oriented Dashboards)](#72--phân-loại-dashboard-theo-đối-tượng-người-dùng-stakeholder-oriented-dashboards)
+    - [7.3 – Quy Ước Trực Quan Hóa Dữ Liệu (Visualization Guidelines)](#73--quy-ước-trực-quan-hóa-dữ-liệu-visualization-guidelines)
+- [8. Tác Động Kinh Doanh và Khuyến Nghị](#8-tác-động-kinh-doanh-và-khuyến-nghị)
+    - [8.1 – Khuyến Nghị Dựa Trên Phân Tích (Analysis-Driven Recommendations)](#81--khuyến-nghị-dựa-trên-phân-tích-analysis-driven-recommendations)
+    - [8.2 – Tác Động Kinh Doanh Mong Đợi (Expected Business Impact)](#82--tác-động-kinh-doanh-mong-đợi-expected-business-impact)
+    - [8.3 – Kế Hoạch Đo Lường và Theo Dõi (Measurement & Monitoring Plan)](#83--kế-hoạch-đo-lường-và-theo-dõi-measurement-monitoring-plan)
+
+---
+
+</details>
+
+---
 ## Tóm Tắt Tổng Quan
 ---
 <details>
@@ -87,39 +132,6 @@ title: report_a05_customer_onboarding_analytics
 
 </details>
 
-## Mục Lục
-
-- [1. Mô Tả Bài Toán và Bối Cảnh Kinh Doanh](#1-mô-tả-bài-toán-và-bối-cảnh-kinh-doanh)
-- [2. Mục Tiêu Phân Tích](#2-mục-tiêu-phân-tích)
-- [3. Nguồn Dữ Liệu và Đặc Điểm Dữ Liệu](#3-nguồn-dữ-liệu-và-đặc-điểm-dữ-liệu)
-- [4. Thiết Kế Lược Đồ Dữ Liệu](#4-thiết-kế-lược-đồ-dữ-liệu)
-  - [4.1 – Phân Tích Yêu Cầu Nghiệp Vụ](#41--phân-tích-yêu-cầu-nghiệp-vụ)
-  - [4.2 – Thiết Kế Lược Đồ Kim Tự Tháp Kim Cương](#42--thiết-kế-lược-đồ-kim-tự-tháp-kim-cương)
-- [5. Logic Chuyển Đổi Dữ Liệu](#5-logic-chuyển-đổi-dữ-liệu)
-  - [5.1 – Tổng Quan Pipeline Chuyển Đổi](#51--tổng-quan-pipeline-chuyển-đổi)
-  - [5.2 – Các Bước Chuyển Đổi Cụ Thể](#52--các-bước-chuyển-đổi-cụ-thể)
-    - [5.2.1 – Giai đoạn Ingestion](#521--giai-đoạn-ingestion)
-    - [5.2.2 – Làm Sạch và Làm Giàu Dữ Liệu](#522--làm-sạch-và-làm-giàu-dữ-liệu)
-    - [5.2.3 – Chuẩn Hóa và Mapping Dữ Liệu](#523--chuẩn-hóa-và-mapping-dữ-liệu)
-    - [5.2.4 – Xây Dựng Các Bảng Fact](#524--xây-dựng-các-bảng-fact)
-    - [5.2.5 – Xây Dựng Các Bảng Dimension](#525--xây-dựng-các-bảng-dimension)
-  - [5.3 – Đảm Bảo Chất Lượng Dữ Liệu (DQA)](#53--đảm-bảo-chất-lượng-dữ-liệu-dqa)
-  - [5.4 – Công Cụ và Công Nghệ Đề Xuất](#54--công-cụ-và-công-nghệ-đề-xuất)
-  - [5.5 – Tổng Kết Giai Đoạn Chuyển Đổi](#55--tổng-kết-giai-đoạn-chuyển-đổi)
-- [6. Khung Phân Tích và KPIs](#6-khung-phân-tích-và-kpis)
-  - [6.1 – Mục Tiêu Phân Tích](#61--mục-tiêu-phân-tích)
-  - [6.2 – Phân Tích Phễu Onboarding](#62--phân-tích-phễu-onboarding)
-  - [6.3 – Chỉ Số KPI Cốt Lõi](#63--chỉ-số-kpi-cốt-lõi)
-  - [6.4 – Phân Tích Hành Vi Người Dùng](#64--phân-tích-hành-vi-người-dùng)
-  - [6.5 – Phân Tích Tuân Thủ & Rủi Ro](#65--phân-tích-tuân-thủ--rủi-ro)
-- [7. Chiến Lược Báo Cáo và Dashboard](#7-chiến-lược-báo-cáo-và-dashboard)
-  - [7.1 – Cấu Trúc Dashboard Theo Chủ Đề](#71--cấu-trúc-dashboard-theo-chủ-đề)
-  - [7.2 – Dashboard Theo Nhóm Người Dùng](#72--dashboard-theo-nhóm-người-dùng)
-  - [7.3 – Nguyên Tắc Thiết Kế Dashboard Hiệu Quả](#73--nguyên-tắc-thiết-kế-dashboard-hiệu-quả)
-- [8. Tác Động Kinh Doanh và Khuyến Nghị](#8-tác-động-kinh-doanh-và-khuyến-nghị)
-  - [8.1 – Khuyến Nghị Dựa Trên Phân Tích](#81--khuyến-nghị-dựa-trên-phân-tích)
-  - [8.2 – Tác Động Kinh Doanh Mong Đợi](#82--tác-động-kinh-doanh-mong-đợi)
-  - [8.3 – Kế Hoạch Đo Lường và Theo Dõi](#83--kế-hoạch-đo-lường-và-theo-dõi)
 
 ---
 
@@ -2007,7 +2019,6 @@ graph TD
 
 </details>
 
----
 </details>
 
 ---
