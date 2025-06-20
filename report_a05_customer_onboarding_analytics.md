@@ -1607,6 +1607,7 @@ graph TD
 
 ---
 
+---
 ## 7. Chiến Lược Báo Cáo và Dashboard
 ---
 <details>
@@ -1631,10 +1632,14 @@ graph TD
 
 ---
 
-### 🧭 Cấu Trúc Dashboard Đề Xuất
+#### 7.1 – Cấu Trúc Dashboard Đề Xuất Theo Chủ Đề (Theme-Oriented Dashboard Structure)
+---
+<details>
+<summary>Tổng quan về các dashboard chính dựa trên các lĩnh vực phân tích cốt lõi</summary>
 
-#### 📊 Dashboard 1: Onboarding Funnel Overview
+---
 
+##### 📊 Dashboard 1: Onboarding Funnel Overview
 - **Mục tiêu:** Theo dõi tỷ lệ hoàn thành onboarding và các điểm rớt chính.
 - **Thành phần:**
   - Funnel Chart: Từ `Started Registration` → `KYC Started` → `Liveness Check` → `Account Activated`.
@@ -1642,8 +1647,7 @@ graph TD
   - Segment by Channel / Device / Country
   - Trendline: Completion Rate theo ngày
 
-#### 📈 Dashboard 2: KYC Performance
-
+##### 📈 Dashboard 2: KYC Performance
 - **Mục tiêu:** Đo lường hiệu suất và chất lượng xử lý hồ sơ xác minh.
 - **Thành phần:**
   - KYC Approval Rate & Retry Rate (KPI cards)
@@ -1651,8 +1655,7 @@ graph TD
   - Document Rejection Reasons (pie chart)
   - KYC Attempts Distribution
 
-#### ⚠️ Dashboard 3: Risk & Compliance Monitoring
-
+##### ⚠️ Dashboard 3: Risk & Compliance Monitoring
 - **Mục tiêu:** Giám sát người dùng rủi ro, xử lý cảnh báo PEP/Sanction.
 - **Thành phần:**
   - Distribution of Risk Scores (histogram)
@@ -1660,8 +1663,7 @@ graph TD
   - Manual Review Volume by Category
   - Decision Breakdown (Approved, Rejected, Escalated)
 
-#### 🔄 Dashboard 4: Manual Review Operations
-
+##### 🔄 Dashboard 4: Manual Review Operations
 - **Mục tiêu:** Theo dõi hiệu suất đội vận hành xử lý thủ công.
 - **Thành phần:**
   - Avg. Manual Review Time
@@ -1669,8 +1671,7 @@ graph TD
   - Review Outcome by Agent
   - SLA Compliance Rate
 
-#### 📢 Dashboard 5: Channel Effectiveness
-
+##### 📢 Dashboard 5: Channel Effectiveness
 - **Mục tiêu:** Đánh giá hiệu quả các kênh marketing trong việc mang lại người dùng chất lượng.
 - **Thành phần:**
   - Completion Rate by Channel
@@ -1679,19 +1680,9 @@ graph TD
   - Conversion Funnel theo Channel
 
 ---
+</details>
 
-### 🧰 Công Cụ Triển Khai
-
-| Thành phần | Công cụ gợi ý | Lý do |
-|------------|----------------|-------|
-| BI Tool | Looker Studio | Dễ sử dụng, tích hợp gốc với BigQuery |
-| Alternative | Power BI, Tableau | Đáp ứng nhu cầu doanh nghiệp nâng cao |
-| Visualization Libraries | matplotlib, seaborn (Python) | Dùng trong phân tích chuyên sâu hoặc notebooks |
-| Drill-down logic | SQL (BigQuery), dbt models | Chuẩn bị data layer tối ưu cho dashboard |
-
----
-
-#### 7.1 – Phân Loại Dashboard Theo Đối Tượng Người Dùng (Stakeholder-Oriented Dashboards)
+#### 7.2 – Phân Loại Dashboard Theo Đối Tượng Người Dùng (Stakeholder-Oriented Dashboards)
 ---
 <details>
 <summary>Thiết kế dashboard phù hợp với từng nhóm người dùng trong tổ chức</summary>
@@ -1705,12 +1696,12 @@ graph TD
 ##### 🎯 1. Executive Dashboard – Dành cho C-Level
 
 - **Mục tiêu:** Cung cấp cái nhìn tổng quan về hiệu suất hệ thống onboarding & KYC/AML.
-- **Chỉ số chính:** 
+- **Chỉ số chính:**
   - Tổng số người dùng mới theo ngày/tuần/tháng
   - Conversion rate toàn phễu
   - KYC approval rate
   - Risky user % theo thời gian
-- **Đặc điểm:** 
+- **Đặc điểm:**
   - Hiển thị tối giản, ưu tiên các KPI chính dạng số
   - Có biểu đồ xu hướng (trend) theo thời gian
   - Thiết kế gọn, không cần drill-down quá chi tiết
@@ -1762,7 +1753,7 @@ graph TD
 
 ##### 📣 5. Marketing Dashboard
 
-- **Mục tiêu:** Theo dõi hiệu quả các chiến dịch thu hút người dùng mới.
+- **Mục tiêu:** Đánh giá hiệu quả các chiến dịch thu hút người dùng mới.
 - **Chỉ số chính:**
   - New user acquisition theo channel
   - Conversion rate theo campaign
@@ -1775,10 +1766,18 @@ graph TD
 
 </details>
 
+### 🧰 Công Cụ Triển Khai
 
+| Thành phần             | Công cụ gợi ý            | Lý do                                                                 |
+|------------------------|--------------------------|----------------------------------------------------------------------|
+| BI Tool                | Looker Studio            | Dễ sử dụng, tích hợp gốc với BigQuery                               |
+| Alternative            | Power BI, Tableau        | Đáp ứng nhu cầu doanh nghiệp nâng cao                               |
+| Visualization Libraries| matplotlib, seaborn      | Dùng trong phân tích chuyên sâu hoặc notebooks                      |
+| Drill-down logic       | SQL (BigQuery), dbt      | Chuẩn bị data layer tối ưu cho dashboard                            |
+
+---
 
 </details>
-
 
 ---
 
