@@ -83,13 +83,13 @@ Each prompt includes the original query, its purpose, and where it was applied i
 
 **Prompt:**  
 > Here's the initial version of my prompt log file:  
-> ```
+> 
 > ---
 > title: _prompt
 > ---
-> # Prompts used for Task A05 – Customer Onboarding Journey Analytics
+> Prompts used for Task A05 – Customer Onboarding Journey Analytics
 > ...
-> ```
+>
 > Can you restructure it to be more professional and aligned with the expected format?
 
 **Purpose:**  
@@ -394,7 +394,6 @@ Each prompt includes the original query, its purpose, and where it was applied i
 - Maintain consistency across documentation
 
 ---
-
 </details>
 
 ---
@@ -419,7 +418,7 @@ For each KPI, provide:
 - Calculation formula (or detailed logic).
 - Data source (e.g., fact_, dim_ tables).
 - Importance and business usage.
-Format: Present the content as bullet points or a table if appropriate, ensuring compliance with the discussed Markdown structure (within a <details> block, no numbered subheadings, use backticks for technical terms)."
+Format: Present the content as bullet points or a table if appropriate, ensuring compliance with the discussed Markdown structure (within a details block, no numbered subheadings, use backticks for technical terms)."
 
 **Purpose:**  
 - Build detailed, standardized core KPI content for Section 6.2, ensuring clarity and adherence to the style guide.
@@ -440,7 +439,7 @@ Format: Present the content as bullet points or a table if appropriate, ensuring
 
 Scope: Include all chapters from Executive Summary to Chapter 8: Business Impact and Recommendations, and all sub-sections (###, ####) within.
 Format:
-Use the structure ---, ## Table of Contents, ---, <details>, <summary>, ---, bullet point list, ---, </details> as agreed in ctx_doc_style.md.
+Use the structure ---, ## Table of Contents, ---, details, summary, ---, bullet point list, ---, /details as agreed in ctx_doc_style.md.
 Ensure all internal links (#anchor-id) are generated accurately, matching how Markdown renderers create IDs from headings.
 Important note: Assume that the original headings in the document have been edited to remove numbering (e.g., ## Problem Statement instead of ## 1. Problem Statement) to comply with the company's 'No numbered headings' rule."
 
@@ -464,7 +463,7 @@ Important note: Assume that the original headings in the document have been edit
 Purpose: Provide a concise, high-level summary of our entire onboarding/KYC/AML analytics project, including the core problem, proposed solutions (analytical framework, dashboard), and key expected business benefits.
 Scope: Summarize highlights from all 8 discussed chapters.
 Audience: Targeted at senior stakeholders (leadership, product/operations managers) who need to quickly grasp the strategic value of the project.
-Format: Ensure compliance with ctx_doc_style.md for the ## Executive Summary section, especially placing all content within a <details> block and using bullet points."
+Format: Ensure compliance with ctx_doc_style.md for the ## Executive Summary section, especially placing all content within a details block and using bullet points."
 
 **Purpose:**  
 - Create a standardized, concise executive summary in line with the style guide.
