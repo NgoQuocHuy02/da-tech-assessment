@@ -105,8 +105,8 @@ title: report_a05_customer_onboarding_analytics
     - [5.4 – Công Cụ và Công Nghệ Đề Xuất (Recommended Tools & Technologies)](#54--công-cụ-và-công-nghệ-đề-xuất-recommended-tools--technologies)
     - [5.5 – Tổng Kết Giai Đoạn Chuyển Đổi Dữ Liệu (Summary of Transformation Logic)](#55--tổng-kết-giai-đoạn-chuyển-đổi-dữ-liệu-summary-of-transformation-logic)
 - [6. Khung Phân Tích và Các KPIs](#6-khung-phân-tích-và-các-kpis)
-    - [6.1 – Mục Tiêu Phân Tích (Analytics Objectives)](#61--mục-tiêu-phân-tích-analytics-objectives)
-    - [6.2 – Phân Tích Phễu Onboarding (Funnel Analysis)](#62--phân-tích-phễu-onboarding-funnel-analysis)
+    - [6.1 – Thiết Kế Cấu Trúc Phễu Onboarding (Funnel Modeling)](#61--thiết-kế-cấu-trúc-phễu-onboarding-funnel-modeling)
+    - [6.2 – Phân Tích Thực Tế Dữ Liệu Funnel (Funnel Metrics Analysis)](#62--phân-tích-thực-tế-dữ-liệu-funnel-funnel-metrics-analysis)
     - [6.3 – Chỉ Số KPI Cốt Lõi (Key Performance Indicators)](#63--chỉ-số-kpi-cốt-lõi-key-performance-indicators)
     - [6.4 – Phân Tích Hành Vi Người Dùng (User Behavior Analytics)](#64--phân-tích-hành-vi-người-dùng-user-behavior-analytics)
     - [6.5 – Phân Tích Tuân Thủ & Rủi Ro (Compliance & Risk Insights)](#65--phân-tích-tuân-thủ--rủi-ro-compliance--risk-insights)
@@ -1288,7 +1288,7 @@ flowchart TD
 <details>
 <summary>Định Nghĩa Các Chỉ Số Hiệu Suất Chính và Các Phương Pháp Phân Tích</summary>
 
-#### 6.1 – Phân Tích Phễu Onboarding (Onboarding Funnel Analysis)
+#### 6.1 – Thiết kế Cấu Trúc Phễu Onboarding (Funnel Modeling)
 ---
 <details>
 <summary>Thiết kế phễu hành trình khách hàng và các điểm rơi quan trọng</summary>
@@ -1327,7 +1327,7 @@ flowchart TD
 </details>
 
 ---
-#### 6.2 – Phân Tích Phễu Onboarding (Funnel Analysis)
+#### 6.2 – Phân Tích Thực Tế Dữ Liệu Funnel (Funnel Metrics Analysis)
 ---
 <details>
 <summary>Phân tích hành trình người dùng qua các bước chính trong quá trình onboarding</summary>
