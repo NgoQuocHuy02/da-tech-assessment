@@ -599,6 +599,130 @@ Output: Provide the fully translated English document as ready-to-use Markdown."
 
 ---
 
+## Day 5 – Task B Selection and Vector Database Tutorial Development
+
+---
+
+### Prompt 1 – Evaluate Additional Task B Options for A05 Enhancement
+<details>
+<summary>Assess which Task B would best complement the completed A05 Customer Onboarding Analytics</summary>
+
+---
+
+**Prompt:**  
+"I have successfully completed Task A05 - Customer Onboarding Journey Analysis (KYC/AML) and still have remaining time within the 5-day deadline. The test document contains List B - Optional Advanced Tasks for bonus points, focusing on creating comprehensive tutorials related to cryptocurrency and analytics topics.
+
+Given that my A05 report covers customer onboarding analytics, KYC/AML processes, data pipeline design, and dashboard strategies, which Task B would be most suitable to enhance and complement my existing work? I'm looking for a task that demonstrates technical depth while maintaining logical continuity with my A05 framework."
+
+**Purpose:**  
+- Identify the most complementary Task B option that builds upon A05's analytical foundation
+- Ensure technical depth and professional value addition
+- Maintain logical continuity between tasks
+
+**Decision:**  
+- Selected B01 - Vector Database Tutorial due to its direct application in KYC/AML face matching and fraud detection
+- Provides technical enhancement to A05's analytics framework
+- Demonstrates advanced data technology knowledge
+
+---
+</details>
+
+---
+
+### Prompt 2 – Create Comprehensive Vector Database Tutorial with A05 Integration
+<details>
+<summary>Develop a comprehensive Vector Database tutorial specifically tailored for KYC/AML applications</summary>
+
+---
+
+**Prompt:**  
+"Please create a comprehensive Vector Database Tutorial (B01) that integrates seamlessly with my completed A05 Customer Onboarding Analytics framework. 
+
+Requirements:
+- Focus on practical applications in KYC/AML processes (face matching, document similarity, behavioral analysis)
+- Include technical implementation examples with Python code
+- Demonstrate how vector databases enhance the analytics framework from A05
+- Provide performance benchmarks and business impact metrics
+- Include security and compliance considerations for financial services
+- Structure the content professionally with clear sections and code examples
+
+The tutorial should show how vector database technology can improve the accuracy, speed, and efficiency of the onboarding processes analyzed in A05."
+
+**Purpose:**  
+- Create a technically advanced tutorial that enhances the A05 analytics framework
+- Demonstrate practical application of vector database technology in financial services
+- Provide implementation guidance with code examples and performance metrics
+
+**Used in:**  
+- Complete B01 Vector Database Tutorial document
+- Integration examples with A05 analytics framework
+- Performance enhancement recommendations
+
+---
+</details>
+
+---
+
+### Prompt 3 – Standardize File Naming Convention for Professional Consistency
+<details>
+<summary>Establish consistent file naming convention across all deliverables</summary>
+
+---
+
+**Prompt:**  
+"I notice that my files have inconsistent naming patterns. I have 'report_a05_customer_onboarding_analytics.md' for A05, but 'B01_Vector_Database_Tutorial_KYC_AML.md' for B01. 
+
+Please help me establish a consistent naming convention that follows professional standards. I prefer the format used in A05 (lowercase with underscores) for consistency across all deliverables. Should I rename the B01 file to match this pattern?"
+
+**Purpose:**  
+- Establish professional and consistent file naming across all project deliverables
+- Ensure easy identification and organization of project files
+- Maintain professional presentation standards
+
+**Result:**  
+- Standardized naming convention: `report_[task]_[description].md`
+- Renamed B01 file to `report_b01_vector_database_tutorial_kyc_aml.md`
+- Created Vietnamese version: `report_b01_vector_database_tutorial_kyc_aml_vietnamese.md`
+
+---
+</details>
+
+---
+
+### Prompt 4 – Create Vietnamese Translation of Vector Database Tutorial
+<details>
+<summary>Develop Vietnamese version of the Vector Database tutorial for local context</summary>
+
+---
+
+**Prompt:**  
+"Please create a Vietnamese version of the B01 Vector Database Tutorial that I just completed in English. 
+
+Requirements:
+- Translate all technical content while maintaining accuracy
+- Adapt code examples and variable names to Vietnamese context where appropriate
+- Preserve the professional structure and formatting
+- Ensure technical terminology is correctly translated
+- Maintain the integration with A05 framework
+- Use the same file naming convention with '_vietnamese' suffix
+
+The Vietnamese version should be equally comprehensive and professional as the English version."
+
+**Purpose:**  
+- Provide bilingual documentation for broader accessibility
+- Demonstrate language proficiency and localization skills
+- Maintain professional quality across both language versions
+
+**Used in:**  
+- Complete Vietnamese version of B01 tutorial
+- Localized code examples and terminology
+- Consistent professional formatting
+
+---
+</details>
+
+---
+
 ## Notes
 
 - GenAI tool used: ChatGPT (GPT-4o), Gemini (Flash 2.5), Cursor
