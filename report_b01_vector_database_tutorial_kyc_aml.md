@@ -93,9 +93,9 @@ Different similarity metrics for vector comparison:
 
 | Metric | Formula | Use Case |
 |--------|---------|----------|
-| **Cosine Similarity** | `cos(θ) = A·B / (||A|| × ||B||)` | Face matching, document similarity |
-| **Euclidean Distance** | `√Σ(Ai - Bi)²` | General similarity search |
-| **Manhattan Distance** | `Σ|Ai - Bi|` | Fast approximate search |
+| **Cosine Similarity** | `cos(θ) = (A·B) / (\|\|A\|\| × \|\|B\|\|)` | Face matching, document similarity |
+| **Euclidean Distance** | `√(Σ(Ai - Bi)²) ` | General similarity search |
+| **Manhattan Distance** | `Σ\|Ai - Bi\|` | Fast approximate search |
 | **Dot Product** | `A·B` | Simple similarity scoring |
 
 ### 2.3 Vector Database Architecture
@@ -244,14 +244,22 @@ ADD COLUMN face_embedding_vector ARRAY<FLOAT64>,
 ADD COLUMN document_embedding_vector ARRAY<FLOAT64>,
 ADD COLUMN behavioral_embedding_vector ARRAY<FLOAT64>;
 
--- Vector similarity search function
-CREATE OR REPLACE FUNCTION vector_similarity(
+-- Vector similarity search function (conceptual)
+CREATE OR REPLACE FUNCTION cosine_similarity(
     vector1 ARRAY<FLOAT64>, 
     vector2 ARRAY<FLOAT64>
 ) RETURNS FLOAT64 AS (
-    -- Cosine similarity implementation
-    ARRAY_LENGTH(vector1) * ARRAY_LENGTH(vector2) / 
-    SQRT(ARRAY_LENGTH(vector1) * ARRAY_LENGTH(vector2))
+    -- The actual implementation would depend on the database's vector capabilities
+    -- For example: VECTOR_COSINE_SIMILARITY(vector1, vector2)
+    -- This is a conceptual representation
+    (SELECT a.dot / (a.norm_a * a.norm_b) 
+     FROM (SELECT 
+              SUM(v1 * v2) AS dot, 
+              SQRT(SUM(v1 * v1)) AS norm_a, 
+              SQRT(SUM(v2 * v2)) AS norm_b 
+           FROM UNNEST(vector1) WITH OFFSET i 
+           JOIN UNNEST(vector2) WITH OFFSET j ON i = j
+    ) a)
 );
 ```
 
@@ -262,6 +270,7 @@ CREATE OR REPLACE FUNCTION vector_similarity(
 import pinecone
 from typing import List, Dict
 import numpy as np
+from datetime import datetime
 
 class KYCVectorDatabase:
     def __init__(self, api_key: str, environment: str):
@@ -477,6 +486,7 @@ class VectorQueryCache:
 ```python
 # Encrypt vectors before storage
 from cryptography.fernet import Fernet
+from datetime import datetime
 
 class SecureVectorStorage:
     def __init__(self, encryption_key: bytes):
